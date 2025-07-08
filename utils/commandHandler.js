@@ -100,7 +100,12 @@ async function handleMessage(client, message) {
     }
 }
 
+function getLoadedCommandsCount() {
+    return new Set(commands.values()).size;
+}
+
 module.exports = {
     handleMessage,
-    commands // Expose commands map if needed elsewhere
+    commands, // Expose commands map if needed elsewhere
+    getLoadedCommandsCount
 };

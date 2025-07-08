@@ -82,48 +82,13 @@ client.on('ready', async () => {
             const mockMessageForMenu = { reply: (text) => { menuTextForWelcome = text; } };
             // Check if commands are loaded before calling this, or handle it inside getFullMenuText
             // For now, we assume commandHandler has loaded commands when 'ready' event fires.
-            // Ensure commandHandler has loaded commands. This should be true by the 'ready' event.
-            const helpCommandModule = require('./commands/help.js');
-
-            if (helpCommandModule && typeof helpCommandModule.__getFullMenuText === 'function') {
-                 menuTextForWelcome = helpCommandModule.__getFullMenuText(config.getBotVersion()); // Pass bot version
-            } else {
-                // Fallback if the function isn't available for some reason
-                console.warn("Welcome message: __getFullMenuText not found, using fallback menu.");
-                 const commandsMap = require('./utils/commandHandler').commands;
-                 menuTextForWelcome = `❀┏━【 💎 WHIZ‑MD BOT MENU ━┓
-❀ Owner     : ${config.ownerName}
-❀ Mode      : Public
-❀ Prefix    : ${config.prefix}
-❀ Commands  : ${commandsMap.size} (Loaded) / 119 (Planned)
-❀ Version   : 1.0.0
-❀ Repo      : github.com/whizmburu/WHIZ‑MD
-❀━━━━━━━━━━━━━━━┛
-... (rest of menu - use the full version from menu.js or help.js)`;
-            }
-
-
+            // DRASTIC SIMPLIFICATION FOR DEBUGGING:
             const selfChatId = client.info.wid._serialized;
-            const firstMessage = await client.sendMessage(selfChatId, welcomeMessage1);
-
-            // Safely try to quote the first message. If it fails or no message, send without quoting.
-            let messagesInChat;
-            try {
-                messagesInChat = await client.getChatById(selfChatId).then(chat => chat.fetchMessages({ limit: 1 }));
-            } catch (fetchError) {
-                console.warn("Could not fetch messages from self chat to quote:", fetchError.message);
-            }
-
-            if (messagesInChat && messagesInChat.length > 0 && messagesInChat[0] && messagesInChat[0].id) {
-                await client.sendMessage(selfChatId, menuTextForWelcome, { quotedMessageId: messagesInChat[0].id._serialized });
-            } else {
-                console.log("No prior message in self-chat to quote, or message ID is missing. Sending help menu as a new message.");
-                await client.sendMessage(selfChatId, menuTextForWelcome);
-            }
-            console.log("Welcome messages sent to self chat.");
+            await client.sendMessage(selfChatId, "Bot connected test!"); // Ultra simple message
+            console.log("Simplified 'Bot connected test!' message sent to self chat.");
 
         } catch (error) {
-            console.error("Error sending welcome message:", error);
+            console.error("Error sending simplified welcome message:", error); // Adjusted error message
     }
 });
 
@@ -146,13 +111,10 @@ client.on('message', async msg => {
 client.on('message', async (msg) => { // Renamed 'message' to 'msg' for clarity within this specific handler
     console.log(`[BOT.JS] Received message event. From: ${msg.from}, Author: ${msg.author || 'N/A'}, Type: ${msg.type}, Body: "${msg.body}"`);
 
-    // Handle status updates (auto-view/react)
+    // TEMPORARILY COMMENT OUT ALL STATUS PROCESSING FOR DEBUGGING COMMANDS
+    /*
     if (msg.from === 'status@broadcast') {
         console.log(`[BOT.JS] Processing status update from author: ${msg.author}, Type: ${msg.type}`); // Reduced verbosity
-
-        // Optional: If you want to completely stop further processing for status@broadcast messages here:
-        // console.log("[BOT.JS] Status message detected. No further command processing will occur for this message.");
-        // return; // This would prevent command handler from seeing it if it somehow matched prefix.
 
         const autoviewCmd = require('./commands/status_extras/autoview.js');
         const autoreactCmd = require('./commands/status_extras/autoreact.js');
@@ -160,8 +122,6 @@ client.on('message', async (msg) => { // Renamed 'message' to 'msg' for clarity 
         if (autoviewCmd && typeof autoviewCmd.isAutoViewEnabled === 'function' && autoviewCmd.isAutoViewEnabled()) {
             if (msg.author && client.info.wid._serialized !== msg.author) {
                 console.log(`[AutoView] Processing status from ${msg.author}. (Conceptual view - actual seen depends on library internals)`);
-                // Actual "sendSeen" for statuses is complex and often not directly possible via a simple message object.
-                // The library might handle this implicitly or require specific methods not used here.
             }
         }
 
@@ -179,11 +139,9 @@ client.on('message', async (msg) => { // Renamed 'message' to 'msg' for clarity 
                 }
             }
         }
-        // After handling status-specific actions, decide if it should proceed to command handler.
-        // Generally, status messages don't trigger text commands.
-        // If you want to ensure status messages are *never* processed as commands:
-        return; // Stop further processing for status@broadcast messages.
+        return;
     }
+    */
 
     // Regular command handling for non-status messages
     if (msg.body && typeof msg.body === 'string' && msg.body.startsWith(config.prefix)) {

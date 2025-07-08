@@ -9,10 +9,9 @@ function getFullMenuTextInternal(botVersion) { // Accepts botVersion as a parame
     // Removed direct require of commandHandler to avoid circular dependency issues here.
     // Command count will be fetched when commandHandler is stable or passed in.
     // For now, using a placeholder for uniqueCommandsCount.
-
     const commandHandler = require('../utils/commandHandler');
-    const uniqueCommands = new Set(commandHandler.commands.values());
-    const uniqueCommandsCount = uniqueCommands.size || "N/A";
+    // const uniqueCommands = new Set(commandHandler.commands.values()); // Accessing .commands directly might be the issue
+    const uniqueCommandsCount = commandHandler.getLoadedCommandsCount ? commandHandler.getLoadedCommandsCount() : "N/A";
 
 
     // Define categories and their commands as per the new format
