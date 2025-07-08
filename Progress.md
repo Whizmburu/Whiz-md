@@ -80,8 +80,32 @@
     - [X] Placeholder implemented.
     - *Note: Likely requires specific API or library for Joox.*
 
+... (Previous content of Phase 1 and 2 remains the same) ...
+
+## Phase 3: TEXT IMAGE STYLES
+- [X] **Research and API Endpoint Identification:**
+    - Investigated TextPro.me and Ephoto360. Confirmed multi-step scraping process (GET page, parse tokens/POST URL, POST data, parse response for image URL).
+    - Added `cheerio` dependency for HTML parsing.
+    - Identified example effect page URLs for various styles.
+- [X] **Add Theming for Text Style Commands:**
+    - Added generic feedback messages (`textEffectCommand.*`) and a list format (`textStylesList`) to `Themes/WHIZ.json`.
+- [X] **Implement Helper Function for Text Effect Generation (`generateTextEffect`):**
+    - Handles the multi-step scraping and image generation process for TextPro.me-like sites.
+- [X] **Implement Core Text Style Commands:**
+    - `.fire` (TextPro.me)
+    - `.neon` (TextPro.me)
+    - `.glitch` (TextPro.me, supports dual text input with '|')
+- [X] **Implement Remaining Text Style Commands:**
+    - `.steel` (TextPro.me)
+    - `.wood` (TextPro.me)
+    - `.ice` (TextPro.me)
+    - `.gradient` (TextPro.me)
+    - `.splash` (Ephoto360 - *Note: May require `generateTextEffect` adjustments if Ephoto360 structure is too different; initial implementation assumes compatibility.*)
+    - `.comic` (Ephoto360 - *Note: Same as for `.splash`.*)
+- [X] **Implement `.textstyles` Command:**
+    - Lists all available implemented text style commands.
+
 ## Future Phases (To be detailed)
-- Text Image Styles
 - Image Tools
 - Utilities & Lookup
 - Fun & Text Games

@@ -76,7 +76,15 @@
       "spotify": "🎧 The `.spotify` command is under development. For now, you can search on Spotify directly: https://open.spotify.com/search/{query}",
       "soundcloud": "☁️ The `.soundcloud` command is under development. For now, you can search on Soundcloud directly: https://soundcloud.com/search?q={query}",
       "joox": "🎤 The `.joox` command is under development. For now, you can search on Joox directly."
-    }
+    },
+    "textEffectCommand": {
+      "noText": "⚠️ Please provide the text you want to stylize. Example: `{prefix}{commandName} Your Text Here`",
+      "generating": "🎨 Generating your \"{styleName}\" text image for \"{text}\"... Please wait.",
+      "apiError": "❌ Oops! Something went wrong while generating the text image. The API might be temporarily down or the effect unavailable.",
+      "downloadImageError": "❌ Failed to download the generated text image.",
+      "sendError": "❌ Failed to send the text image."
+    },
+    "textStylesList": "✨ Available Text Styles ✨\n\n{stylesList}\n\nUse `{prefix}[style_name] [your text]` to generate an image."
   },
   "menu": {
     "title": "*❀━【 💎* _*{botName} MENU*━━━ *╮*",

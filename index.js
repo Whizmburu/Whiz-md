@@ -205,6 +205,99 @@ function sanitizeFilename(filename) {
     return filename.replace(/[<>:"/\\|?*]+/g, '_').substring(0, 100); // Replace invalid chars and limit length
 }
 
+// Helper function for Text Effect Generation (primarily for TextPro.me style sites)
+async function generateTextEffect(effectPageUrl, textInputs = [], effectName = "effect") {
+    if (!textInputs || textInputs.length === 0) {
+        throw new Error("No text provided for the effect.");
+    }
+
+    try {
+        // Step 1: GET the effect page to get cookies and form details/token
+        const initialPageResponse = await axios.get(effectPageUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0' } // Common user agent
+        });
+        const cookies = initialPageResponse.headers['set-cookie'] ? initialPageResponse.headers['set-cookie'].join('; ') : '';
+        const $ = cheerio.load(initialPageResponse.data);
+
+        // Step 2: Scrape form action URL and necessary tokens/parameters
+        // These selectors are common for TextPro.me but might need adjustment
+        const formActionUrl = $('#effect-form, #form_value_maker, form[action*="effect/create-image"]').attr('action');
+        const token = $('input[name="token"]').val();
+        const buildServer = $('input[name="build_server"]').val();
+        const buildServerId = $('input[name="build_server_id"]').val();
+
+        if (!formActionUrl) {
+            console.error(`Could not find form action URL on ${effectPageUrl}`);
+            throw new Error(`Failed to find form action for ${effectName}.`);
+        }
+
+        const postUrl = new URL(formActionUrl, effectPageUrl).toString(); // Ensure it's an absolute URL
+
+        // Step 3: Prepare form data for POST request
+        const formData = new URLSearchParams();
+        textInputs.forEach(text => formData.append('text[]', text));
+        if (token) formData.append('token', token);
+        if (buildServer) formData.append('build_server', buildServer);
+        if (buildServerId) formData.append('build_server_id', buildServerId);
+        formData.append('submit', 'Go'); // Or 'Create', depends on the site
+
+        // Step 4: Make POST request to generate the image
+        const postResponse = await axios.post(postUrl, formData, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Mozilla/5.0',
+                'Cookie': cookies,
+                'Referer': effectPageUrl
+            }
+        });
+
+        // Step 5: Parse POST response to find the final image URL
+        // TextPro.me often returns JSON with image URL or HTML containing it
+        let finalImageUrl;
+        if (typeof postResponse.data === 'object' && postResponse.data.image_url) { // JSON response
+            finalImageUrl = postResponse.data.image_url;
+        } else if (typeof postResponse.data === 'string') { // HTML response
+            const $$ = cheerio.load(postResponse.data);
+            finalImageUrl = $$('#image-container img, .image-container img, #result-image, .result-image img').attr('src');
+            if (!finalImageUrl) { // Try another common pattern if first fails
+                 finalImageUrl = $$('img[id*="image"], img[class*="result"]').attr('src');
+            }
+             if (!finalImageUrl && postResponse.data.includes("image_url")) { // Check if URL is in a script tag as string
+                const match = postResponse.data.match(/"image_url"\s*:\s*"([^"]+)"/);
+                if (match && match[1]) finalImageUrl = match[1];
+            }
+        }
+
+        if (!finalImageUrl) {
+            console.error('Could not find final image URL in POST response from:', postUrl, 'Response Data:', postResponse.data);
+            throw new Error(`Failed to extract final image URL for ${effectName}.`);
+        }
+
+        // Ensure finalImageUrl is absolute
+        finalImageUrl = new URL(finalImageUrl, effectPageUrl).toString();
+
+
+        // Step 6: Download the final image
+        const imageResponse = await axios.get(finalImageUrl, {
+            responseType: 'arraybuffer',
+            headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': postUrl }
+        });
+
+        // Step 7: Create MessageMedia
+        const imageBuffer = Buffer.from(imageResponse.data, 'binary');
+        const mimeType = imageResponse.headers['content-type'] || 'image/jpeg'; // Default to jpeg if not specified
+        return new MessageMedia(mimeType, imageBuffer.toString('base64'), `${effectName.replace(/\s+/g, '_')}.jpg`);
+
+    } catch (error) {
+        console.error(`Error in generateTextEffect for ${effectName} (${effectPageUrl}):`, error.message);
+        if (error.response) {
+            // console.error("Error response data:", error.response.data);
+            // console.error("Error response status:", error.response.status);
+        }
+        throw new Error(`Failed to generate ${effectName} image. ${error.message}`);
+    }
+}
+
 
 client.on('ready', async () => {
     console.log('WHIZ-MD: Client is ready!');
@@ -271,6 +364,28 @@ client.on('message', async (msg) => {
         } catch (error) {
             console.error(`Error processing ping command for ${msg.from}:`, error);
             await chat.clearState(); // Ensure state is cleared even on error
+        }
+        return;
+    }
+
+    if (commandName === 'textstyles') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            const availableStyles = Object.keys(textEffectCommands);
+            const stylesListString = availableStyles.map(style => `➢ \`.${style}\``).join('\n');
+
+            let listMessage = theme.messages.textStylesList || "✨ Available Text Styles ✨\n\n{stylesList}\n\nUse `{prefix}[style_name] [your text]` to generate an image.";
+            listMessage = listMessage
+                .replace('{stylesList}', stylesListString)
+                .replace(/{prefix}/g, botPrefix);
+
+            await msg.reply(listMessage);
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing .textstyles command:`, error);
+            await msg.reply("❌ Oops! Something went wrong while fetching the list of text styles.");
+            await chat.clearState();
         }
         return;
     }
@@ -397,6 +512,69 @@ client.on('message', async (msg) => {
         }
         return;
     }
+
+    // --- Text Effect Commands ---
+    const textEffectCommands = {
+        'fire': 'https://textpro.me/create-a-flaming-text-effect-online-1039.html',
+        'neon': 'https://textpro.me/create-a-glowing-neon-text-effect-online-1061.html',
+        'glitch': 'https://textpro.me/create-a-glitch-text-effect-online-free-1026.html', // Takes 2 texts
+        'steel': 'https://textpro.me/steel-text-effect-online-921.html',
+        'wood': 'https://textpro.me/create-3d-wood-text-effect-online-1054.html',
+        'ice': 'https://textpro.me/create-realistic-3d-text-effect-frozen-ice-1094.html',
+        'gradient': 'https://textpro.me/create-a-gradient-text-effect-online-1092.html',
+        // Ephoto360 URLs - may require adjustments to generateTextEffect or a new helper if structure is too different
+        'splash': 'https://en.ephoto360.com/create-water-splash-text-effect-online-294.html',
+        'comic': 'https://en.ephoto360.com/comic-style-text-effect-596.html',
+    };
+
+    if (textEffectCommands[commandName]) {
+        const chat = await msg.getChat();
+        const text = args.join(' ');
+        const effectStyleName = commandName.charAt(0).toUpperCase() + commandName.slice(1); // e.g., "Fire"
+
+        if (!text) {
+            let रिप्लाईMsg = theme.messages.textEffectCommand.noText || "⚠️ Please provide text.";
+            await msg.reply(रिप्लाईMsg.replace('{prefix}', botPrefix).replace('{commandName}', commandName));
+            return;
+        }
+
+        try {
+            await chat.sendStateTyping();
+            let जेनरेटिंगMsg = theme.messages.textEffectCommand.generating || "🎨 Generating...";
+            await msg.reply(जेनरेटिंगMsg.replace('{styleName}', effectStyleName).replace('{text}', text.substring(0, 30))); // Show first 30 chars
+
+            let effectPageUrl = textEffectCommands[commandName];
+            let textInputs = [text];
+
+            // Special handling for effects known to take multiple inputs
+            if (commandName === 'glitch') {
+                effectPageUrl = 'https://textpro.me/create-a-glitch-text-effect-online-free-1026.html'; // Ensure correct URL if map is simplified
+                if (text.includes('|')) {
+                    const parts = text.split('|');
+                    textInputs = [parts[0].trim(), parts[1] ? parts[1].trim() : parts[0].trim()];
+                } else {
+                    textInputs = [text, text];
+                }
+            }
+            // Add other multi-input effects here if any, e.g.
+            // if (commandName === 'someOtherEffectWithTwoTexts') {
+            //     if (text.includes('|')) { ... } else { textInputs = [text, text]; }
+            // }
+
+            const media = await generateTextEffect(effectPageUrl, textInputs, effectStyleName);
+            // Sanitize the caption text to prevent WhatsApp formatting issues if it contains special characters like * _ ~ `
+            const safeCaptionText = text.replace(/[*_~`]/g, '');
+            await client.sendMessage(msg.from, media, { caption: `${effectStyleName} text: ${safeCaptionText.substring(0,50)}` });
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .${commandName} command for "${text}":`, error);
+            await msg.reply(theme.messages.textEffectCommand.apiError || "❌ Error generating image.");
+            await chat.clearState();
+        }
+        return;
+    }
+
 
     if (commandName === 'ytmp4') {
         const chat = await msg.getChat();
