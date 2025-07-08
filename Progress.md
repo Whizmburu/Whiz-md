@@ -105,8 +105,37 @@
 - [X] **Implement `.textstyles` Command:**
     - Lists all available implemented text style commands.
 
+... (Previous content of Phase 1, 2, 3 remains the same) ...
+
+## Phase 4: IMAGE TOOLS
+- [X] **Dependency Installation & Setup:**
+    - [X] Added `jimp` to `package.json`.
+    - [X] Added `REMOVEBG_API_KEY` placeholder to `.env.example`.
+- [X] **Add Theming for Image Tool Commands:**
+    - Added feedback messages for sticker, toimg, removebg, image filters, and wanted commands to `Themes/WHIZ.json`.
+- [X] **Implement `.sticker` Command:**
+    - Creates stickers from images/GIFs using `whatsapp-web.js` native capabilities.
+- [X] **Implement `.toimg` Command:**
+    - Converts stickers back to images (sends WebP data as an image).
+- [X] **Implement `.removebg` Command:**
+    - Removes image background using `api.remove.bg` (requires API key).
+    - Added `form-data` dependency.
+- [X] **Implement Basic Image Filters with `jimp`:**
+    - `.blur [amount]`
+    - `.invert`
+    - `.sepia`
+    - `.circle` (circular crop)
+- [X] **Implement `.wanted` Command with `jimp`:**
+    - Composites user's image onto a 'wanted_template.png'.
+    - *Note: User must provide the template and adjust coordinates in code.*
+- [ ] **Implement `.triggered` Command:**
+    - [X] Placeholder implemented.
+    - *Note: Complex GIF creation (shake effect, overlaid text). Might require dedicated GIF library or advanced `ffmpeg`/`jimp` usage.*
+- [ ] **Implement `.glitchimg` Command:**
+    - [X] Placeholder implemented.
+    - *Note: Advanced glitch art effects are complex. Basic pixel manipulation possible with `jimp` but might not meet expectations for varied 'artistic' glitches.*
+
 ## Future Phases (To be detailed)
-- Image Tools
 - Utilities & Lookup
 - Fun & Text Games
 - Interactive Games

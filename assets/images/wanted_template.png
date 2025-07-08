@@ -1,0 +1,9 @@
+This is a placeholder. A real wanted poster template image (e.g., PNG or JPG)
+should be placed here by the user.
+
+It should have a designated area where the user's image will be composited.
+For example, a 600x800 template might have a blank space for a 400x400 picture
+at coordinates (100, 150). These coordinates and dimensions would be used in the code.
+
+A simple template could have a parchment background, "WANTED" text at the top,
+"DEAD OR ALIVE" at the bottom, and a frame in the middle.

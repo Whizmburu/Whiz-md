@@ -84,7 +84,40 @@
       "downloadImageError": "❌ Failed to download the generated text image.",
       "sendError": "❌ Failed to send the text image."
     },
-    "textStylesList": "✨ Available Text Styles ✨\n\n{stylesList}\n\nUse `{prefix}[style_name] [your text]` to generate an image."
+    "textStylesList": "✨ Available Text Styles ✨\n\n{stylesList}\n\nUse `{prefix}[style_name] [your text]` to generate an image.",
+    "stickerCommand": {
+        "noMedia": "⚠️ Please reply to an image/GIF or send one with the command to create a sticker.",
+        "creating": "✨ Creating your sticker... Please wait.",
+        "error": "❌ Oops! Something went wrong while creating the sticker.",
+        "success": "✅ Sticker created!"
+    },
+    "toImgCommand": {
+        "noSticker": "⚠️ Please reply to a sticker message to convert it to an image.",
+        "converting": "🖼️ Converting sticker to image...",
+        "error": "❌ Failed to convert sticker to image."
+    },
+    "removeBgCommand": {
+        "noImage": "⚠️ Please reply to an image or send one with the command to remove its background.",
+        "noApiKey": "🔑 API key for background removal service is not set. Please contact the bot owner.",
+        "processing": "⏳ Removing background... This might take a moment.",
+        "apiError": "❌ Failed to remove background due to an API error. Please try again later.",
+        "downloadError": "❌ Failed to download the processed image.",
+        "error": "❌ Oops! Something went wrong during background removal."
+    },
+    "imageFilterCommand": {
+        "noImage": "⚠️ Please reply to an image or send one with the command to apply a filter.",
+        "applying": "🎨 Applying {filterName} filter...",
+        "error": "❌ Oops! Something went wrong while applying the {filterName} filter."
+    },
+    "wantedCommand": {
+        "noImage": "⚠️ Please reply to an image or send one with the command to create a wanted poster.",
+        "creating": "📜 Creating your wanted poster...",
+        "error": "❌ Oops! Something went wrong while creating the wanted poster."
+    },
+    "placeholderImageCommand": {
+        "triggered": "💥 The `.triggered` GIF generator is under development.",
+        "glitchimg": "👾 The `.glitchimg` effect generator is under development."
+    }
   },
   "menu": {
     "title": "*❀━【 💎* _*{botName} MENU*━━━ *╮*",

@@ -10,6 +10,7 @@ const YouTube = require('youtube-sr').default; // .default is important for yout
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path'); // For handling file paths
 const os = require('os'); // For temporary directory
+const FormData = require('form-data'); // For removebg
 
 // Load theme/config
 let theme = {};
@@ -367,6 +368,318 @@ client.on('message', async (msg) => {
         }
         return;
     }
+
+    // --- Placeholder for Advanced Image Effects ---
+    if (['triggered', 'glitchimg'].includes(commandName)) {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            let replyMsg;
+            if (commandName === 'triggered') {
+                replyMsg = theme.messages.placeholderImageCommand.triggered;
+            } else if (commandName === 'glitchimg') {
+                replyMsg = theme.messages.placeholderImageCommand.glitchimg;
+            }
+            await msg.reply(replyMsg || `.${commandName} is under development.`);
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing placeholder command ${commandName}:`, error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'wanted') {
+        const chat = await msg.getChat();
+        const templatePath = './assets/images/wanted_template.png'; // Ensure this path is correct
+
+        try {
+            await chat.sendStateTyping();
+            let userImageMedia;
+
+            if (msg.hasQuotedMsg) {
+                const quotedMsg = await msg.getQuotedMessage();
+                if (quotedMsg.hasMedia && quotedMsg.type === 'image') {
+                    userImageMedia = await quotedMsg.downloadMedia();
+                }
+            } else if (msg.hasMedia && msg.type === 'image') {
+                userImageMedia = await msg.downloadMedia();
+            }
+
+            if (!userImageMedia) {
+                await msg.reply(theme.messages.wantedCommand.noImage);
+                await chat.clearState();
+                return;
+            }
+
+            if (!fs.existsSync(templatePath)) {
+                console.error("Wanted template not found at:", templatePath);
+                await msg.reply("📜 Wanted poster template is missing. Please contact the bot owner.");
+                await chat.clearState();
+                return;
+            }
+
+            await msg.reply(theme.messages.wantedCommand.creating);
+
+            const userImageBuffer = Buffer.from(userImageMedia.data, 'base64');
+            const userImage = await Jimp.read(userImageBuffer);
+            const template = await Jimp.read(templatePath);
+
+            // Define coordinates and size for placing the user's image on the template
+            // These values are examples and need to be adjusted based on the actual template image
+            const targetX = 100; // Example: X-coordinate on template
+            const targetY = 150; // Example: Y-coordinate on template
+            const targetWidth = 300;  // Example: Width for user image on template
+            const targetHeight = 300; // Example: Height for user image on template
+
+            userImage.cover(targetWidth, targetHeight); // Resize and crop to fit target area
+            template.composite(userImage, targetX, targetY);
+
+            // Optional: Add text like "WANTED"
+            // This requires a Jimp-compatible font (.fnt) or loading a system font if Jimp supports it easily.
+            // For simplicity, we'll assume the template already has "WANTED" text or skip dynamic text for now.
+            // Example if font is loaded:
+            // const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK); // Example generic font
+            // template.print(font, textX, textY, "WANTED");
+
+
+            const outputMimeType = Jimp.MIME_PNG; // Output as PNG to preserve transparency if any
+            const outputBuffer = await template.getBufferAsync(outputMimeType);
+            const processedImage = new MessageMedia(outputMimeType, outputBuffer.toString('base64'), 'wanted_poster.png');
+
+            await client.sendMessage(msg.from, processedImage, { caption: "🚨 You're Wanted!" });
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .wanted command:`, error);
+            await msg.reply(theme.messages.wantedCommand.error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    // --- Basic Image Filters ---
+    const basicImageFilters = ['blur', 'invert', 'sepia', 'circle'];
+    if (basicImageFilters.includes(commandName)) {
+        const chat = await msg.getChat();
+        const filterName = commandName.charAt(0).toUpperCase() + commandName.slice(1);
+
+        try {
+            await chat.sendStateTyping();
+            let imageMedia;
+
+            if (msg.hasQuotedMsg) {
+                const quotedMsg = await msg.getQuotedMessage();
+                if (quotedMsg.hasMedia && quotedMsg.type === 'image') {
+                    imageMedia = await quotedMsg.downloadMedia();
+                }
+            } else if (msg.hasMedia && msg.type === 'image') {
+                imageMedia = await msg.downloadMedia();
+            }
+
+            if (!imageMedia) {
+                await msg.reply(theme.messages.imageFilterCommand.noImage);
+                await chat.clearState();
+                return;
+            }
+
+            await msg.reply(theme.messages.imageFilterCommand.applying.replace('{filterName}', filterName));
+
+            const imageBuffer = Buffer.from(imageMedia.data, 'base64');
+            const image = await Jimp.read(imageBuffer);
+
+            switch (commandName) {
+                case 'blur':
+                    const blurAmount = parseInt(args[0]) || 5; // Default blur radius 5 if no arg or invalid
+                    image.blur(Math.max(1, Math.min(blurAmount, 50))); // Clamp blur to reasonable values (1-50)
+                    break;
+                case 'invert':
+                    image.invert();
+                    break;
+                case 'sepia':
+                    image.sepia();
+                    break;
+                case 'circle':
+                    image.circle(); // Jimp's circle crop
+                    break;
+            }
+
+            const outputBuffer = await image.getBufferAsync(imageMedia.mimetype); // Preserve original mimetype if possible
+            const processedImage = new MessageMedia(imageMedia.mimetype, outputBuffer.toString('base64'), `filtered_${commandName}.${Jimp.getExtension(imageMedia.mimetype) || 'png'}`);
+
+            await client.sendMessage(msg.from, processedImage, { caption: `🖼️ ${filterName} filter applied!` });
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .${commandName} filter:`, error);
+            await msg.reply(theme.messages.imageFilterCommand.error.replace('{filterName}', filterName));
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'toimg') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+
+            if (!msg.hasQuotedMsg) {
+                await msg.reply(theme.messages.toImgCommand.noSticker);
+                await chat.clearState();
+                return;
+            }
+
+            const quotedMsg = await msg.getQuotedMessage();
+            if (quotedMsg.type === 'sticker' && quotedMsg.hasMedia) {
+                await msg.reply(theme.messages.toImgCommand.converting);
+                const stickerMedia = await quotedMsg.downloadMedia(); // This will be a MessageMedia object
+
+                // Send the sticker's media data as a regular image.
+                // The stickerMedia object already contains the necessary mimetype and data.
+                await client.sendMessage(msg.from, stickerMedia, { caption: "🖼️ Sticker converted to image." });
+            } else {
+                await msg.reply(theme.messages.toImgCommand.noSticker + " (The replied message is not a sticker or has no media).");
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .toimg command:`, error);
+            await msg.reply(theme.messages.toImgCommand.error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'removebg') {
+        const chat = await msg.getChat();
+        const apiKey = process.env.REMOVEBG_API_KEY;
+
+        if (!apiKey) {
+            await msg.reply(theme.messages.removeBgCommand.noApiKey);
+            return;
+        }
+
+        try {
+            await chat.sendStateTyping();
+            let imageMedia;
+
+            if (msg.hasQuotedMsg) {
+                const quotedMsg = await msg.getQuotedMessage();
+                if (quotedMsg.hasMedia && quotedMsg.type === 'image') {
+                    imageMedia = await quotedMsg.downloadMedia();
+                }
+            } else if (msg.hasMedia && msg.type === 'image') {
+                imageMedia = await msg.downloadMedia();
+            }
+
+            if (!imageMedia) {
+                await msg.reply(theme.messages.removeBgCommand.noImage);
+                await chat.clearState();
+                return;
+            }
+
+            await msg.reply(theme.messages.removeBgCommand.processing);
+
+            const formData = new FormData();
+            formData.append('image_file', Buffer.from(imageMedia.data, 'base64'), {
+                filename: 'image.jpg', // Filename is required by the API
+                contentType: imageMedia.mimetype
+            });
+            formData.append('size', 'auto'); // Or other sizes like 'preview', 'full'
+
+            const response = await axios.post('https://api.remove.bg/v1.0/removebg', formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                    'X-Api-Key': apiKey,
+                },
+                responseType: 'arraybuffer' // Get image data as buffer
+            });
+
+            if (response.status === 200) {
+                const processedImage = new MessageMedia('image/png', Buffer.from(response.data).toString('base64'), 'removed_bg.png');
+                await client.sendMessage(msg.from, processedImage, { caption: "🖼️ Background removed!" });
+            } else {
+                // This case might not be hit if axios throws for non-2xx statuses,
+                // but good for explicit handling if API returns error JSON with 200.
+                console.error("Remove.bg API responded with status:", response.status, response.data);
+                await msg.reply(theme.messages.removeBgCommand.apiError + ` (Status: ${response.status})`);
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .removebg command:`, error.message);
+            let errorMsg = theme.messages.removeBgCommand.error;
+            if (error.response) {
+                // Try to parse error from remove.bg API response
+                // response.data might be a buffer, so need to convert to string
+                let apiErrorDetails = '';
+                try {
+                    const errorDataStr = Buffer.from(error.response.data).toString('utf-8');
+                    const errorJson = JSON.parse(errorDataStr);
+                    if (errorJson.errors && errorJson.errors.length > 0) {
+                        apiErrorDetails = errorJson.errors.map(e => e.title || e.detail).join(', ');
+                    }
+                } catch (parseError) {
+                    // If parsing fails, use generic message
+                }
+                errorMsg = `${theme.messages.removeBgCommand.apiError} ${apiErrorDetails ? `(${apiErrorDetails})` : `(Status: ${error.response.status})`}`;
+            }
+            await msg.reply(errorMsg);
+            await chat.clearState();
+        }
+        return;
+    }
+
+
+    if (commandName === 'sticker') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            let mediaToProcess;
+
+            if (msg.hasQuotedMsg) {
+                const quotedMsg = await msg.getQuotedMessage();
+                if (quotedMsg.hasMedia) {
+                    mediaToProcess = await quotedMsg.downloadMedia();
+                }
+            } else if (msg.hasMedia) {
+                mediaToProcess = await msg.downloadMedia();
+            }
+
+            if (!mediaToProcess) {
+                await msg.reply(theme.messages.stickerCommand.noMedia);
+                await chat.clearState();
+                return;
+            }
+
+            // Check if media is image or video (for GIF -> animated sticker)
+            if (mediaToProcess.mimetype.startsWith('image/') || mediaToProcess.mimetype.startsWith('video/')) {
+                await msg.reply(theme.messages.stickerCommand.creating);
+
+                // Sticker metadata (optional)
+                const stickerAuthor = theme.botName || "WHIZ-MD";
+                const stickerName = `Sticker by ${msg.author ? msg.author.slice(0, msg.author.indexOf('@')) : 'User'}`; // Use user's pushname part
+
+                await client.sendMessage(msg.from, mediaToProcess, {
+                    sendMediaAsSticker: true,
+                    stickerName: stickerName,
+                    stickerAuthor: stickerAuthor,
+                    //stickerCategories: ['cool'] // Optional: Sticker categories
+                });
+                // await msg.reply(theme.messages.stickerCommand.success); // Optional success message
+            } else {
+                await msg.reply(theme.messages.stickerCommand.noMedia + " (Unsupported media type)");
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .sticker command:`, error);
+            await msg.reply(theme.messages.stickerCommand.error);
+            await chat.clearState();
+        }
+        return;
+    }
+
 
     if (commandName === 'textstyles') {
         const chat = await msg.getChat();
