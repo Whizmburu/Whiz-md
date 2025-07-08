@@ -352,8 +352,24 @@
 - [X] **Integrate New Command Handlers into `index.js`:**
     - [X] Imported and routed all new command handlers. Passed necessary state/helpers.
 
+... (Previous content of Phase 1-11 Part 2 remains the same) ...
+
+## Phase 12: Finalize PriorityView & Implement First AI Command (DALL-E Image Generation)
+- [X] **Integrate `priorityViewList` into Autoview Logic:**
+    - [X] Modified `client.on('message', ...)` in `index.js` to use `priorityViewList` for Autoview decisions if the list is populated and `autoViewEnabled` is true. Autoreact logic also updated to respect this.
+- [X] **Setup for AI Command (DALL-E Image Generation):**
+    - [X] Created `commands/ai/` directory.
+    - [X] Added `openai` to `package.json`.
+    - [X] Added `OPENAI_API_KEY` placeholder to `.env.example`.
+- [X] **Add Theming for AI Image Command:**
+    - [X] Added `aiImageCmd` messages to `Themes/WHIZ.json` for `.image`/`.dalle`.
+- [X] **Implement `.image <prompt>` (DALL-E Image Generation) Command:**
+    - [X] In `commands/ai/image.js`. Uses `openai` library to call DALL-E API, downloads and sends image.
+- [X] **Integrate `.image` Command Handler into `index.js`:**
+    - [X] Imported and routed `.image` (and alias `.dalle`) command.
+
 ## Future Phases (To be detailed)
-- AI & Prompt Tools
+- AI & Prompt Tools (Part 2: ChatGPT/Bard, Caption, Nameart, Imgprompt)
 - Final review of all commands, AGENTS.md, README.md.
 
 ## Pending Configurations / Notes

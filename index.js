@@ -74,7 +74,7 @@ const { handleCovidCommand } = require('./commands/info/covid.js');
 const { handleAutoviewCommand } = require('./commands/owner/autoview.js');
 const { handleAutoreactCommand } = require('./commands/owner/autoreact.js');
 const { handleSetreactionsCommand } = require('./commands/owner/setreactions.js');
-const { handlePriorityViewCommand } = require('./commands/owner/priorityview.js');
+// const { handlePriorityViewCommand } = require('./commands/owner/priorityview.js'); // Removed
 
 // Misc/Extras Command Handlers
 const { handleVvCommand } = require('./commands/misc/vv.js');
@@ -83,6 +83,9 @@ const { handleLogomakerCommand, handleLogostylesCommand } = require('./commands/
 const { handleBirthdayCommand } = require('./commands/misc/birthday.js');
 const { handleQotdCommand } = require('./commands/info/qotd.js'); // Assuming qotd is in info
 
+// AI Command Handlers
+const { handleImageCommand } = require('./commands/ai/image.js');
+
 // Active games state management (in-memory)
 const activeGames = {};
 
@@ -90,7 +93,7 @@ const activeGames = {};
 let autoViewEnabled = true;
 let autoReactEnabled = true;
 let autoReactionEmojis = ['🔥', '💥', '🕳', '👾', '🤣', '👎', '🧡']; // Default set
-let priorityViewList = []; // JIDs of users whose statuses should be prioritized for viewing
+// let priorityViewList = []; // Removed
 let birthdays = {}; // Stores birthdays, e.g., { "userId@c.us": "DD/MM" }
 
 // Logo Maker Styles Configuration
@@ -1869,6 +1872,24 @@ client.on('message', async (msg) => {
         return; // Command handled
     }
 
+    // --- AI Commands ---
+    const aiCommands = {
+        'image': handleImageCommand,
+        'dalle': handleImageCommand, // Alias for .image
+        // 'chatgpt': handleChatGPTCommand, // Future
+        // 'bard': handleBardCommand,       // Future
+    };
+
+    if (aiCommands[commandName]) {
+        try {
+            await aiCommands[commandName](msg, args, client, theme, botPrefix, activeGames);
+        } catch (error) {
+            console.error(`Unhandled error in AI command ${commandName}:`, error);
+            await msg.reply(`❌ An unexpected error occurred while running the AI command ${commandName}.`);
+        }
+        return; // Command handled
+    }
+
     // --- Misc & Extras Commands ---
     const miscCommands = {
         'vv': handleVvCommand,
@@ -1945,12 +1966,12 @@ client.on('message', async (msg) => {
         'autoview': handleAutoviewCommand,
         'autoreact': handleAutoreactCommand,
         'setreactions': handleSetreactionsCommand,
-        'priorityview': handlePriorityViewCommand, // Added
+        // 'priorityview': handlePriorityViewCommand, // Removed
     };
 
     if (ownerCommands[commandName]) {
         if (isOwner(msg.author || msg.from)) {
-            // Prepare the statusAutomation state object and globalState for birthdays/priorityList
+            // Prepare the statusAutomation state object and globalState for birthdays
             const statusAutomationState = {
                 get autoViewEnabled() { return autoViewEnabled; },
                 set autoViewEnabled(val) { autoViewEnabled = val; },
@@ -1960,12 +1981,12 @@ client.on('message', async (msg) => {
                 set autoReactionEmojis(val) { autoReactionEmojis = val; }
             };
             const globalState = { // For commands needing to modify global lists/objects
-                priorityViewList: priorityViewList, // Direct reference to allow modification
+                // priorityViewList: priorityViewList, // Removed
                 birthdays: birthdays             // Direct reference
             };
 
             try {
-                // Pass statusAutomationState and globalState to all owner commands for consistency
+                // Pass statusAutomationState and globalState to relevant owner commands
                 await ownerCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, statusAutomationState, globalState);
             } catch (error) {
                 console.error(`Unhandled error in owner command ${commandName}:`, error);
@@ -2076,6 +2097,8 @@ client.on('message', async (msg) => {
     // This should be checked for every message that could be a status
     if (msg.from === 'status@broadcast' && msg.author && msg.author !== client.info.wid._serialized) {
         const statusAuthorId = msg.author;
+        // console.log(`Received status from ${statusAuthorId}`); // Debug log
+
         // console.log(`Received status from ${statusAuthorId}`); // Debug log
 
         if (autoViewEnabled) {
