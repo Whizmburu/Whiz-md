@@ -137,44 +137,63 @@ function getFullMenuText() {
     const menuConfig = theme.menu;
     if (!menuConfig) return "Menu configuration is missing in Themes/WHIZ.json";
 
-    let menuText = `${menuConfig.title}\n\n`;
+    let menuText = `${menuConfig.title.replace('{botName}', theme.botName || 'WHIZ-MD')}\n\n`;
 
     menuConfig.header.forEach(line => {
         menuText += `${line
             .replace('{prefix}', botPrefix)
-            .replace('{commandCount}', tổngCommandCount) // Corrected variable name
-            .replace('{version}', theme.version || '1.0.0') // Assuming theme has a version
-            .replace('{botName}', theme.botName || 'WHIZ-MD')
+            .replace('{commandCount}', totalCommandCount)
+            .replace('{version}', theme.version || '1.0.0')
+            // botName is already in the title, but if any header line specifically needs it:
+            // .replace('{botName}', theme.botName || 'WHIZ-MD')
         }\n`;
     });
     menuText += `${menuConfig.headerEnd}\n\n`;
 
     menuConfig.instructions.forEach(line => {
-        menuText += `${line.replace('{prefix}', botPrefix)}\n`;
+        menuText += `${line.replace(/{prefix}/g, botPrefix)}\n`; // Replaced dot with {prefix}
     });
-    menuText += `\n${theme.borders.section || '❀━━━━━━━━━━━━❀'}\n`;
+    // The first separator is handled by the structure, then before each section.
+    // menuText += `\n${menuConfig.sectionSeparator || theme.borders.sectionSeparator}\n`;
 
     menuConfig.sections.forEach(section => {
-        menuText += `❀ ${section.title} ✦✦✦\n`;
+        menuText += `\n${menuConfig.sectionSeparator || theme.borders.sectionSeparator}\n`; // Separator before section title
+        menuText += `${menuConfig.sectionTitleFormat.replace('{sectionTitle}', section.title)}\n`;
         section.commands.forEach(cmd => {
-            menuText += `❀ ┃ *${cmd}*\n`;
+            menuText += `${menuConfig.commandFormat.replace('{commandName}', cmd)}\n`;
         });
-        menuText += `${theme.borders.section || '❀━━━━━━━━━━━━❀'}\n`;
     });
+    // The last separator is handled by the structure (after last section, before footer)
+    menuText += `${menuConfig.sectionSeparator || theme.borders.sectionSeparator}\n`;
 
     menuText += `\n${menuConfig.footer}\n`;
     menuText += `${menuConfig.footerEnd}`;
 
-    return menuText;
+    return menuText.trim(); // Trim overall to remove any leading/trailing newlines from assembly
 }
 
 
+const startTime = Date.now(); // Store bot start time
+
 // Calculate total commands once
-let tổngCommandCount = 0;
+let totalCommandCount = 0;
 if (theme.menu && theme.menu.sections) {
     theme.menu.sections.forEach(section => {
-        tổngCommandCount += section.commands.length;
+        totalCommandCount += section.commands.length;
     });
+}
+
+function formatUptime(ms) {
+    let seconds = Math.floor(ms / 1000);
+    let minutes = Math.floor(seconds / 60);
+    let hours = Math.floor(minutes / 60);
+    let days = Math.floor(hours / 24);
+
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
 
@@ -222,28 +241,157 @@ client.on('message', async (msg) => {
     const commandName = args.shift().toLowerCase();
 
     console.log(`Command received: ${commandName}, Args: ${args.join(' ')}`);
+    const messageTimestamp = msg.timestamp ? msg.timestamp * 1000 : Date.now(); // Use message timestamp if available
 
     // Simple Ping command for testing the handler
     if (commandName === 'ping') {
         const chat = await msg.getChat();
         try {
             await chat.sendStateTyping();
-            const startTime = Date.now();
-            // Simulate some async work or just reply directly
-            // For a true latency, we'd need to factor in message send/ack time if possible,
-            // but for a simple ping, response time is a good indicator.
-            await msg.reply(`${theme.emojis.ping || '🏓'} Pong!`);
-            const endTime = Date.now();
-            const latency = endTime - startTime;
-            // Send latency in a follow-up or edit message if library supports
-            // For now, just log it or send a new message if desired.
-            // console.log(`Ping latency: ${latency}ms`);
-            // Optionally send latency back:
-            // await client.sendMessage(msg.from, `Latency: ${latency}ms`);
+            const processingStartTime = Date.now();
+            // Latency: time from message arrival (or processing start) to sending reply
+            const latency = processingStartTime - messageTimestamp;
+
+            let pongMsg = theme.messages.pongWithLatency || "{pingEmoji} Pong! Latency: {latency}ms";
+            pongMsg = pongMsg
+                .replace('{pingEmoji}', theme.emojis.ping || '🏓')
+                .replace('{latency}', latency);
+
+            await msg.reply(pongMsg);
             await chat.clearState();
         } catch (error) {
             console.error(`Error processing ping command for ${msg.from}:`, error);
             await chat.clearState(); // Ensure state is cleared even on error
+        }
+        return;
+    }
+
+    if (commandName === 'runtime') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            const uptime = formatUptime(Date.now() - startTime);
+            let runtimeMsg = theme.messages.runtime || "{uptimeEmoji} Bot has been running for: {runtimeValue}";
+
+            runtimeMsg = runtimeMsg
+                .replace('{uptimeEmoji}', theme.emojis.uptime || '⏱️')
+                .replace('{runtimeValue}', uptime);
+
+            await msg.reply(runtimeMsg.trim());
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing .runtime command for ${msg.from}:`, error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'status') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            const uptime = formatUptime(Date.now() - startTime);
+            let statusMsg = theme.messages.status || "❀ *{botName} Status* ❀\nMode: {mode}\nUptime: {uptime}\nCommands Loaded: {commandsCount}\nPrefix: {prefix}";
+
+            statusMsg = statusMsg
+                .replace('{botName}', theme.botName || 'WHIZ-MD')
+                .replace('{mode}', 'Public') // Mode is hardcoded as Public for now
+                .replace('{uptime}', uptime)
+                .replace('{commandsCount}', totalCommandCount)
+                .replace('{prefix}', botPrefix);
+
+            await msg.reply(statusMsg.trim());
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing .status command for ${msg.from}:`, error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'menu') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            const menuText = getFullMenuText();
+            await msg.reply(menuText.trim());
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing .menu command for ${msg.from}:`, error);
+            await chat.clearState();
+            // Optionally send an error message to the user
+            // await msg.reply(theme.messages.commandError || "❌ Oops! Something went wrong while fetching the menu.");
+        }
+        return;
+    }
+
+    if (commandName === 'info') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            let infoMsg = theme.messages.botInfo || "Bot Info Missing";
+
+            infoMsg = infoMsg
+                .replace('{ownerEmoji}', theme.emojis.owner || '👑')
+                .replace('{botName}', theme.botName || 'WHIZ-MD')
+                .replace('{repoEmoji}', "") // No repo emoji in the example provided for .info specifically
+                .replace(/{prefix}/g, botPrefix)
+                .replace('{commandsCount}', totalCommandCount)
+                .replace('{version}', theme.version || '1.0.0');
+
+            // The theme.messages.botInfo already includes "Owner: WHIZ" and "Mode: Public"
+            // and the repo link directly.
+            // If we need to make "Mode" dynamic later, we'll adjust.
+
+            await msg.reply(infoMsg.trim());
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing .info command for ${msg.from}:`, error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'version') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            let versionMsg = theme.messages.versionInfo || "{botName} Version: {version}";
+
+            versionMsg = versionMsg
+                .replace('{botName}', theme.botName || 'WHIZ-MD')
+                .replace('{version}', theme.version || '1.0.0');
+
+            await msg.reply(versionMsg.trim());
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing .version command for ${msg.from}:`, error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'help') {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            if (args.length === 0) {
+                // .help without arguments - show full menu
+                const menuText = getFullMenuText();
+                await msg.reply(menuText.trim());
+            } else {
+                // .help with argument (command name)
+                const specificCommand = args[0].toLowerCase();
+                // For now, just a placeholder. Later, this could look up actual help text.
+                let helpMsg = theme.messages.specificHelpPlaceholder || "📋 Detailed help for `{prefix}{command}` is not yet available. Please check back later!";
+                helpMsg = helpMsg.replace('{command}', specificCommand).replace(/{prefix}/g, botPrefix);
+                await msg.reply(helpMsg);
+            }
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing .help command for ${msg.from}:`, error);
+            await chat.clearState();
+            // Optionally send an error message
         }
         return;
     }

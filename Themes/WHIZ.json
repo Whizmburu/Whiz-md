@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "borders": {
     "headerTop": "❀━━━━━━━━━━━━━━━━━━━━━❀",
-    "headerBottom": "❀━━━━━━━━━━━━━╯",
-    "section": "❀━━━━━━━━━━━━❀",
-    "footer": "❀━━━━━━━━━━━━━━╯"
+    "headerBottom": "*❀━━━━━━━━━━━━━╯*",
+    "section": "*❀━━━━━━━━━━━━❀*",
+    "footer": "*❀━━━━━━━━━━━━━━╯*",
+    "sectionSeparator": "*❀━━━━━━━━━━━━❀*"
   },
   "emojis": {
     "owner": "👑",
@@ -30,9 +31,10 @@
     "commandNotFound": "{errorEmoji} Command not found. Type `{prefix}help` to see the menu.",
     "pingResponse": "{pingEmoji} Pong!",
     "pongWithLatency": "{pingEmoji} Pong! Latency: {latency}ms",
+    "specificHelpPlaceholder": "📋 Detailed help for `{prefix}{command}` is not yet available. Please check back later!",
     "status": "❀ *{botName} Status* ❀\nMode: {mode}\nUptime: {uptime}\nCommands Loaded: {commandsCount}\nPrefix: {prefix}",
-    "runtime": "{uptimeEmoji} Bot has been running for: {runtime}",
-    "botInfo": "❀━【 {ownerEmoji} *{botName} MENU*{repoEmoji}*━━━ *╮*\n*❀* *Owner* : WHIZ\n*❀* *Mode* : Public\n*❀* *Prefix* : {prefix}\n*❀* *Commands* : {commandsCount}\n*❀* *Version* : {version}\n*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n❀━━━━━━━━━━━━━╯",
+    "runtime": "{uptimeEmoji} Bot has been running for: {runtimeValue}",
+    "botInfo": "❀━【 {ownerEmoji} *{botName} MENU*{repoEmoji}*━━━ *╮*\n*❀* *Owner* : WHIZ\n*❀* *Mode* : Public\n*❀* *Prefix* : {prefix}\n*❀* *Commands* : {commandsCount}\n*❀* *Version* : {version}\n*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n*❀━━━━━━━━━━━━━╯*",
     "versionInfo": "{botName} Version: {version}"
   },
   "menu": {
@@ -40,16 +42,19 @@
     "header": [
       "*❀* *Owner* : WHIZ",
       "*❀* *Mode* : Public",
-      "*❀* *Prefix* : .{prefix}",
+      "*❀* *Prefix* : {prefix}",
       "*❀* *Commands* : {commandCount}",
       "*❀* *Version* : {version}",
       "*❀* *Repo* : github.com/whizmburu/WHIZ‑MD"
     ],
-    "headerEnd": "❀━━━━━━━━━━━━━╯",
+    "headerEnd": "*❀━━━━━━━━━━━━━╯*",
     "instructions": [
-      "*❀* _Type_ `.{prefix}help [command]` _for command details_",
-      "*❀* _Type_ `.{prefix}menu` _for the full command list (this message)_"
+      "*❀* _Type_ `{prefix}help [command]` _for command details_",
+      "*❀* _Type_ `{prefix}menu` _for the full command list (this message)_"
     ],
+    "sectionSeparator": "*❀━━━━━━━━━━━━❀*",
+    "commandFormat": "*❀* ┃ *{commandName}*",
+    "sectionTitleFormat": "*❀* ✦✦✦ *{sectionTitle}* ✦✦✦",
     "sections": [
       {
         "title": "📁 MEDIA TOOLS",
@@ -101,6 +106,6 @@
       }
     ],
     "footer": "https://chat.whatsapp.com/JLmSbTfqf4I2Kh4SNJcWgM",
-    "footerEnd": "❀━━━━━━━━━━━━━━╯"
+    "footerEnd": "*❀━━━━━━━━━━━━━━╯*"
   }
 }
