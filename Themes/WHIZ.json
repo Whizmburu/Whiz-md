@@ -383,7 +383,8 @@
             "warning": "🔒 *Security Warning!* Below is your session data. Keep it extremely confidential. Anyone with this data can take over your bot's WhatsApp session.",
             "dataPrefix": "📄 Session Data (WHIZMD_SESSION_DATA content):",
             "fail": "❌ Failed to retrieve session data."
-        },
+        }
+    },
     "profileCmd": {
         "loading": "👤 Fetching profile information...",
         "notFound": "❓ Could not retrieve profile information for the specified user.",
@@ -433,6 +434,31 @@
         "apiError": "❌ Failed to fetch COVID-19 data.",
         "globalStats": "🌎 *Global COVID-19 Stats*\n\nCases: {cases}\nDeaths: {deaths}\nRecovered: {recovered}\nActive: {active}\nToday Cases: {todayCases}\nToday Deaths: {todayDeaths}\nUpdated: {updated}",
         "countryStats": "🌍 *COVID-19 Stats for {country}*\n\nCases: {cases}\nDeaths: {deaths}\nRecovered: {recovered}\nActive: {active}\nCritical: {critical}\nToday Cases: {todayCases}\nToday Deaths: {todayDeaths}\nCases/Million: {casesPerOneMillion}\nDeaths/Million: {deathsPerOneMillion}\nUpdated: {updated}"
+    },
+    "statusSaveCmd": {
+        "notStatusReply": "⚠️ Please reply to a status with 'save' to download it.",
+        "notMediaStatus": "⚠️ The replied status does not seem to contain downloadable media.",
+        "saving": "📥 Saving status from {userName}...",
+        "success": "✅ Status saved and sent to your chat!",
+        "failDownload": "❌ Failed to download the status media.",
+        "failSend": "❌ Failed to send the saved status media to you.",
+        "caption": "Status from: {userName}\n\n{statusCaption}"
+    },
+    "autoViewCmd": {
+        "enabled": "👁️ Auto-viewing of statuses is now ON.",
+        "disabled": "🙈 Auto-viewing of statuses is now OFF.",
+        "status": "Auto-view is currently: {statusState}"
+    },
+    "autoReactCmd": {
+        "enabled": "💖 Auto-reacting to statuses is now ON.",
+        "disabled": "💔 Auto-reacting to statuses is now OFF.",
+        "status": "Auto-react is currently: {statusState}"
+    },
+    "setReactionsCmd": {
+        "success": "👍 Reaction emojis updated to: {emojis}",
+        "noEmojisProvided": "⚠️ No emojis provided. To clear, use `{prefix}setreactions clear`.",
+        "cleared": "🗑️ Reaction emoji list has been cleared. Auto-react will be ineffective until new emojis are set.",
+        "current": "Current reaction emojis: {emojis}\nUse `{prefix}setreactions <e1> <e2> ...` to change them, or `{prefix}setreactions clear` to remove all."
     }
   },
   "menu": {

@@ -307,9 +307,29 @@
 - [X] **Integrate Info & Fetcher Command Handlers into `index.js`:**
     - Imported and routed all new info/fetcher command handlers.
 
+... (Previous content of Phase 1-10 remains the same) ...
+
+## Phase 11: STATUS & EXTRAS (Part 1 - Core Status Features)
+- [X] **Initial Setup & Configuration Variables (in `index.js`):**
+    - [X] Defined `autoViewEnabled`, `autoReactEnabled`, `autoReactionEmojis` global variables.
+- [X] **Add Theming for Status Saver & Auto-Status Features:**
+    - [X] Added `statusSaveCmd`, `autoViewCmd`, `autoReactCmd`, `setReactionsCmd` to `Themes/WHIZ.json`.
+- [X] **Implement `save` (No-Prefix, Reply-Based Status Saver) in `index.js`:**
+    - [X] Logic added to main message handler to save media from replied-to statuses starting with "save".
+- [X] **Implement Autoview & Autoreact Logic in `client.on('message', ...)` handler in `index.js`:**
+    - [X] Listens for messages from `status@broadcast`.
+    - [X] If `autoViewEnabled`, calls `client.sendSeen()` on status author.
+    - [X] If `autoReactEnabled`, randomly selects an emoji from `autoReactionEmojis` and calls `message.react()`.
+- [X] **Implement Owner Commands for Status Automation Control:**
+    - [X] `.autoview on/off/status` (in `commands/owner/autoview.js`) - Toggles `autoViewEnabled`.
+    - [X] `.autoreact on/off/status` (in `commands/owner/autoreact.js`) - Toggles `autoReactEnabled`.
+    - [X] `.setreactions <emojis...>/clear` (in `commands/owner/setreactions.js`) - Updates `autoReactionEmojis`.
+    - [X] Integrated these handlers into `index.js` owner command router, passing a `statusAutomationState` object to them.
+
 ## Future Phases (To be detailed)
+- Status & Extras (Part 2: Vv, Emojimix, Logomaker, Qotd, Birthday, Priorityview)
 - AI & Prompt Tools
-- Status & Extras
+
 
 ## Pending Configurations / Notes
 - Decide on final WhatsApp library if `whatsapp-web.js` proves problematic for specific features.

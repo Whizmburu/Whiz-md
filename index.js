@@ -71,9 +71,17 @@ const { handleNpmCommand } = require('./commands/info/npm.js');
 const { handleAnimeCommand } = require('./commands/info/anime.js');
 const { handleQuoteImgCommand } = require('./commands/info/quoteimg.js');
 const { handleCovidCommand } = require('./commands/info/covid.js');
+const { handleAutoviewCommand } = require('./commands/owner/autoview.js');
+const { handleAutoreactCommand } = require('./commands/owner/autoreact.js');
+const { handleSetreactionsCommand } = require('./commands/owner/setreactions.js');
 
 // Active games state management (in-memory)
 const activeGames = {};
+
+// Status Automation Settings (in-memory)
+let autoViewEnabled = true;
+let autoReactEnabled = true;
+let autoReactionEmojis = ['🔥', '💥', '🕳', '👾', '🤣', '👎', '🧡']; // Default set
 
 // Load theme/config
 let theme = {};
@@ -435,6 +443,54 @@ client.on('ready', async () => {
 });
 
 client.on('message', async (msg) => {
+    // --- Reply-based Status Save (No Prefix) ---
+    if (msg.body && msg.body.toLowerCase().startsWith('save') && msg.hasQuotedMsg) {
+        const quotedMsg = await msg.getQuotedMessage();
+        // Status messages typically come from 'status@broadcast' and have an 'author' field for the actual sender.
+        // Also check if it has media.
+        if (quotedMsg.from === 'status@broadcast' && quotedMsg.hasMedia) {
+            const chat = await msg.getChat(); // For sendStateTyping
+            try {
+                await chat.sendStateTyping();
+                const statusAuthorId = quotedMsg.author;
+                if (!statusAuthorId) {
+                    await msg.reply(theme.messages.statusSaveCmd.failNotStatusOrMedia || "Could not identify status author.");
+                    await chat.clearState();
+                    return;
+                }
+
+                const statusAuthorContact = await client.getContactById(statusAuthorId);
+                const authorName = statusAuthorContact.pushname || statusAuthorContact.name || statusAuthorId.split('@')[0];
+
+                await msg.reply(theme.messages.statusSaveCmd.saving.replace('{userName}', authorName));
+
+                const media = await quotedMsg.downloadMedia();
+                if (!media) {
+                    await msg.reply(theme.messages.statusSaveCmd.failDownload);
+                    await chat.clearState();
+                    return;
+                }
+
+                const originalStatusCaption = quotedMsg.body || ""; // Statuses can have text captions
+                const finalCaption = theme.messages.statusSaveCmd.caption
+                    .replace('{userName}', authorName)
+                    .replace('{statusCaption}', originalStatusCaption);
+
+                await client.sendMessage(msg.from, media, { caption: finalCaption.trim() });
+                // await msg.reply(theme.messages.statusSaveCmd.success); // Optional success message after sending media
+
+                await chat.clearState();
+            } catch (error) {
+                console.error("Error in status save feature:", error);
+                await msg.reply(theme.messages.statusSaveCmd.failDownload + ` (Error: ${error.message})`);
+                if (chat) await chat.clearState();
+            }
+            return; // Important: stop further processing if it was a save attempt
+        }
+        // If it wasn't a reply to a status from status@broadcast, let it fall through to command processing.
+    }
+
+
     if (!msg.body || !msg.body.startsWith(botPrefix)) return; // Ignore non-commands and empty messages
 
     const args = msg.body.slice(botPrefix.length).trim().split(/ +/);
@@ -1832,12 +1888,26 @@ client.on('message', async (msg) => {
         'restart': handleRestartCommand,
         'getsession': handleGetsessionCommand,
         'eval': handleEvalCommand,
+        'autoview': handleAutoviewCommand,
+        'autoreact': handleAutoreactCommand,
+        'setreactions': handleSetreactionsCommand,
     };
 
     if (ownerCommands[commandName]) {
         if (isOwner(msg.author || msg.from)) {
+            // Prepare the statusAutomation state object to pass to handlers
+            const statusAutomationState = {
+                get autoViewEnabled() { return autoViewEnabled; },
+                set autoViewEnabled(val) { autoViewEnabled = val; },
+                get autoReactEnabled() { return autoReactEnabled; },
+                set autoReactEnabled(val) { autoReactEnabled = val; },
+                get autoReactionEmojis() { return autoReactionEmojis; },
+                set autoReactionEmojis(val) { autoReactionEmojis = val; }
+            };
+
             try {
-                await ownerCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner); // Pass isOwner if needed by handlers
+                // Pass statusAutomationState to all owner commands for consistency, though only some will use it.
+                await ownerCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, statusAutomationState);
             } catch (error) {
                 console.error(`Unhandled error in owner command ${commandName}:`, error);
                 await msg.reply(`❌ An unexpected error occurred while running the owner command ${commandName}.`);
@@ -1942,6 +2012,36 @@ client.on('message', async (msg) => {
             }
         }
     }
+
+    // --- Autoview & Autoreact to Statuses ---
+    // This should be checked for every message that could be a status
+    if (msg.from === 'status@broadcast' && msg.author && msg.author !== client.info.wid._serialized) {
+        const statusAuthorId = msg.author;
+        // console.log(`Received status from ${statusAuthorId}`); // Debug log
+
+        if (autoViewEnabled) {
+            try {
+                await client.sendSeen(statusAuthorId);
+                // console.log(`Autoviewed status from ${statusAuthorId}`);
+            } catch (viewError) {
+                console.error(`Failed to autoview status from ${statusAuthorId}:`, viewError.message);
+            }
+        }
+
+        if (autoReactEnabled && autoReactionEmojis.length > 0) {
+            // Small delay before reacting, can seem more natural
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500));
+            try {
+                const randomReaction = autoReactionEmojis[Math.floor(Math.random() * autoReactionEmojis.length)];
+                await msg.react(randomReaction);
+                // console.log(`Autoreacted with ${randomReaction} to status from ${statusAuthorId}`);
+            } catch (reactError) {
+                console.error(`Failed to autoreact to status from ${statusAuthorId}:`, reactError.message);
+            }
+        }
+    }
+    // End of Autoview & Autoreact
+
 });
 
 console.log("WHIZ-MD: Initializing WhatsApp client...");
