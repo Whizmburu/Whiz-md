@@ -74,6 +74,14 @@ const { handleCovidCommand } = require('./commands/info/covid.js');
 const { handleAutoviewCommand } = require('./commands/owner/autoview.js');
 const { handleAutoreactCommand } = require('./commands/owner/autoreact.js');
 const { handleSetreactionsCommand } = require('./commands/owner/setreactions.js');
+const { handlePriorityViewCommand } = require('./commands/owner/priorityview.js');
+
+// Misc/Extras Command Handlers
+const { handleVvCommand } = require('./commands/misc/vv.js');
+const { handleEmojimixCommand } = require('./commands/misc/emojimix.js');
+const { handleLogomakerCommand, handleLogostylesCommand } = require('./commands/misc/logomaker.js');
+const { handleBirthdayCommand } = require('./commands/misc/birthday.js');
+const { handleQotdCommand } = require('./commands/info/qotd.js'); // Assuming qotd is in info
 
 // Active games state management (in-memory)
 const activeGames = {};
@@ -82,6 +90,17 @@ const activeGames = {};
 let autoViewEnabled = true;
 let autoReactEnabled = true;
 let autoReactionEmojis = ['🔥', '💥', '🕳', '👾', '🤣', '👎', '🧡']; // Default set
+let priorityViewList = []; // JIDs of users whose statuses should be prioritized for viewing
+let birthdays = {}; // Stores birthdays, e.g., { "userId@c.us": "DD/MM" }
+
+// Logo Maker Styles Configuration
+const availableLogoStyles = {
+    'neongalaxy': { url: 'https://textpro.me/neon-light-text-effect-with-galaxy-background-1069.html', inputs: 1, category: 'textpro' },
+    'hubstyle': { url: 'https://en.ephoto360.com/create-a-logo-in-the-style-of-pornhub-online-676.html', inputs: 2, category: 'ephoto360' },
+    // Add more styles here as { styleName: { url: 'page_url', inputs: numberOfTextInputs, category: 'textpro'/'ephoto360'/etc } }
+    // The 'category' can help if generateTextEffect needs to adapt for different site structures.
+};
+
 
 // Load theme/config
 let theme = {};
@@ -1850,6 +1869,41 @@ client.on('message', async (msg) => {
         return; // Command handled
     }
 
+    // --- Misc & Extras Commands ---
+    const miscCommands = {
+        'vv': handleVvCommand,
+        'emojimix': handleEmojimixCommand,
+        'logomaker': handleLogomakerCommand,
+        'logostyles': handleLogostylesCommand,
+        'qotd': handleQotdCommand,
+        'birthday': handleBirthdayCommand,
+    };
+
+    if (miscCommands[commandName]) {
+        try {
+            // Prepare globalState for birthday command
+            const globalState = {
+                birthdays: birthdays, // Direct reference
+                // priorityViewList is not typically needed by these misc commands directly
+                // but could be part of a larger globalState object if structured that way.
+                // For logomaker, pass generateTextEffect and availableLogoStyles
+            };
+
+            if (commandName === 'logomaker' || commandName === 'logostyles') {
+                 await miscCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, null, generateTextEffect, availableLogoStyles);
+            } else {
+                // Most misc commands don't need statusAutomationState or isOwner, but pass for consistency if signature expects it
+                // The `isOwner` is passed to birthday to allow owner to set for others.
+                await miscCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, null, globalState);
+            }
+
+        } catch (error) {
+            console.error(`Unhandled error in misc command ${commandName}:`, error);
+            await msg.reply(`❌ An unexpected error occurred while running the ${commandName} command.`);
+        }
+        return; // Command handled
+    }
+
     // --- Group Tool Commands ---
     const groupCommands = {
         'add': handleAddCommand,
@@ -1891,11 +1945,12 @@ client.on('message', async (msg) => {
         'autoview': handleAutoviewCommand,
         'autoreact': handleAutoreactCommand,
         'setreactions': handleSetreactionsCommand,
+        'priorityview': handlePriorityViewCommand, // Added
     };
 
     if (ownerCommands[commandName]) {
         if (isOwner(msg.author || msg.from)) {
-            // Prepare the statusAutomation state object to pass to handlers
+            // Prepare the statusAutomation state object and globalState for birthdays/priorityList
             const statusAutomationState = {
                 get autoViewEnabled() { return autoViewEnabled; },
                 set autoViewEnabled(val) { autoViewEnabled = val; },
@@ -1904,10 +1959,14 @@ client.on('message', async (msg) => {
                 get autoReactionEmojis() { return autoReactionEmojis; },
                 set autoReactionEmojis(val) { autoReactionEmojis = val; }
             };
+            const globalState = { // For commands needing to modify global lists/objects
+                priorityViewList: priorityViewList, // Direct reference to allow modification
+                birthdays: birthdays             // Direct reference
+            };
 
             try {
-                // Pass statusAutomationState to all owner commands for consistency, though only some will use it.
-                await ownerCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, statusAutomationState);
+                // Pass statusAutomationState and globalState to all owner commands for consistency
+                await ownerCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, statusAutomationState, globalState);
             } catch (error) {
                 console.error(`Unhandled error in owner command ${commandName}:`, error);
                 await msg.reply(`❌ An unexpected error occurred while running the owner command ${commandName}.`);

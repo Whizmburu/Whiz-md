@@ -459,6 +459,66 @@
         "noEmojisProvided": "⚠️ No emojis provided. To clear, use `{prefix}setreactions clear`.",
         "cleared": "🗑️ Reaction emoji list has been cleared. Auto-react will be ineffective until new emojis are set.",
         "current": "Current reaction emojis: {emojis}\nUse `{prefix}setreactions <e1> <e2> ...` to change them, or `{prefix}setreactions clear` to remove all."
+    },
+    "vvCmd": {
+        "noReply": "⚠️ Please reply to a view-once message with `.vv` to save it.",
+        "notViewOnce": "⚠️ The replied message is not a view-once message.",
+        "saving": "📥 Saving view-once media from {userName}...",
+        "success": "✅ View-once media saved and sent to your chat!",
+        "fail": "❌ Failed to save the view-once media.",
+        "caption": "View-once media from: {userName}\n\n{originalCaption}"
+    },
+    "emojimixCmd": {
+        "usage": "⚠️ Please provide two emojis to mix. Example: `{prefix}emojimix 😂😭`",
+        "mixing": "🔄 Mixing {emoji1} + {emoji2}...",
+        "notFound": "❓ Sorry, I couldn't create a mix for {emoji1} and {emoji2}. Not all combinations are possible!",
+        "apiError": "❌ Failed to generate emoji mix. The API might be down or the combination is unsupported."
+    },
+    "logomakerCmd": {
+        "usage": "⚠️ Usage: `{prefix}logomaker <style_name> <text1> [| text2]` (Use '|' to separate text for multi-text logos). Example: `{prefix}logomaker neon MyLogo`",
+        "styleNotFound": "🎨 Style '{styleName}' not found. Use `{prefix}logostyles` to see available styles.",
+        "generating": "✨ Generating your '{styleName}' logo with text \"{text}\"...",
+        "apiError": "❌ Failed to generate logo. API error or invalid parameters for the style.",
+        "noText": "⚠️ Please provide text for the logo."
+    },
+    "qotdCmd": {
+        "loading": "📜 Fetching the Quote of the Day...",
+        "quoteFormat": "🌟 *Quote of the Day* 🌟\n\n\"_{quote}_\"\n\n— *{author}*",
+        "apiError": "❌ Failed to fetch the Quote of the Day."
+    },
+    "priorityViewCmd": {
+        "usage": "⚠️ Usage: `{prefix}priorityview <add|remove|list> [@user]`",
+        "added": "⭐ User {userName} added to priority view list.",
+        "removed": "🗑️ User {userName} removed from priority view list.",
+        "notFound": "❓ User {userName} not found in priority view list to remove.",
+        "listEmpty": "🗒️ Priority view list is currently empty.",
+        "listHeader": "⭐ Priority View List ({count} users):",
+        "listEntry": "➢ {userName} ({userId})",
+        "alreadyExists": "⚠️ User {userName} is already in the priority view list.",
+        "notInList": "⚠️ User {userName} was not found in the priority view list.",
+        "noUserMentioned": "⚠️ Please mention a user for 'add' or 'remove' actions."
+    },
+    "birthdayCmd": {
+        "usageSet": "🎂 Usage: `{prefix}birthday set DD/MM [@user_if_owner]` (e.g., `{prefix}birthday set 28/10`)",
+        "usageCheck": "🎂 Usage: `{prefix}birthday check [@user_optional]`",
+        "usageRemove": "🎂 Usage: `{prefix}birthday remove [@user_optional_if_owner]`",
+        "usageList": "🎂 Usage: `{prefix}birthday list`",
+        "setSuccess": "✅ Your birthday has been set to {date}!",
+        "setForUserSuccess": "✅ Birthday for {userName} has been set to {date}.",
+        "checkResult": "🎂 {userName}'s birthday is on {date}.",
+        "checkNotSet": "❓ {userName} has not set a birthday with me yet.",
+        "checkSelfNotSet": "❓ You haven't set your birthday with me yet. Use `{prefix}birthday set DD/MM`.",
+        "removedSuccess": "🗑️ Birthday for {userName} has been removed.",
+        "removeUserNotSet": "🤷 {userName} does not have a birthday set to remove.",
+        "removeSelfNotSet": "🤷 You don't have a birthday set to remove.",
+        "listHeaderGroup": "🎂 Birthdays Set in this Group:",
+        "listHeaderPm": "🎂 Your Registered Birthday:",
+        "listEntry": "➢ {userName}: {date}",
+        "listEmptyChat": "🤷 No birthdays have been set in this group yet.",
+        "listEmptyUser": "🤷 You haven't set your birthday yet.",
+        "invalidDate": "⚠️ Invalid date format. Please use DD/MM (e.g., 28/10).",
+        "notFound": "❓ User {userName} not found.",
+        "noUserMentioned": "⚠️ Please mention a user if you are the owner and setting/removing for someone else."
     }
   },
   "menu": {

@@ -326,10 +326,35 @@
     - [X] `.setreactions <emojis...>/clear` (in `commands/owner/setreactions.js`) - Updates `autoReactionEmojis`.
     - [X] Integrated these handlers into `index.js` owner command router, passing a `statusAutomationState` object to them.
 
-## Future Phases (To be detailed)
-- Status & Extras (Part 2: Vv, Emojimix, Logomaker, Qotd, Birthday, Priorityview)
-- AI & Prompt Tools
+... (Previous content of Phase 1-10 & Phase 11 Part 1 remains the same) ...
 
+## Phase 11: STATUS & EXTRAS (Part 2)
+- [X] **Directory Structure & Setup (Misc):**
+    - [X] Created `commands/misc/` directory.
+    - [X] Initialized `priorityViewList = []` and `birthdays = {}` in `index.js`.
+- [X] **Add Theming for New Commands:**
+    - [X] Added themes for `.vv`, `.emojimix`, `.logomaker`, `.qotd`, `.priorityview`, `.birthday` to `Themes/WHIZ.json`.
+- [X] **Implement `.vv` (View Once Saver) Command:**
+    - [X] In `commands/misc/vv.js`. Saves replied-to view-once media.
+- [X] **Implement `.emojimix <emoji1> <emoji2>` Command:**
+    - [X] In `commands/misc/emojimix.js`. Attempts to fetch mixed emoji from gstatic URLs; provides fallback link.
+- [X] **Implement `.logomaker <style> <text...>` Command (2 initial styles):**
+    - [X] In `commands/misc/logomaker.js`. Uses `generateTextEffect` with styles 'neongalaxy' and 'hubstyle'.
+    - [X] Implemented `.logostyles` to list available logo styles.
+    - [X] Defined `availableLogoStyles` map in `index.js`.
+- [X] **Implement `.qotd` (Quote of the Day) Command:**
+    - [X] In `commands/info/qotd.js`. Fetches QOTD from ZenQuotes API.
+- [X] **Implement `.priorityview add/remove/list @user` (Owner Command):**
+    - [X] In `commands/owner/priorityview.js`. Manages `priorityViewList`.
+    - [X] *Note: Autoview logic in `index.js` needs to be updated to use `priorityViewList` (this will be handled during integration or as a separate small step).*
+- [X] **Implement `.birthday` Command (Simplified, In-Memory):**
+    - [X] In `commands/misc/birthday.js`. Sub-commands: `set`, `check`, `remove`, `list`. Uses in-memory `birthdays` object.
+- [X] **Integrate New Command Handlers into `index.js`:**
+    - [X] Imported and routed all new command handlers. Passed necessary state/helpers.
+
+## Future Phases (To be detailed)
+- AI & Prompt Tools
+- Final review of all commands, AGENTS.md, README.md.
 
 ## Pending Configurations / Notes
 - Decide on final WhatsApp library if `whatsapp-web.js` proves problematic for specific features.
