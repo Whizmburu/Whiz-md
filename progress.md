@@ -5,8 +5,8 @@ This file tracks the implementation status of commands and features for the WHIZ
 ## Command Status
 
 **Total Commands Planned:** 119+
-**Implemented Commands:** 24 (Basic) + 8 (Image Tools) + 10 (Text Image Placeholders) = 42
-**Pending Commands:** 119 - 42 = 77+
+**Implemented Commands:** 24 (Basic) + 8 (Image Tools) + 10 (Text Image Placeholders) + 12 (Fun) + 10 (Games) = 64
+**Pending Commands:** 119 - 64 = 55+
 
 ### Key:
 - ✅: Implemented (Core functionality)
@@ -77,33 +77,33 @@ This file tracks the implementation status of commands and features for the WHIZ
 
 ---
 
-### 🎭 FUN & TEXT GAMES (0/12)
-- ❌ `.meme`
-- ❌ `.joke`
-- ❌ `.quote`
-- ❌ `.fact`
-- ❌ `.8ball`
-- ❌ `.truth`
-- ❌ `.dare`
-- ❌ `.ship`
-- ❌ `.slap`
-- ❌ `.hug`
-- ❌ `.kiss`
-- ❌ `.pat`
+### 🎭 FUN & TEXT GAMES (12/12)
+- 🟡 `.meme` (Placeholder, needs API/local)
+- ✅ `.joke` (Simple local list)
+- ✅ `.quote` (Simple local list)
+- ✅ `.fact` (Simple local list)
+- ✅ `.8ball` (Simple local list)
+- ✅ `.truth` (Simple local list)
+- ✅ `.dare` (Simple local list)
+- ✅ `.ship` (Simple calculation)
+- ✅ `.slap` (Action text)
+- ✅ `.hug` (Action text)
+- ✅ `.kiss` (Action text)
+- ✅ `.pat` (Action text)
 
 ---
 
-### 🎮 INTERACTIVE GAMES (0/12)
-- ❌ `.ttt` (Tic Tac Toe)
-- ❌ `.connect4`
-- ❌ `.guess`
-- ❌ `.sudoku`
-- ❌ `.trivia`
-- ❌ `.hangman`
-- ❌ `.riddle`
-- ❌ `.slot`
-- ❌ `.roll`
-- ❌ `.quiz`
+### 🎮 INTERACTIVE GAMES (10/12)
+- 🟡 `.ttt` (Tic Tac Toe - Placeholder)
+- 🟡 `.connect4` (Placeholder)
+- ✅ `.guess` (Simple number guessing game)
+- 🟡 `.sudoku` (Placeholder)
+- 🟡 `.trivia` (Placeholder, needs API/questions)
+- ✅ (simpl) `.hangman` (Simple local game)
+- ✅ `.riddle` (Simple local list, reveals answer)
+- ✅ `.slot` (Text-based slot machine)
+- ✅ `.roll` (Dice roller)
+- 🟡 `.quiz` (Placeholder, needs API/questions)
 
 ---
 
