@@ -11,6 +11,8 @@ const ffmpeg = require('fluent-ffmpeg');
 const path = require('path'); // For handling file paths
 const os = require('os'); // For temporary directory
 const FormData = require('form-data'); // For removebg
+const { evaluate } = require('mathjs'); // For .calc command
+const QRCode = require('qrcode'); // For .qr command
 
 // Load theme/config
 let theme = {};
@@ -368,6 +370,431 @@ client.on('message', async (msg) => {
         }
         return;
     }
+
+    if (commandName === 'time' || commandName === 'date') {
+        const chat = await msg.getChat();
+        try {
+            // await chat.sendStateTyping(); // Optional for very quick commands
+
+            const now = new Date();
+
+            let replyMsg = "";
+
+            if (commandName === 'time') {
+                const serverTime = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const utcTime = now.toLocaleTimeString('en-US', { timeZone: 'UTC', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                replyMsg = `${theme.messages.dateTimeCommand.serverTime.replace('{time}', serverTime)}\n` +
+                           `${theme.messages.dateTimeCommand.utcTime.replace('{time}', utcTime + ' UTC')}`;
+            } else { // commandName === 'date'
+                const serverDate = now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); // e.g., Monday, 28 October 2024
+                const utcDate = now.toLocaleDateString('en-GB', { timeZone: 'UTC', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                replyMsg = `${theme.messages.dateTimeCommand.serverDate.replace('{date}', serverDate)}\n` +
+                           `${theme.messages.dateTimeCommand.utcDate.replace('{date}', utcDate + ' (UTC)')}`;
+            }
+
+            await msg.reply(replyMsg.trim());
+            // await chat.clearState(); // Optional
+
+        } catch (error) {
+            console.error(`Error processing .${commandName} command:`, error);
+            await msg.reply(`❌ Oops! Something went wrong while fetching the ${commandName}.`);
+            // await chat.clearState(); // Ensure clear state if it was set
+        }
+        return;
+    }
+
+    if (commandName === 'speedtest') {
+        const chat = await msg.getChat(); // Not strictly needed if only replying with static text
+        try {
+            // await chat.sendStateTyping(); // Optional for static message
+            await msg.reply(theme.messages.speedtestCommand.info);
+            // await chat.clearState(); // Optional
+        } catch (error) {
+            console.error("Error sending .speedtest placeholder:", error);
+            // Fallback reply if theme message fails for some reason
+            await msg.reply("To test your internet speed, please visit a website like https://www.speedtest.net or https://fast.com.");
+        }
+        return;
+    }
+
+
+    if (commandName === 'ip') {
+        const query = args.join(' '); // Can be IP or domain
+        if (!query) {
+            await msg.reply(theme.messages.ipCommand.noQuery.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.ipCommand.fetching.replace('{query}', query));
+
+            // ip-api.com provides comprehensive, keyless lookups
+            const apiUrl = `http://ip-api.com/json/${encodeURIComponent(query)}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`;
+            const response = await axios.get(apiUrl, { timeout: 10000 });
+
+            if (response.data && response.data.status === 'success') {
+                const data = response.data;
+                let resultMsg = theme.messages.ipCommand.result;
+                resultMsg = resultMsg
+                    .replace(/{query}/g, data.query) // Use the query returned by API (resolved IP)
+                    .replace('{ip}', data.query) // Actual IP address
+                    .replace('{country}', data.country || 'N/A')
+                    .replace('{countryCode}', data.countryCode || 'N/A')
+                    .replace('{regionName}', data.regionName || 'N/A')
+                    .replace('{region}', data.region || 'N/A')
+                    .replace('{city}', data.city || 'N/A')
+                    .replace('{zip}', data.zip || 'N/A')
+                    .replace('{lat}', data.lat || 'N/A')
+                    .replace('{lon}', data.lon || 'N/A')
+                    .replace('{timezone}', data.timezone || 'N/A')
+                    .replace('{isp}', data.isp || 'N/A')
+                    .replace('{org}', data.org || 'N/A')
+                    .replace('{as}', data.as || 'N/A');
+
+                await msg.reply(resultMsg);
+            } else {
+                const apiErrorMsg = response.data.message || "Invalid input or not found.";
+                await msg.reply(theme.messages.ipCommand.notFound.replace('{query}', query) + ` (API: ${apiErrorMsg})`);
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .ip command for "${query}":`, error.message);
+            await msg.reply(theme.messages.ipCommand.apiError);
+            await chat.clearState();
+        }
+        return;
+    }
+
+
+    if (commandName === 'shorturl') {
+        const longUrl = args[0];
+        if (!longUrl) {
+            await msg.reply(theme.messages.shortUrlCommand.noUrl.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        // Basic URL validation
+        try {
+            new URL(longUrl); // This will throw an error if the URL is invalid
+        } catch (_) {
+            await msg.reply(theme.messages.shortUrlCommand.invalidUrl);
+            return;
+        }
+
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.shortUrlCommand.shortening);
+
+            const apiUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
+            const response = await axios.get(apiUrl, { timeout: 7000 }); // 7s timeout
+
+            if (response.status === 200 && response.data && !response.data.toLowerCase().startsWith('error')) {
+                const shortenedUrl = response.data.trim();
+                await msg.reply(theme.messages.shortUrlCommand.result.replace('{shortenedUrl}', shortenedUrl));
+            } else {
+                // is.gd might return 200 OK with an error message in the body
+                const apiErrorMsg = response.data ? response.data.substring(0, 100) : "Unknown API issue.";
+                console.error("is.gd API error:", apiErrorMsg);
+                await msg.reply(theme.messages.shortUrlCommand.error + ` (API: ${apiErrorMsg})`);
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .shorturl for "${longUrl}":`, error.message);
+            await msg.reply(theme.messages.shortUrlCommand.error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'translate') {
+        const chat = await msg.getChat();
+        let textToTranslate = "";
+        let targetLang = "";
+
+        // Syntax 1: .translate <lang_code> <text...>
+        // Syntax 2: .translate <text...> to <lang_code/lang_name>
+        const toKeywordIndex = args.findIndex(arg => arg.toLowerCase() === 'to');
+
+        if (args.length < 2) {
+            await msg.reply(theme.messages.translateCommand.usage.replace(/{prefix}/g, botPrefix));
+            return;
+        }
+
+        if (toKeywordIndex > -1 && toKeywordIndex < args.length - 1 && toKeywordIndex > 0) {
+            // Syntax: .translate <text...> to <lang>
+            textToTranslate = args.slice(0, toKeywordIndex).join(' ');
+            targetLang = args.slice(toKeywordIndex + 1).join(' ');
+        } else if (args.length >= 2 && args[0].length <= 3 && !args.slice(1).join(' ').includes(' to ')) {
+            // Syntax: .translate <lang_code> <text...> (lang_code usually 2-3 chars)
+            // And ensure "to" is not part of the text to avoid conflict if lang code is also "to" (unlikely)
+            targetLang = args[0];
+            textToTranslate = args.slice(1).join(' ');
+        } else {
+             // Default assumption or fallback: treat the last word as lang if it's short, otherwise it's part of text.
+             // This is a bit ambiguous, so the other syntaxes are preferred.
+             // For now, let's enforce one of the clearer syntaxes by replying usage.
+            await msg.reply(theme.messages.translateCommand.usage.replace(/{prefix}/g, botPrefix));
+            return;
+        }
+
+        if (!textToTranslate || !targetLang) {
+            await msg.reply(theme.messages.translateCommand.usage.replace(/{prefix}/g, botPrefix));
+            return;
+        }
+
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.translateCommand.translating
+                .replace('{text}', textToTranslate.substring(0, 30) + (textToTranslate.length > 30 ? '...' : ''))
+                .replace('{language}', targetLang)
+            );
+
+            // MyMemory API: langpair format is source|target, e.g., en|es or auto|es
+            // We'll use auto-detect for source language.
+            const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=|${encodeURIComponent(targetLang)}`;
+
+            const response = await axios.get(apiUrl, { timeout: 15000 }); // 15s timeout
+
+            if (response.data && response.data.responseData && response.data.responseStatus === 200) {
+                const translatedText = response.data.responseData.translatedText;
+                const detectedSourceLang = response.data.responseData.detectedLanguage || "auto-detected";
+
+                // Sometimes MyMemory includes "NO QUERY SPECIFIED!" or similar if it fails.
+                if (translatedText.includes("NO QUERY SPECIFIED!") || translatedText.includes("INVALID LANGUAGE PAIR") || translatedText.length === 0) {
+                     await msg.reply(theme.messages.translateCommand.error + " (API indicated an issue or no translation found).");
+                } else {
+                    let resultMsg = theme.messages.translateCommand.result;
+                    resultMsg = resultMsg
+                        .replace('{language}', `${targetLang} (from ${detectedSourceLang})`)
+                        .replace('{translatedText}', translatedText);
+                    await msg.reply(resultMsg);
+                }
+            } else if (response.data && response.data.responseDetails) {
+                 await msg.reply(theme.messages.translateCommand.error + ` (API: ${response.data.responseDetails})`);
+            }
+            else {
+                await msg.reply(theme.messages.translateCommand.error);
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .translate command for "${textToTranslate}" to "${targetLang}":`, error.message);
+            await msg.reply(theme.messages.translateCommand.error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'weather') {
+        const city = args.join(' ');
+        const apiKey = process.env.OPENWEATHERMAP_API_KEY;
+
+        if (!city) {
+            await msg.reply(theme.messages.weatherCommand.noCity.replace('{prefix}', botPrefix));
+            return;
+        }
+        if (!apiKey) {
+            await msg.reply(theme.messages.weatherCommand.noApiKey);
+            return;
+        }
+
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.weatherCommand.fetching.replace('{city}', city));
+
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+            const response = await axios.get(apiUrl, { timeout: 10000 });
+
+            if (response.data && response.data.cod === 200) {
+                const weatherData = response.data;
+                const main = weatherData.main;
+                const wind = weatherData.wind;
+                const weatherDesc = weatherData.weather[0].description;
+                const sys = weatherData.sys;
+
+                // Function to convert timestamp to HH:MM format in local time (server's local time)
+                // For more accurate timezone specific sunrise/sunset, would need weatherData.timezone (offset in seconds from UTC)
+                const formatTime = (timestamp) => {
+                    const date = new Date((timestamp + weatherData.timezone) * 1000); // Adjust with timezone offset for true local time of city
+                    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }); // Display as UTC then user infers
+                };
+                 const formatTimeWithOffset = (timestamp, offsetSeconds) => {
+                    const date = new Date((timestamp + offsetSeconds) * 1000);
+                    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                };
+
+
+                const windDir = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'][Math.floor((wind.deg / 22.5) + 0.5) % 16] || 'N/A';
+
+                let resultMsg = theme.messages.weatherCommand.result;
+                resultMsg = resultMsg
+                    .replace('{city}', weatherData.name)
+                    .replace('{country}', sys.country)
+                    .replace('{temp}', main.temp.toFixed(1))
+                    .replace('{feelsLike}', main.feels_like.toFixed(1))
+                    .replace('{humidity}', main.humidity)
+                    .replace('{windSpeed}', wind.speed.toFixed(1))
+                    .replace('{windDir}', windDir)
+                    .replace('{description}', weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1))
+                    .replace('{sunrise}', formatTimeWithOffset(sys.sunrise, weatherData.timezone))
+                    .replace('{sunset}', formatTimeWithOffset(sys.sunset, weatherData.timezone));
+
+                await msg.reply(resultMsg);
+
+            } else if (response.data && response.data.message) { // OpenWeatherMap often returns error message with cod != 200
+                await msg.reply(theme.messages.weatherCommand.notFound.replace('{city}', city) + ` (API: ${response.data.message})`);
+            } else {
+                 await msg.reply(theme.messages.weatherCommand.notFound.replace('{city}', city));
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .weather command for "${city}":`, error.message);
+            if (error.response && error.response.status === 404) {
+                await msg.reply(theme.messages.weatherCommand.notFound.replace('{city}', city));
+            } else if (error.response && error.response.data && error.response.data.message) {
+                 await msg.reply(theme.messages.weatherCommand.apiError + ` (API: ${error.response.data.message})`);
+            }
+            else {
+                await msg.reply(theme.messages.weatherCommand.apiError);
+            }
+            await chat.clearState();
+        }
+        return;
+    }
+
+
+    if (commandName === 'qr') {
+        const textToEncode = args.join(' ');
+        if (!textToEncode) {
+            await msg.reply(theme.messages.qrCommand.noText.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.qrCommand.generating.replace('{text}', textToEncode.substring(0, 30) + (textToEncode.length > 30 ? '...' : '')));
+
+            // Generate QR code to a buffer
+            const qrCodeBuffer = await QRCode.toBuffer(textToEncode, {
+                errorCorrectionLevel: 'H', // High error correction
+                type: 'png', // Output as PNG buffer
+                margin: 2, // Margin around QR code
+                scale: 8 // Scale factor for size (pixels per module)
+            });
+
+            const qrMedia = new MessageMedia('image/png', qrCodeBuffer.toString('base64'), 'qrcode.png');
+            await client.sendMessage(msg.from, qrMedia, { caption: `QR Code for: ${textToEncode.substring(0, 50)}` });
+
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error generating QR code for "${textToEncode}":`, error);
+            await msg.reply(theme.messages.qrCommand.error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'wiki') {
+        const query = args.join(' ');
+        if (!query) {
+            await msg.reply(theme.messages.wikiCommand.noQuery.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.wikiCommand.searching.replace('{query}', query));
+
+            // Step 1: Search for the article to get the exact title
+            const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&srlimit=1`;
+            const searchResponse = await axios.get(searchUrl);
+
+            if (!searchResponse.data.query.search || searchResponse.data.query.search.length === 0) {
+                await msg.reply(theme.messages.wikiCommand.notFound.replace('{query}', query));
+                await chat.clearState();
+                return;
+            }
+
+            const pageTitle = searchResponse.data.query.search[0].title;
+
+            // Step 2: Get the extract of the found article
+            const extractUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(pageTitle)}&format=json&redirects=1`;
+            const extractResponse = await axios.get(extractUrl);
+
+            const pages = extractResponse.data.query.pages;
+            const pageId = Object.keys(pages)[0]; // Get the first (and likely only) page ID
+
+            if (pageId === "-1" || !pages[pageId].extract) { // Page ID -1 means article not found (e.g. after redirect)
+                await msg.reply(theme.messages.wikiCommand.notFound.replace('{query}', pageTitle)); // Use pageTitle here
+                await chat.clearState();
+                return;
+            }
+
+            let summary = pages[pageId].extract;
+            // Limit summary length
+            const maxSummaryLength = 500; // Adjust as needed
+            if (summary.length > maxSummaryLength) {
+                summary = summary.substring(0, maxSummaryLength).trim() + "...";
+            }
+
+            const articleUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle.replace(/ /g, '_'))}`;
+
+            let resultMsg = theme.messages.wikiCommand.summaryTitle;
+            resultMsg = resultMsg
+                .replace('{title}', pageTitle)
+                .replace('{summary}', summary)
+                .replace('{url}', articleUrl);
+
+            await msg.reply(resultMsg);
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .wiki command for "${query}":`, error);
+            await msg.reply(theme.messages.wikiCommand.apiError);
+            await chat.clearState();
+        }
+        return;
+    }
+
+
+    if (commandName === 'calc') {
+        const expression = args.join(' ');
+        if (!expression) {
+            await msg.reply(theme.messages.calcCommand.noExpression.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        try {
+            const chat = await msg.getChat(); // getChat might not be needed if only replying
+            // await chat.sendStateTyping(); // Optional for quick commands
+
+            const result = evaluate(expression);
+            // Ensure result is a number or something easily stringifiable.
+            // math.js evaluate can return functions or complex objects for some inputs.
+            if (typeof result === 'function' || (typeof result === 'object' && result !== null && !Array.isArray(result))) {
+                 await msg.reply(theme.messages.calcCommand.invalidExpression + " (Cannot evaluate to a simple value).");
+            } else {
+                await msg.reply(theme.messages.calcCommand.result.replace('{result}', result.toString()));
+            }
+            // await chat.clearState(); // Optional
+        } catch (error) {
+            // console.error(`Error in .calc for expression "${expression}":`, error.message);
+            await msg.reply(theme.messages.calcCommand.invalidExpression);
+        }
+        return;
+    }
+
 
     // --- Placeholder for Advanced Image Effects ---
     if (['triggered', 'glitchimg'].includes(commandName)) {

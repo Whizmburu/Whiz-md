@@ -117,6 +117,60 @@
     "placeholderImageCommand": {
         "triggered": "💥 The `.triggered` GIF generator is under development.",
         "glitchimg": "👾 The `.glitchimg` effect generator is under development."
+    },
+    "calcCommand": {
+        "noExpression": "⚠️ Please provide a mathematical expression to calculate. Example: `{prefix}calc 2+2*10`",
+        "invalidExpression": "❌ Invalid mathematical expression. Please check your input.",
+        "result": "🧮 Result: `{result}`"
+    },
+    "qrCommand": {
+        "noText": "⚠️ Please provide text to generate a QR code. Example: `{prefix}qr Hello World`",
+        "generating": "🔄 Generating QR code for \"{text}\"...",
+        "error": "❌ Failed to generate QR code."
+    },
+    "wikiCommand": {
+        "noQuery": "⚠️ Please provide a search query for Wikipedia. Example: `{prefix}wiki Artificial Intelligence`",
+        "searching": "🔎 Searching Wikipedia for \"{query}\"...",
+        "notFound": "❓ Sorry, I couldn't find any Wikipedia results for \"{query}\".",
+        "apiError": "❌ Oops! Something went wrong while fetching data from Wikipedia.",
+        "summaryTitle": "📖 *{title}*\n\n{summary}\n\nRead more: {url}"
+    },
+    "translateCommand": {
+        "usage": "⚠️ Usage: `{prefix}translate <target_lang_code> <text>` or `{prefix}translate <text> to <target_lang_name/code>`.\nExample: `{prefix}translate es Hello World` or `{prefix}translate Hello World to Spanish`",
+        "translating": "🌐 Translating \"{text}\" to {language}...",
+        "error": "❌ Failed to translate text. Please check the language code/name or try again.",
+        "result": "📜 Translation ({language}):\n\n`{translatedText}`"
+    },
+    "weatherCommand": {
+        "noCity": "⚠️ Please provide a city name to get weather information. Example: `{prefix}weather London`",
+        "noApiKey": "🔑 API key for weather service is not set. Please contact the bot owner.",
+        "fetching": "🌦️ Fetching weather for \"{city}\"...",
+        "notFound": "❓ City \"{city}\" not found or no weather data available.",
+        "apiError": "❌ Oops! Something went wrong while fetching weather data.",
+        "result": "🌤️ *Weather in {city} ({country})*:\n\n🌡️ Temp: {temp}°C (Feels like: {feelsLike}°C)\n💧 Humidity: {humidity}%\n🌬️ Wind: {windSpeed} m/s {windDir}\n☁️ Condition: {description}\n🌅 Sunrise: {sunrise}\n🌇 Sunset: {sunset}"
+    },
+    "shortUrlCommand": {
+        "noUrl": "⚠️ Please provide a URL to shorten. Example: `{prefix}shorturl https://example.com/very/long/url`",
+        "invalidUrl": "🚫 The provided input is not a valid URL.",
+        "shortening": "🔗 Shortening URL...",
+        "error": "❌ Failed to shorten URL.",
+        "result": "✅ Shortened URL: {shortenedUrl}"
+    },
+    "ipCommand": {
+        "noQuery": "⚠️ Please provide an IP address or domain name. Example: `{prefix}ip google.com` or `{prefix}ip 8.8.8.8`",
+        "fetching": "🛰️ Fetching IP/domain information for \"{query}\"...",
+        "notFound": "❓ Information not found for \"{query}\". Please provide a valid IP or domain.",
+        "apiError": "❌ Oops! Something went wrong while fetching IP/domain data.",
+        "result": "💻 *IP/Domain Info for: {query}*\n\nIP: {ip}\nCountry: {country} ({countryCode})\nRegion: {regionName} ({region})\nCity: {city}\nZip: {zip}\nLat/Lon: {lat}, {lon}\nTimezone: {timezone}\nISP: {isp}\nOrg: {org}\nAS: {as}"
+    },
+    "dateTimeCommand": {
+        "serverTime": "🕰️ Current Server Time: `{time}`",
+        "serverDate": "📅 Current Server Date: `{date}`",
+        "utcTime": "🌍 Current UTC Time: `{time}`",
+        "utcDate": "🌍 Current UTC Date: `{date}`"
+    },
+    "speedtestCommand": {
+        "info": "💨 To test *your* internet speed, please visit a website like https://www.speedtest.net or https://fast.com.\nThis command, if fully implemented, would test the *server's* internet speed."
     }
   },
   "menu": {

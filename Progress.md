@@ -135,8 +135,35 @@
     - [X] Placeholder implemented.
     - *Note: Advanced glitch art effects are complex. Basic pixel manipulation possible with `jimp` but might not meet expectations for varied 'artistic' glitches.*
 
+... (Previous content of Phase 1-4 remains the same) ...
+
+## Phase 5: UTILITIES & LOOKUP
+- [X] **Dependency Installation & Setup:**
+    - [X] Added `mathjs` (for `.calc`), `qrcode` (for `.qr`) to `package.json`.
+    - [X] Added `OPENWEATHERMAP_API_KEY` placeholder to `.env.example`.
+- [X] **Add Theming for Utility Commands:**
+    - Added feedback messages for all utility commands to `Themes/WHIZ.json`.
+- [X] **Implement `.calc <expression>` Command:**
+    - Uses `mathjs.evaluate()` for safe calculation.
+- [X] **Implement `.qr <text>` Command:**
+    - Uses `qrcode` library to generate and send QR code image.
+- [X] **Implement `.wiki <query>` Command:**
+    - Uses MediaWiki API (via `axios`) to search and fetch article summaries.
+- [X] **Implement `.translate` Command:**
+    - Uses MyMemory API (via `axios`) for translations. Supports `.translate <lang> <text>` and `.translate <text> to <lang>`.
+- [X] **Implement `.weather <city>` Command:**
+    - Uses OpenWeatherMap API (via `axios`, requires API key) for current weather data.
+- [X] **Implement `.shorturl <URL>` Command:**
+    - Uses `is.gd` API (via `axios`) to shorten URLs.
+- [X] **Implement `.ip <IP_or_domain>` Command:**
+    - Uses `ip-api.com` (via `axios`) for IP/domain geolocation.
+- [X] **Implement `.time` and `.date` Commands (Simplified):**
+    - Displays current server and UTC time/date. Full timezone support deferred.
+- [X] **Implement `.speedtest` Command (Placeholder/Link):**
+    - Provides informational message and links to speed test websites.
+- [ ] **(Ping command was already implemented/enhanced in Phase 1)**
+
 ## Future Phases (To be detailed)
-- Utilities & Lookup
 - Fun & Text Games
 - Interactive Games
 - Group Tools
