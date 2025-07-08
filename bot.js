@@ -100,7 +100,21 @@ client.on('ready', async () => {
 
             const selfChatId = client.info.wid._serialized;
             const firstMessage = await client.sendMessage(selfChatId, welcomeMessage1);
-            await client.sendMessage(selfChatId, menuTextForWelcome, { quotedMessageId: firstMessage.id._serialized });
+
+            // Safely try to quote the first message. If it fails or no message, send without quoting.
+            let messagesInChat;
+            try {
+                messagesInChat = await client.getChatById(selfChatId).then(chat => chat.fetchMessages({ limit: 1 }));
+            } catch (fetchError) {
+                console.warn("Could not fetch messages from self chat to quote:", fetchError.message);
+            }
+
+            if (messagesInChat && messagesInChat.length > 0 && messagesInChat[0] && messagesInChat[0].id) {
+                await client.sendMessage(selfChatId, menuTextForWelcome, { quotedMessageId: messagesInChat[0].id._serialized });
+            } else {
+                console.log("No prior message in self-chat to quote, or message ID is missing. Sending help menu as a new message.");
+                await client.sendMessage(selfChatId, menuTextForWelcome);
+            }
             console.log("Welcome messages sent to self chat.");
 
         } catch (error) {
