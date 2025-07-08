@@ -136,73 +136,58 @@ client.on('message', async msg => {
     }
 });
 
-// Status event listeners
-// Assuming 'status' event exists and provides status objects.
-// The actual event name and structure might differ in whatsapp-web.js for statuses.
-// Common way is 'message' event with msg.isStatus or msg.from === 'status@broadcast'.
-// Let's refine this based on typical wwebjs patterns.
-// whatsapp-web.js typically emits 'message' for statuses too.
-// We need to check msg.from === 'status@broadcast' or if msg.type indicates a status update.
+// Status event listeners are now integrated into the main 'message' handler below.
 
-client.on('message', async (message) => {
-    // This will run handleMessage again, which is fine as it filters by prefix.
-    // Now, add status specific logic.
-    if (message.from === 'status@broadcast' || message.isStatus) { // isStatus might not be reliable, 'status@broadcast' is better for received statuses
-        // console.log("Received a status update:", message);
+client.on('message', async (msg) => { // Renamed 'message' to 'msg' for clarity within this specific handler
+    console.log(`[BOT.JS] Received message event. From: ${msg.from}, Author: ${msg.author || 'N/A'}, Type: ${msg.type}, Body: "${msg.body}"`);
+
+    // Handle status updates (auto-view/react)
+    if (msg.from === 'status@broadcast') {
+        console.log(`[BOT.JS] Detected status update from author: ${msg.author}. Body: ${msg.body}, Type: ${msg.type}`);
+
+        // Optional: If you want to completely stop further processing for status@broadcast messages here:
+        // console.log("[BOT.JS] Status message detected. No further command processing will occur for this message.");
+        // return; // This would prevent command handler from seeing it if it somehow matched prefix.
 
         const autoviewCmd = require('./commands/status_extras/autoview.js');
         const autoreactCmd = require('./commands/status_extras/autoreact.js');
 
         if (autoviewCmd && typeof autoviewCmd.isAutoViewEnabled === 'function' && autoviewCmd.isAutoViewEnabled()) {
-            try {
-                // Marking as read: sendReadReceipt might not work for statuses directly.
-                // Viewing is usually implicit by fetching/receiving it.
-                // For whatsapp-web.js, viewing a status is done by client.sendSeen(statusId)
-                // statusId is tricky to get here. It's usually chatId of the status.
-                // The message object for a status is from 'status@broadcast'.
-                // The actual sender is in message.author.
-                if (message.author && client.info.wid._serialized !== message.author) { // Don't mark own statuses as seen via bot
-                    // console.log(`Auto-viewing status from ${message.author}`);
-                    // client.sendSeen needs the chatID of the status message, which is tricky.
-                    // A common way is to get the chat of the author and then send "read" for their statuses.
-                    // This is an area that often needs library-specific handling.
-                    // For now, we'll log, as direct "sendSeen" for a specific status message ID is complex.
-                    // A simpler "view" might be to fetch the status message itself, which some libraries treat as viewing.
-                    // whatsapp-web.js doesn't have a direct "viewStatus(statusMsg)" function.
-                    // The most reliable way is often to get all statuses for a contact and iterate.
-                    // This event is for *new* status posts.
-                    // Let's assume for now that receiving it and logging is a conceptual "view".
-                    // Actual "seen" checkmark update is more involved.
-                    // await client.sendPresenceUpdate('available', message.author); // Not for viewing
-                    // The library might automatically handle "seen" for statuses you receive if you process them.
-                    // No explicit "sendSeenForStatus" for a single status message object.
-                    // The most common workaround is to fetch all statuses by the author and then the library marks them.
-                    // This is not ideal for an event-driven new status.
-                    console.log(`[AutoView] Received status from ${message.author}. "Viewing" it (actual seen may depend on library internals).`);
-                     // Attempting to send a read receipt to the status sender's chat (their user ID)
-                    // This is speculative and might not correctly mark the status as read.
-                    // client.sendSeen(message.author); // This would mark their CHAT as seen, not status.
-                }
-            } catch (e) {
-                console.error("Error during auto-view attempt:", e);
+            if (msg.author && client.info.wid._serialized !== msg.author) {
+                console.log(`[AutoView] Processing status from ${msg.author}. (Conceptual view - actual seen depends on library internals)`);
+                // Actual "sendSeen" for statuses is complex and often not directly possible via a simple message object.
+                // The library might handle this implicitly or require specific methods not used here.
             }
         }
 
         if (autoreactCmd && typeof autoreactCmd.isAutoReactEnabled === 'function' && autoreactCmd.isAutoReactEnabled()) {
-            if (message.author && client.info.wid._serialized !== message.author) { // Don't react to own statuses
-                 try {
+            if (msg.author && client.info.wid._serialized !== msg.author) {
+                try {
                     const reactions = autoreactCmd.getReactions();
                     if (reactions && reactions.length > 0) {
                         const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
-                        // Reacting to a status message
-                        await message.react(randomReaction);
-                        console.log(`[AutoReact] Reacted with ${randomReaction} to status from ${message.author}`);
+                        await msg.react(randomReaction);
+                        console.log(`[AutoReact] Reacted with ${randomReaction} to status from ${msg.author}`);
                     }
                 } catch (e) {
-                    console.error(`Error auto-reacting to status from ${message.author}:`, e);
+                    console.error(`[AutoReact] Error auto-reacting to status from ${msg.author}:`, e);
                 }
             }
         }
+        // After handling status-specific actions, decide if it should proceed to command handler.
+        // Generally, status messages don't trigger text commands.
+        // If you want to ensure status messages are *never* processed as commands:
+        return; // Stop further processing for status@broadcast messages.
+    }
+
+    // Regular command handling for non-status messages
+    if (msg.body && typeof msg.body === 'string' && msg.body.startsWith(config.prefix)) {
+        console.log(`[BOT.JS] Message from ${msg.from} starts with prefix, attempting to handle command: "${msg.body}"`);
+        await handleMessage(client, msg);
+    } else if (msg.body && typeof msg.body === 'string' && !msg.body.startsWith(config.prefix)) {
+        // console.log(`[BOT.JS] Message from ${msg.from} does not start with prefix, ignoring for command handling.`);
+    } else {
+        // console.log(`[BOT.JS] Message from ${msg.from} body is not a string or is empty, ignoring.`);
     }
 });
 

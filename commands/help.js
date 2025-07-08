@@ -5,12 +5,15 @@ const { commands } = require('../utils/commandHandler'); // Assuming commandHand
 // Helper function to generate the full menu text
 // Exported for use in bot.js for the welcome message
 function getFullMenuTextInternal() {
-    const commandList = require('../utils/commandHandler').commands; // Ensure this is the map
-    const loadedCommandsCount = commandList.size; // This counts aliases too if not careful, need unique command count
-    // To get unique commands, we can convert the map values to a Set and get its size.
-    const uniqueCommands = new Set(commandList.values());
-    const uniqueCommandsCount = uniqueCommands.size;
+    // Moved pjson require inside the function
+    const pathMod = require('path'); // Renamed to avoid conflict if 'path' is used elsewhere
+    const pjson = require(pathMod.join(__dirname, '..', '..', 'package.json'));
 
+    // Temporarily remove dynamic command count to isolate package.json issue
+    // const commandList = require('../utils/commandHandler').commands;
+    // const uniqueCommands = new Set(commandList.values());
+    // const uniqueCommandsCount = uniqueCommands.size;
+    const uniqueCommandsCount = "N/A"; // Placeholder
 
     // Define categories and their commands as per the new format
     const categories = [
@@ -28,39 +31,35 @@ function getFullMenuTextInternal() {
         { name: "📋 BOT SYSTEM", commands: ["Menu", "Help", "Status", "Ping", "Runtime", "Info", "Version"] }
     ];
 
-    let menuText = `*❀━【 💎* _*WHIZ‑MD BOT MENU*_ *╮*\n\n`; // Added extra newline for spacing
+    let menuText = `*❀━【 💎* _*WHIZ‑MD BOT MENU*_ *╮*\n\n`;
     menuText += `*❀* *Owner* : ${config.ownerName}\n`;
     menuText += `*❀* *Mode* : Public\n`;
     menuText += `*❀* *Prefix* : ${config.prefix}\n`;
-    // Use uniqueCommandsCount for a more accurate "Loaded" count if commandHandler's size includes aliases.
-    // However, the original spec example had "17 (Loaded)" which might be a specific count of primary commands.
-    // For now, using uniqueCommandsCount for better accuracy reflecting distinct functionalities.
-    menuText += `*❀* *Commands* : ${uniqueCommandsCount} (Loaded) / 119 (Planned)\n`;
-    menuText += `*❀* *Version* : ${pjson.version || "1.0.0"}\n`; // Read from package.json
+    menuText += `*❀* *Commands* : ${uniqueCommandsCount} (Loaded) / 119 (Planned)\n`; // Using placeholder count
+    menuText += `*❀* *Version* : ${pjson.version || "1.0.0"}\n`;
     menuText += `*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n`;
-    menuText += `*❀━━━━━━━━━━━━━╯*\n\n`; // Added extra newline
+    menuText += `*❀━━━━━━━━━━━━━╯*\n\n`;
 
     menuText += `*❀* _Type_ \`${config.prefix}help [command]\` _for command details_\n`;
-    menuText += `*❀* _Type_ \`${config.prefix}menu\` _for the full command list (this message)_\n\n`; // Added extra newline
+    menuText += `*❀* _Type_ \`${config.prefix}menu\` _for the full command list (this message)_\n\n`;
 
     categories.forEach(category => {
         menuText += `*❀━━━━━━━━━━━━❀*\n`;
         menuText += `*❀* ✦✦✦ *${category.name}* ✦✦✦\n`;
         category.commands.forEach(cmd => {
-            // We need to ensure the command name casing matches how it's typed/defined if we were to link to help.
-            // For display, Title Case is fine.
             menuText += `*❀* ┃ *${cmd}*\n`;
         });
     });
 
-    menuText += `*❀━━━━━━━━━━━━❀*\n`; // Final separator before link
-    menuText += `https://chat.whatsapp.com/JLmSbTfqf4I2Kh4SNJcWgM\n\n`; // Group link
-    menuText += `*❀━━━━━━━━━━━━━━╯*`; // Final bottom border
+    menuText += `*❀━━━━━━━━━━━━❀*\n`;
+    menuText += `https://chat.whatsapp.com/JLmSbTfqf4I2Kh4SNJcWgM\n\n`;
+    menuText += `*❀━━━━━━━━━━━━━━╯*`;
 
     return menuText;
 }
 
-const pjson = require('../../package.json'); // For version
+// const path = require('path'); // No longer needed at top level if moved inside function
+// const pjson = require(path.join(__dirname, '..', '..', 'package.json')); // Moved
 
 module.exports = {
     name: 'help',
