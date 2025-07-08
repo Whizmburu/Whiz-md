@@ -6,67 +6,61 @@ const { commands } = require('../utils/commandHandler'); // Assuming commandHand
 // Exported for use in bot.js for the welcome message
 function getFullMenuTextInternal() {
     const commandList = require('../utils/commandHandler').commands; // Ensure this is the map
-    return `❀┏━【 💎 WHIZ‑MD BOT MENU ━┓
-❀ Owner     : ${config.ownerName}
-❀ Mode      : Public
-❀ Prefix    : ${config.prefix}
-❀ Commands  : ${commandList.size} (Loaded) / 119 (Planned)
-❀ Version   : 1.0.0
-❀ Repo      : github.com/whizmburu/WHIZ‑MD
-❀━━━━━━━━━━━━━━━┛
+    const loadedCommandsCount = commandList.size; // This counts aliases too if not careful, need unique command count
+    // To get unique commands, we can convert the map values to a Set and get its size.
+    const uniqueCommands = new Set(commandList.values());
+    const uniqueCommandsCount = uniqueCommands.size;
 
-❀ Type \`${config.prefix}help [command]\` for command details
-❀ Type \`${config.prefix}menu\` for the full command list (this message)
 
-❀━━━━━━━━━━━━❀
-❀ 📁 MEDIA TOOLS
-❀ ${config.prefix}play / ${config.prefix}ytmp3 / ${config.prefix}ytmp4 / ${config.prefix}tiktok / ${config.prefix}instagram / ${config.prefix}facebook / ${config.prefix}spotify / ${config.prefix}soundcloud / ${config.prefix}joox / ${config.prefix}pinterest / ${config.prefix}shazam / ${config.prefix}lyrics
-╰───────────── ⬇️ read more ⬇️
+    // Define categories and their commands as per the new format
+    const categories = [
+        { name: "📁 MEDIA TOOLS", commands: ["Play", "Ytmp3", "Ytmp4", "Tiktok", "Instagram", "Facebook", "Spotify", "Soundcloud", "Joox", "Pinterest", "Shazam", "Lyrics"] },
+        { name: "🎨 TEXT IMAGE STYLES", commands: ["Steel", "Wood", "Fire", "Ice", "Neon", "Splash", "Glitchtxt", "Gradient", "Comic", "Textstyles"] },
+        { name: "📷 IMAGE TOOLS", commands: ["Sticker", "Toimg", "Removebg", "Blur", "Invert", "Circle", "Sepia", "Triggered", "Glitchimg", "Wanted", "Ocr"] },
+        { name: "🔧 UTILITIES & LOOKUP", commands: ["Wiki", "Translate", "Weather", "Time", "Date", "Calc", "Shorturl", "Ip", "Qr", "Ping", "Speedtest"] },
+        { name: "🎭 FUN & TEXT GAMES", commands: ["Meme", "Joke", "Quote", "Fact", "8ball", "Truth", "Dare", "Ship", "Slap", "Hug", "Kiss", "Pat"] },
+        { name: "🎮 INTERACTIVE GAMES", commands: ["Ttt", "Connect4", "Guess", "Sudoku", "Trivia", "Hangman", "Riddle", "Slot", "Roll", "Quiz"] },
+        { name: "👥 GROUP TOOLS", commands: ["Add", "Kick", "Promote", "Demote", "Link", "Tagall", "Hidetag", "Mute", "Unmute", "Setname", "Setdesc", "Setpp"] },
+        { name: "🧑‍💻 OWNER CONTROLS", commands: ["Block", "Unblock", "Broadcast", "Shutdown", "Restart", "Eval", "Send", "Getsession"] },
+        { name: "📊 INFO & FETCHERS", commands: ["Profile", "Numberinfo", "Github", "Npm", "Anime", "Quoteimg", "Iplookup", "Covid"] },
+        { name: "💡 AI & PROMPT TOOLS", commands: ["Chatgpt", "Bard", "Openai", "Dalle", "Image", "Caption", "Nameart", "Imgprompt"] },
+        { name: "🧪 STATUS & EXTRAS", commands: ["Vv", "Emojimix", "Logomaker", "Qotd", "Birthday", "Autoreact", "Autoview", "Setreactions", "Priorityview", "Save"] },
+        { name: "📋 BOT SYSTEM", commands: ["Menu", "Help", "Status", "Ping", "Runtime", "Info", "Version"] }
+    ];
 
-❀━━━━━━━━━━━━❀
-❀ 🎨 TEXT IMAGE STYLES
-❀ ${config.prefix}steel / ${config.prefix}wood / ${config.prefix}fire / ${config.prefix}ice / ${config.prefix}neon / ${config.prefix}splash / ${config.prefix}glitchtxt / ${config.prefix}gradient / ${config.prefix}comic / ${config.prefix}textstyles
+    let menuText = `*❀━【 💎* _*WHIZ‑MD BOT MENU*_ *╮*\n\n`; // Added extra newline for spacing
+    menuText += `*❀* *Owner* : ${config.ownerName}\n`;
+    menuText += `*❀* *Mode* : Public\n`;
+    menuText += `*❀* *Prefix* : ${config.prefix}\n`;
+    // Use uniqueCommandsCount for a more accurate "Loaded" count if commandHandler's size includes aliases.
+    // However, the original spec example had "17 (Loaded)" which might be a specific count of primary commands.
+    // For now, using uniqueCommandsCount for better accuracy reflecting distinct functionalities.
+    menuText += `*❀* *Commands* : ${uniqueCommandsCount} (Loaded) / 119 (Planned)\n`;
+    menuText += `*❀* *Version* : ${pjson.version || "1.0.0"}\n`; // Read from package.json
+    menuText += `*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n`;
+    menuText += `*❀━━━━━━━━━━━━━╯*\n\n`; // Added extra newline
 
-❀━━━━━━━━━━━━❀
-❀ 📷 IMAGE TOOLS
-❀ ${config.prefix}sticker / ${config.prefix}toimg / ${config.prefix}removebg / ${config.prefix}blur / ${config.prefix}invert / ${config.prefix}circle / ${config.prefix}sepia / ${config.prefix}triggered / ${config.prefix}glitchimg / ${config.prefix}wanted / ${config.prefix}ocr
+    menuText += `*❀* _Type_ \`${config.prefix}help [command]\` _for command details_\n`;
+    menuText += `*❀* _Type_ \`${config.prefix}menu\` _for the full command list (this message)_\n\n`; // Added extra newline
 
-❀━━━━━━━━━━━━❀
-❀ 🔧 UTILITIES & LOOKUP
-❀ ${config.prefix}wiki / ${config.prefix}translate / ${config.prefix}weather / ${config.prefix}time / ${config.prefix}date / ${config.prefix}calc / ${config.prefix}shorturl / ${config.prefix}ip / ${config.prefix}qr / ${config.prefix}ping / ${config.prefix}speedtest
+    categories.forEach(category => {
+        menuText += `*❀━━━━━━━━━━━━❀*\n`;
+        menuText += `*❀* ✦✦✦ *${category.name}* ✦✦✦\n`;
+        category.commands.forEach(cmd => {
+            // We need to ensure the command name casing matches how it's typed/defined if we were to link to help.
+            // For display, Title Case is fine.
+            menuText += `*❀* ┃ *${cmd}*\n`;
+        });
+    });
 
-❀━━━━━━━━━━━━❀
-❀ 🎭 FUN & TEXT GAMES
-❀ ${config.prefix}meme / ${config.prefix}joke / ${config.prefix}quote / ${config.prefix}fact / ${config.prefix}8ball / ${config.prefix}truth / ${config.prefix}dare / ${config.prefix}ship / ${config.prefix}slap / ${config.prefix}hug / ${config.prefix}kiss / ${config.prefix}pat
+    menuText += `*❀━━━━━━━━━━━━❀*\n`; // Final separator before link
+    menuText += `https://chat.whatsapp.com/JLmSbTfqf4I2Kh4SNJcWgM\n\n`; // Group link
+    menuText += `*❀━━━━━━━━━━━━━━╯*`; // Final bottom border
 
-❀━━━━━━━━━━━━❀
-❀ 🎮 INTERACTIVE GAMES
-❀ ${config.prefix}ttt / ${config.prefix}connect4 / ${config.prefix}guess / ${config.prefix}sudoku / ${config.prefix}trivia / ${config.prefix}hangman / ${config.prefix}riddle / ${config.prefix}slot / ${config.prefix}roll / ${config.prefix}quiz
-
-❀━━━━━━━━━━━━❀
-❀ 👥 GROUP TOOLS
-❀ ${config.prefix}add / ${config.prefix}kick / ${config.prefix}promote / ${config.prefix}demote / ${config.prefix}link / ${config.prefix}tagall / ${config.prefix}hidetag / ${config.prefix}mute / ${config.prefix}unmute / ${config.prefix}setname / ${config.prefix}setdesc / ${config.prefix}setpp
-
-❀━━━━━━━━━━━━❀
-❀ 🧑‍💻 OWNER CONTROLS
-❀ ${config.prefix}block / ${config.prefix}unblock / ${config.prefix}broadcast / ${config.prefix}shutdown / ${config.prefix}restart / ${config.prefix}eval / ${config.prefix}send / ${config.prefix}getsession
-
-❀━━━━━━━━━━━━❀
-❀ 📊 INFO & FETCHERS
-❀ ${config.prefix}profile / ${config.prefix}numberinfo / ${config.prefix}github / ${config.prefix}npm / ${config.prefix}anime / ${config.prefix}quoteimg / ${config.prefix}iplookup / ${config.prefix}covid
-
-❀━━━━━━━━━━━━❀
-❀ 💡 AI & PROMPT TOOLS
-❀ ${config.prefix}chatgpt / ${config.prefix}bard / ${config.prefix}openai / ${config.prefix}dalle / ${config.prefix}image / ${config.prefix}caption / ${config.prefix}nameart / ${config.prefix}imgprompt
-
-❀━━━━━━━━━━━━❀
-❀ 🧪 STATUS & EXTRAS
-❀ ${config.prefix}vv / ${config.prefix}emojimix / ${config.prefix}logomaker / ${config.prefix}qotd / ${config.prefix}birthday / ${config.prefix}autoreact / ${config.prefix}autoview / ${config.prefix}setreactions / ${config.prefix}priorityview / ${config.prefix}save
-
-❀━━━━━━━━━━━━❀
-❀ 📋 BOT SYSTEM
-❀ ${config.prefix}menu / ${config.prefix}help / ${config.prefix}status / ${config.prefix}ping / ${config.prefix}runtime / ${config.prefix}info / ${config.prefix}version`;
+    return menuText;
 }
+
+const pjson = require('../../package.json'); // For version
 
 module.exports = {
     name: 'help',

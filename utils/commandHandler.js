@@ -4,29 +4,57 @@ const path = require('path');
 const config = require('../config');
 
 const commands = new Map();
-const commandFiles = fs.readdirSync(path.join(__dirname, '../commands')).filter(file => file.endsWith('.js'));
+let totalCommandsLoaded = 0;
+let totalAliasesLoaded = 0;
 
-for (const file of commandFiles) {
-    try {
-        const command = require(`../commands/${file}`);
-        if (command.name && command.execute) {
-            commands.set(command.name, command);
-            if (command.aliases && Array.isArray(command.aliases)) {
-                command.aliases.forEach(alias => commands.set(alias, command));
+function loadCommandsRecursive(directory) {
+    const entries = fs.readdirSync(directory, { withFileTypes: true });
+    for (const entry of entries) {
+        const fullPath = path.join(directory, entry.name);
+        if (entry.isDirectory()) {
+            loadCommandsRecursive(fullPath);
+        } else if (entry.isFile() && entry.name.endsWith('.js')) {
+            try {
+                const command = require(fullPath);
+                if (command.name && command.execute) {
+                    if(commands.has(command.name)) {
+                        console.warn(`[COMMAND_HANDLER] Warning: Duplicate command name '${command.name}' from file ${entry.name}. Previous one will be overwritten.`);
+                    }
+                    commands.set(command.name, command);
+                    totalCommandsLoaded++;
+                    if (command.aliases && Array.isArray(command.aliases)) {
+                        command.aliases.forEach(alias => {
+                            if(commands.has(alias)) {
+                                console.warn(`[COMMAND_HANDLER] Warning: Alias '${alias}' for command '${command.name}' (from ${entry.name}) conflicts with an existing command or alias. Previous one will be overwritten.`);
+                            }
+                            commands.set(alias, command);
+                            totalAliasesLoaded++;
+                        });
+                    }
+                } else {
+                    console.warn(`[COMMAND_HANDLER] Warning: Command file ${entry.name} at ${fullPath} is missing 'name' or 'execute' property.`);
+                }
+            } catch (error) {
+                console.error(`[COMMAND_HANDLER] Error loading command from file ${entry.name} at ${fullPath}:`, error);
             }
-        } else {
-            console.warn(`Warning: Command file ${file} is missing 'name' or 'execute' property.`);
         }
-    } catch (error) {
-        console.error(`Error loading command from file ${file}:`, error);
     }
 }
 
-console.log(`Loaded ${commands.size} commands/aliases.`);
+// Load commands from all subdirectories within 'commands'
+const commandsBaseDir = path.join(__dirname, '../commands');
+loadCommandsRecursive(commandsBaseDir);
+
+console.log(`[COMMAND_HANDLER] Loaded ${totalCommandsLoaded} commands with ${totalAliasesLoaded} aliases. Total map size: ${commands.size}.`);
 
 async function handleMessage(client, message) {
+    console.log(`[COMMAND_HANDLER] handleMessage called with body: "${message.body}"`);
     const body = message.body;
-    if (!body || !body.startsWith(config.prefix)) return;
+
+    if (!body || typeof body !== 'string' || !body.startsWith(config.prefix)) {
+        // console.log(`[COMMAND_HANDLER] Message does not start with prefix or body is invalid. Prefix: '${config.prefix}', Body: '${body}'`);
+        return;
+    }
 
     const args = body.slice(config.prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
@@ -34,10 +62,12 @@ async function handleMessage(client, message) {
     const command = commands.get(commandName);
 
     if (!command) {
+        console.log(`[COMMAND_HANDLER] Command not found for: "${commandName}" (Full map size: ${commands.size})`);
         // Optional: reply if command is not found
         // message.reply(`Command not found: ${commandName}`);
         return;
     }
+    console.log(`[COMMAND_HANDLER] Command "${command.name}" found for "${commandName}". Executing...`);
 
     // Permission checks (e.g., ownerOnly, groupAdminOnly) can be added here
     if (command.ownerOnly && message.from !== `${config.ownerNumber}@c.us` && message.author !== `${config.ownerNumber}@c.us`) {

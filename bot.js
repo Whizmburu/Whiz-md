@@ -125,9 +125,15 @@ client.on('ready', async () => {
 const { handleMessage } = require('./utils/commandHandler');
 
 client.on('message', async msg => {
-    // Basic message logging
-    // console.log(`Message from ${msg.from} (${msg.author || 'N/A'}): ${msg.body}`);
-    await handleMessage(client, msg);
+    console.log(`[BOT.JS] Received message from: ${msg.from}, author: ${msg.author || 'N/A'}, body: "${msg.body}"`);
+    if (msg.body && typeof msg.body === 'string' && msg.body.startsWith(config.prefix)) {
+        console.log(`[BOT.JS] Message starts with prefix, attempting to handle command.`);
+        await handleMessage(client, msg);
+    } else if (msg.body && typeof msg.body === 'string' && !msg.body.startsWith(config.prefix)) {
+        // console.log(`[BOT.JS] Message does not start with prefix, ignoring for command handling.`);
+    } else {
+        // console.log(`[BOT.JS] Message body is not a string or is empty, ignoring.`);
+    }
 });
 
 // Status event listeners
