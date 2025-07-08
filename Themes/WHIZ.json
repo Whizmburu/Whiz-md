@@ -1,0 +1,106 @@
+{
+  "botName": "WHIZ-MD",
+  "version": "1.0.0",
+  "borders": {
+    "headerTop": "❀━━━━━━━━━━━━━━━━━━━━━❀",
+    "headerBottom": "❀━━━━━━━━━━━━━╯",
+    "section": "❀━━━━━━━━━━━━❀",
+    "footer": "❀━━━━━━━━━━━━━━╯"
+  },
+  "emojis": {
+    "owner": "👑",
+    "mode": "⚙️",
+    "prefix": "❗",
+    "commands": "🔢",
+    "version": " V",
+    "repo": "🔗",
+    "success": "✅",
+    "error": "❌",
+    "info": "💡",
+    "ping": "🏓",
+    "uptime": "⏱️",
+    "live": "🌀",
+    "welcome": "👋",
+    "fork": "🙏"
+  },
+  "messages": {
+    "startupErrorNoSession": "WHIZMD_SESSION_DATA environment variable not found or invalid. Please set it correctly. You can generate a session at https://whizmdsessions.onrender.com",
+    "welcomeMessage1": "❀━━━━━━━━━━━━❀\n❀ *{botName}* is now Live{liveEmoji}\n❀ Welcome and Enjoy{welcomeEmoji}\n❀ Repo : github.com/whizmburu/whiz-md\n❀ Owner : https://wa.me/254754783683\n❀ *_Kindly Fork me, it means a lot_{forkEmoji}\n❀━━━━━━━━━━━━❀",
+    "welcomeMessage2Prefix": "Here is the full command menu:",
+    "commandNotFound": "{errorEmoji} Command not found. Type `{prefix}help` to see the menu.",
+    "pingResponse": "{pingEmoji} Pong!",
+    "pongWithLatency": "{pingEmoji} Pong! Latency: {latency}ms",
+    "status": "❀ *{botName} Status* ❀\nMode: {mode}\nUptime: {uptime}\nCommands Loaded: {commandsCount}\nPrefix: {prefix}",
+    "runtime": "{uptimeEmoji} Bot has been running for: {runtime}",
+    "botInfo": "❀━【 {ownerEmoji} *{botName} MENU*{repoEmoji}*━━━ *╮*\n*❀* *Owner* : WHIZ\n*❀* *Mode* : Public\n*❀* *Prefix* : {prefix}\n*❀* *Commands* : {commandsCount}\n*❀* *Version* : {version}\n*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n❀━━━━━━━━━━━━━╯",
+    "versionInfo": "{botName} Version: {version}"
+  },
+  "menu": {
+    "title": "*❀━【 💎* _*{botName} MENU*━━━ *╮*",
+    "header": [
+      "*❀* *Owner* : WHIZ",
+      "*❀* *Mode* : Public",
+      "*❀* *Prefix* : .{prefix}",
+      "*❀* *Commands* : {commandCount}",
+      "*❀* *Version* : {version}",
+      "*❀* *Repo* : github.com/whizmburu/WHIZ‑MD"
+    ],
+    "headerEnd": "❀━━━━━━━━━━━━━╯",
+    "instructions": [
+      "*❀* _Type_ `.{prefix}help [command]` _for command details_",
+      "*❀* _Type_ `.{prefix}menu` _for the full command list (this message)_"
+    ],
+    "sections": [
+      {
+        "title": "📁 MEDIA TOOLS",
+        "commands": ["Play", "Ytmp3", "Ytmp4", "Tiktok", "Instagram", "Facebook", "Spotify", "Soundcloud", "Joox", "Pinterest", "Shazam", "Lyrics"]
+      },
+      {
+        "title": "🎨 TEXT IMAGE STYLES",
+        "commands": ["Steel", "Wood", "Fire", "Ice", "Neon", "Splash", "Glitchtxt", "Gradient", "Comic", "Textstyles"]
+      },
+      {
+        "title": "📷 IMAGE TOOLS",
+        "commands": ["Sticker", "Toimg", "Removebg", "Blur", "Invert", "Circle", "Sepia", "Triggered", "Glitchimg", "Wanted", "Ocr"]
+      },
+      {
+        "title": "🔧 UTILITIES & LOOKUP",
+        "commands": ["Wiki", "Translate", "Weather", "Time", "Date", "Calc", "Shorturl", "Ip", "Qr", "Ping", "Speedtest"]
+      },
+      {
+        "title": "🎭 FUN & TEXT GAMES",
+        "commands": ["Meme", "Joke", "Quote", "Fact", "8ball", "Truth", "Dare", "Ship", "Slap", "Hug", "Kiss", "Pat"]
+      },
+      {
+        "title": "🎮 INTERACTIVE GAMES",
+        "commands": ["Ttt", "Connect4", "Guess", "Sudoku", "Trivia", "Hangman", "Riddle", "Slot", "Roll", "Quiz"]
+      },
+      {
+        "title": "👥 GROUP TOOLS",
+        "commands": ["Add", "Kick", "Promote", "Demote", "Link", "Tagall", "Hidetag", "Mute", "Unmute", "Setname", "Setdesc", "Setpp"]
+      },
+      {
+        "title": "🧑‍💻 OWNER CONTROLS",
+        "commands": ["Block", "Unblock", "Broadcast", "Shutdown", "Restart", "Eval", "Send", "Getsession"]
+      },
+      {
+        "title": "📊 INFO & FETCHERS",
+        "commands": ["Profile", "Numberinfo", "Github", "Npm", "Anime", "Quoteimg", "Iplookup", "Covid"]
+      },
+      {
+        "title": "💡 AI & PROMPT TOOLS",
+        "commands": ["Chatgpt", "Bard", "Openai", "Dalle", "Image", "Caption", "Nameart", "Imgprompt"]
+      },
+      {
+        "title": "🧪 STATUS & EXTRAS",
+        "commands": ["Vv", "Emojimix", "Logomaker", "Qotd", "Birthday", "Autoreact", "Autoview", "Setreactions", "Priorityview", "Save"]
+      },
+      {
+        "title": "📋 BOT SYSTEM",
+        "commands": ["Menu", "Help", "Status", "Ping", "Runtime", "Info", "Version"]
+      }
+    ],
+    "footer": "https://chat.whatsapp.com/JLmSbTfqf4I2Kh4SNJcWgM",
+    "footerEnd": "❀━━━━━━━━━━━━━━╯"
+  }
+}
