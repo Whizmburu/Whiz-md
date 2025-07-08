@@ -35,7 +35,48 @@
     "status": "❀ *{botName} Status* ❀\nMode: {mode}\nUptime: {uptime}\nCommands Loaded: {commandsCount}\nPrefix: {prefix}",
     "runtime": "{uptimeEmoji} Bot has been running for: {runtimeValue}",
     "botInfo": "❀━【 {ownerEmoji} *{botName} MENU*{repoEmoji}*━━━ *╮*\n*❀* *Owner* : WHIZ\n*❀* *Mode* : Public\n*❀* *Prefix* : {prefix}\n*❀* *Commands* : {commandsCount}\n*❀* *Version* : {version}\n*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n*❀━━━━━━━━━━━━━╯*",
-    "versionInfo": "{botName} Version: {version}"
+    "versionInfo": "{botName} Version: {version}",
+    "playCommand": {
+      "noQuery": "⚠️ Please provide a song name or search query after the command. Example: `{prefix}play Never Gonna Give You Up`",
+      "searching": "🔎 Searching for \"{query}\"...",
+      "downloading": "📥 Downloading audio for \"{title}\"... Please wait.",
+      "notFound": "❓ Sorry, I couldn't find any results for \"{query}\".",
+      "downloadError": "❌ Oops! Something went wrong while downloading the audio for \"{title}\".",
+      "sendError": "❌ Failed to send the audio for \"{title}\"."
+    },
+    "ytmp3Command": {
+      "noUrl": "⚠️ Please provide a valid YouTube video URL after the command. Example: `{prefix}ytmp3 https://www.youtube.com/watch?v=dQw4w9WgXcQ`",
+      "invalidUrl": "🚫 The URL provided does not seem to be a valid YouTube video URL.",
+      "fetchingInfo": "ℹ️ Fetching video information...",
+      "downloading": "📥 Downloading MP3 for \"{title}\"... Please wait.",
+      "conversionError": "❌ Error converting audio to MP3 for \"{title}\".",
+      "downloadError": "❌ Oops! Something went wrong while downloading the MP3 for \"{title}\".",
+      "sendError": "❌ Failed to send the MP3 for \"{title}\"."
+    },
+    "ytmp4Command": {
+      "noUrl": "⚠️ Please provide a valid YouTube video URL after the command. Example: `{prefix}ytmp4 https://www.youtube.com/watch?v=dQw4w9WgXcQ`",
+      "invalidUrl": "🚫 The URL provided does not seem to be a valid YouTube video URL.",
+      "fetchingInfo": "ℹ️ Fetching video information...",
+      "downloading": "📥 Downloading MP4 for \"{title}\"... This may take a moment.",
+      "downloadError": "❌ Oops! Something went wrong while downloading the video \"{title}\".",
+      "sendError": "❌ Failed to send the video for \"{title}\"."
+    },
+    "lyricsCommand": {
+      "noQuery": "⚠️ Please provide a song name (and optionally artist) to search for lyrics. Example: `{prefix}lyrics Bohemian Rhapsody Queen`",
+      "searching": "🔎 Searching for lyrics for \"{query}\"...",
+      "notFound": "❓ Sorry, I couldn't find lyrics for \"{query}\". Please try being more specific or check the spelling.",
+      "fetchError": "❌ Oops! Something went wrong while trying to fetch the lyrics."
+    },
+    "placeholderCommand": {
+      "shazam": "🎵 The `.shazam` command is under development. It will allow identifying songs from audio replies. Requires API setup (e.g., ACRCloud).",
+      "pinterest": "🖼️ The `.pinterest` command to search for images is under development.",
+      "tiktok": "📹 The `.tiktok` command to download TikTok videos is under development. Direct downloads are challenging.",
+      "instagram": "📸 The `.instagram` command to download Instagram media is under development. Direct downloads are challenging.",
+      "facebook": "📘 The `.facebook` command to download Facebook videos is under development. Direct downloads are challenging.",
+      "spotify": "🎧 The `.spotify` command is under development. For now, you can search on Spotify directly: https://open.spotify.com/search/{query}",
+      "soundcloud": "☁️ The `.soundcloud` command is under development. For now, you can search on Soundcloud directly: https://soundcloud.com/search?q={query}",
+      "joox": "🎤 The `.joox` command is under development. For now, you can search on Joox directly."
+    }
   },
   "menu": {
     "title": "*❀━【 💎* _*{botName} MENU*━━━ *╮*",

@@ -3,8 +3,13 @@
 
 require('dotenv').config();
 const fs = require('fs');
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const ytdl = require('ytdl-core');
+const YouTube = require('youtube-sr').default; // .default is important for youtube-sr
+const ffmpeg = require('fluent-ffmpeg');
+const path = require('path'); // For handling file paths
+const os = require('os'); // For temporary directory
 
 // Load theme/config
 let theme = {};
@@ -196,6 +201,10 @@ function formatUptime(ms) {
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
+function sanitizeFilename(filename) {
+    return filename.replace(/[<>:"/\\|?*]+/g, '_').substring(0, 100); // Replace invalid chars and limit length
+}
+
 
 client.on('ready', async () => {
     console.log('WHIZ-MD: Client is ready!');
@@ -266,6 +275,285 @@ client.on('message', async (msg) => {
         return;
     }
 
+    // --- Placeholder Media Commands ---
+    const placeholderCommands = {
+        'shazam': theme.messages.placeholderCommand.shazam,
+        'pinterest': theme.messages.placeholderCommand.pinterest,
+        'tiktok': theme.messages.placeholderCommand.tiktok,
+        'instagram': theme.messages.placeholderCommand.instagram,
+        'facebook': theme.messages.placeholderCommand.facebook,
+        'spotify': theme.messages.placeholderCommand.spotify,
+        'soundcloud': theme.messages.placeholderCommand.soundcloud,
+        'joox': theme.messages.placeholderCommand.joox
+    };
+
+    if (placeholderCommands[commandName]) {
+        const chat = await msg.getChat();
+        try {
+            await chat.sendStateTyping();
+            let replyMsg = placeholderCommands[commandName];
+            if (commandName === 'spotify' || commandName === 'soundcloud') {
+                const query = args.join(' ') || 'your query';
+                replyMsg = replyMsg.replace('{query}', encodeURIComponent(query));
+            }
+            await msg.reply(replyMsg);
+            await chat.clearState();
+        } catch (error) {
+            console.error(`Error processing placeholder command ${commandName}:`, error);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'lyrics') {
+        const chat = await msg.getChat();
+        const query = args.join(' ');
+
+        if (!query) {
+            await msg.reply(theme.messages.lyricsCommand.noQuery.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.lyricsCommand.searching.replace('{query}', query));
+
+            // Attempt to split query into artist and title if possible, otherwise use full query for title
+            // This is a simple heuristic; lyrics.ovh API is flexible.
+            // Example: "Bohemian Rhapsody Queen" -> artist: Queen, title: Bohemian Rhapsody
+            // If only "Bohemian Rhapsody" -> artist: "", title: Bohemian Rhapsody
+            // The API format is https://api.lyrics.ovh/v1/artist/title
+
+            let artist = "";
+            let title = query;
+
+            // A simple way to guess artist if multiple words and last words might be artist
+            // This is very basic and might not always be accurate.
+            // For a more robust solution, one might try to find "by" or "-"
+            // or use a more sophisticated NLP approach if available.
+            const words = query.split(' ');
+            if (words.length > 2) { // Heuristic: if more than 2 words, last one or two could be artist
+                // This part can be refined. For now, we'll just pass the query as title.
+                // A better approach for lyrics.ovh is to try to parse artist/title or just send the query as title.
+                // The API seems to handle "Artist Title" as title sometimes.
+            }
+
+            // For lyrics.ovh, the artist/title in the URL needs to be URL encoded.
+            // Let's assume the query is mostly the title, or "artist title".
+            // The API is a bit fuzzy. We'll try with the full query as title first.
+            // If that fails, and there's a clear separator like " by ", we could split.
+            // For now, simple approach:
+
+            let apiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
+            if (args.includes('by') && args.indexOf('by') < args.length -1 && args.indexOf('by') > 0) {
+                const byIndex = args.indexOf('by');
+                artist = args.slice(byIndex + 1).join(' ');
+                title = args.slice(0, byIndex).join(' ');
+                apiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
+            } else {
+                 // If no "by", assume the whole query is the title, or "Artist - Title"
+                 // The API might handle "Artist - Title" directly in the title field.
+                 apiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent("")}/${encodeURIComponent(query)}`;
+            }
+
+
+            const response = await axios.get(apiUrl, { timeout: 10000 }); // 10s timeout
+
+            if (response.data && response.data.lyrics) {
+                let lyricsText = response.data.lyrics;
+                // API sometimes returns instrumental message
+                if (lyricsText.toLowerCase().includes("instrumental")) {
+                     await msg.reply(`It seems \"${query}\" is an instrumental piece or lyrics are not available.`);
+                } else {
+                    // Format lyrics: Title + Lyrics
+                    // The API doesn't return title/artist in the response, so we use the query.
+                    lyricsText = `🎶 *Lyrics for: ${query}*\n\n${lyricsText.trim()}`;
+                    // WhatsApp has message length limits (around 4096, but practically less with formatting)
+                    // Split into chunks if too long
+                    const MAX_LENGTH = 4000;
+                    if (lyricsText.length > MAX_LENGTH) {
+                        await msg.reply(`Lyrics for \"${query}\" are very long. Sending in parts...`);
+                        for (let i = 0; i < lyricsText.length; i += MAX_LENGTH) {
+                            await client.sendMessage(msg.from, lyricsText.substring(i, i + MAX_LENGTH));
+                        }
+                    } else {
+                        await client.sendMessage(msg.from, lyricsText);
+                    }
+                }
+            } else {
+                // This case might be covered by the catch block if API returns 404 for not found
+                await msg.reply(theme.messages.lyricsCommand.notFound.replace('{query}', query));
+            }
+            await chat.clearState();
+
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                await msg.reply(theme.messages.lyricsCommand.notFound.replace('{query}', query));
+            } else {
+                console.error(`Error processing .lyrics command for "${query}":`, error.message);
+                await msg.reply(theme.messages.lyricsCommand.fetchError);
+            }
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'ytmp4') {
+        const chat = await msg.getChat();
+        const url = args[0];
+
+        if (!url) {
+            await msg.reply(theme.messages.ytmp4Command.noUrl.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        if (!ytdl.validateURL(url)) {
+            await msg.reply(theme.messages.ytmp4Command.invalidUrl);
+            return;
+        }
+
+        let videoInfo;
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.ytmp4Command.fetchingInfo);
+
+            videoInfo = await ytdl.getInfo(url);
+            const videoTitle = sanitizeFilename(videoInfo.videoDetails.title);
+
+            await msg.reply(theme.messages.ytmp4Command.downloading.replace('{title}', videoTitle));
+
+            const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'whizmd-ytmp4-'));
+            const tempFilePath = path.join(tempDir, `${Date.now()}_${videoTitle}.mp4`);
+
+            // Choose a format that has both video and audio, preferably mp4
+            // ytdl-core often provides DASH formats (separate audio/video) or progressive (combined)
+            // We'll try to get a good quality progressive MP4 stream directly.
+            // If ytdl can't provide a direct mp4 stream with audio+video, ffmpeg would be needed to merge.
+            // For simplicity, we first try to get a combined stream.
+
+            const videoStream = ytdl(url, {
+                quality: 'highestvideo', // or a specific itag like '18' (360p), '22' (720p) if available
+                filter: format => format.container === 'mp4' && format.hasAudio && format.hasVideo
+            });
+
+            // Pipe the stream to a file
+            const fileStream = fs.createWriteStream(tempFilePath);
+
+            await new Promise((resolve, reject) => {
+                videoStream.pipe(fileStream);
+                fileStream.on('finish', resolve);
+                videoStream.on('error', (err) => {
+                     console.error('Error during ytdl video stream for .ytmp4:', err.message);
+                     reject(new Error(theme.messages.ytmp4Command.downloadError.replace('{title}', videoTitle)));
+                });
+                fileStream.on('error', (err) => { // Handle errors on the file stream as well
+                    console.error('Error during file stream for .ytmp4:', err.message);
+                    reject(new Error(theme.messages.ytmp4Command.downloadError.replace('{title}', videoTitle)));
+                });
+            });
+
+            // Ensure the file is not empty (ytdl might end stream early on error sometimes)
+            const stats = fs.statSync(tempFilePath);
+            if (stats.size === 0) {
+                fs.unlinkSync(tempFilePath); // Clean up empty file
+                throw new Error(theme.messages.ytmp4Command.downloadError.replace('{title}', videoTitle) + " (File empty)");
+            }
+
+            const media = MessageMedia.fromFilePath(tempFilePath);
+            await client.sendMessage(msg.from, media, { caption: `${videoInfo.videoDetails.title}` });
+
+            fs.unlink(tempFilePath, (err) => {
+                if (err) console.error("Error deleting temp video file for .ytmp4:", err);
+                fs.rmdir(tempDir, { recursive: true }, (rmErr) => {
+                    if (rmErr) console.error("Error deleting temp directory for .ytmp4:", rmErr);
+                });
+            });
+
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .ytmp4 command for URL "${url}":`, error);
+            const titleForError = videoInfo ? videoInfo.videoDetails.title : "the video";
+             const errorMessage = error.message.includes("private") || error.message.includes("age-restricted") || (error.response && error.response.status === 410)
+                ? `❌ The video "${titleForError}" might be private, age-restricted, or unavailable.`
+                : theme.messages.ytmp4Command.downloadError.replace('{title}', titleForError);
+            await msg.reply(errorMessage);
+            await chat.clearState();
+        }
+        return;
+    }
+
+    if (commandName === 'play') {
+        const chat = await msg.getChat();
+        const query = args.join(' ');
+
+        if (!query) {
+            await msg.reply(theme.messages.playCommand.noQuery.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.playCommand.searching.replace('{query}', query));
+
+            const searchResults = await YouTube.search(query, { limit: 1, type: 'video' });
+
+            if (!searchResults || searchResults.length === 0) {
+                await msg.reply(theme.messages.playCommand.notFound.replace('{query}', query));
+                await chat.clearState();
+                return;
+            }
+
+            const video = searchResults[0];
+            await msg.reply(theme.messages.playCommand.downloading.replace('{title}', video.title));
+
+            const audioStream = ytdl(video.url, { filter: 'audioonly', quality: 'highestaudio' });
+
+            // We need to save the stream to a temporary file to send it as MessageMedia
+            // whatsapp-web.js does not directly support sending streams as media attachments for audio.
+            // It expects a filepath or a base64 encoded string.
+            const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'whizmd-play-'));
+            const tempFilePath = path.join(tempDir, `${Date.now()}_${sanitizeFilename(video.title || 'audio')}.mp3`);
+
+            // Promisify the ffmpeg conversion / stream saving
+            await new Promise((resolve, reject) => {
+                ffmpeg(audioStream)
+                    .audioBitrate(128) // Standard bitrate
+                    .toFormat('mp3')
+                    .on('error', (err) => {
+                        console.error('Error during ffmpeg processing for .play:', err.message);
+                        reject(new Error(theme.messages.playCommand.downloadError.replace('{title}', video.title)));
+                    })
+                    .on('end', () => {
+                        console.log('ffmpeg processing finished for .play');
+                        resolve();
+                    })
+                    .save(tempFilePath);
+            });
+
+            const media = MessageMedia.fromFilePath(tempFilePath);
+            await client.sendMessage(msg.from, media, { sendAudioAsVoice: false, caption: `Playing: ${video.title}` });
+
+            fs.unlink(tempFilePath, (err) => { // Clean up temp file
+                if (err) console.error("Error deleting temp audio file for .play:", err);
+                fs.rmdir(tempDir, { recursive: true }, (rmErr) => {
+                    if (rmErr) console.error("Error deleting temp directory for .play:", rmErr);
+                });
+            });
+
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .play command for "${query}":`, error);
+            const errorMessage = error.message.includes(" privata") || error.message.includes(" age-restricted")
+                ? `❌ The video "${searchResults && searchResults[0] ? searchResults[0].title : query}" might be private or age-restricted.`
+                : theme.messages.playCommand.downloadError.replace('{title}', (searchResults && searchResults[0] ? searchResults[0].title : query));
+            await msg.reply(errorMessage);
+            await chat.clearState();
+        }
+        return;
+    }
+
     if (commandName === 'runtime') {
         const chat = await msg.getChat();
         try {
@@ -308,6 +596,76 @@ client.on('message', async (msg) => {
         }
         return;
     }
+
+    if (commandName === 'ytmp3') {
+        const chat = await msg.getChat();
+        const url = args[0];
+
+        if (!url) {
+            await msg.reply(theme.messages.ytmp3Command.noUrl.replace('{prefix}', botPrefix));
+            return;
+        }
+
+        if (!ytdl.validateURL(url)) {
+            await msg.reply(theme.messages.ytmp3Command.invalidUrl);
+            return;
+        }
+
+        let videoInfo; // To store video info for error messages if needed
+
+        try {
+            await chat.sendStateTyping();
+            await msg.reply(theme.messages.ytmp3Command.fetchingInfo);
+
+            videoInfo = await ytdl.getInfo(url);
+            const videoTitle = sanitizeFilename(videoInfo.videoDetails.title);
+
+            await msg.reply(theme.messages.ytmp3Command.downloading.replace('{title}', videoTitle));
+
+            const audioStream = ytdl(url, { filter: 'audioonly', quality: 'highestaudio' });
+
+            const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'whizmd-ytmp3-'));
+            const tempFilePath = path.join(tempDir, `${Date.now()}_${videoTitle}.mp3`);
+
+            await new Promise((resolve, reject) => {
+                ffmpeg(audioStream)
+                    .audioBitrate(128)
+                    .toFormat('mp3')
+                    .on('error', (err) => {
+                        console.error('Error during ffmpeg processing for .ytmp3:', err.message);
+                        reject(new Error(theme.messages.ytmp3Command.conversionError.replace('{title}', videoTitle)));
+                    })
+                    .on('end', () => {
+                        console.log('ffmpeg processing finished for .ytmp3');
+                        resolve();
+                    })
+                    .save(tempFilePath);
+            });
+
+            const media = MessageMedia.fromFilePath(tempFilePath);
+            await client.sendMessage(msg.from, media, { sendAudioAsVoice: false, caption: `${videoInfo.videoDetails.title}` });
+
+            fs.unlink(tempFilePath, (err) => {
+                if (err) console.error("Error deleting temp audio file for .ytmp3:", err);
+                 fs.rmdir(tempDir, { recursive: true }, (rmErr) => {
+                    if (rmErr) console.error("Error deleting temp directory for .ytmp3:", rmErr);
+                });
+            });
+
+            await chat.clearState();
+
+        } catch (error) {
+            console.error(`Error processing .ytmp3 command for URL "${url}":`, error);
+            const titleForError = videoInfo ? videoInfo.videoDetails.title : "the video";
+            const errorMessage = error.message.includes("private") || error.message.includes("age-restricted")
+                ? `❌ The video "${titleForError}" might be private or age-restricted.`
+                : (error.message.startsWith("❌ Error converting") ? error.message : theme.messages.ytmp3Command.downloadError.replace('{title}', titleForError) );
+            await msg.reply(errorMessage);
+            await chat.clearState();
+        }
+        return;
+    }
+
 
     if (commandName === 'menu') {
         const chat = await msg.getChat();

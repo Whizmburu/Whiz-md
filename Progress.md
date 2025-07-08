@@ -39,8 +39,48 @@
 - [X] **Implement the `Version` command (`.version`).**
     - Displays bot name and version.
 
+## Phase 1: BOT SYSTEM Commands
+... (previous content remains the same) ...
+
+## Phase 2: MEDIA TOOLS
+- [X] **Dependency Installation & Setup:**
+    - [X] Added `ytdl-core`, `youtube-sr`, `fluent-ffmpeg`, `axios` to `package.json`.
+    - [X] Updated `Dockerfile` to install `ffmpeg`.
+    - [X] Added API key placeholders to `.env.example` for media services.
+- [X] **Implement `Play` command (`.play` query):**
+    - Searches YouTube, downloads audio of the first result, converts to MP3, sends, and cleans up.
+- [X] **Implement `Ytmp3` command (`.ytmp3 URL`):**
+    - Downloads audio from YouTube URL, converts to MP3, sends, and cleans up.
+- [X] **Implement `Ytmp4` command (`.ytmp4 URL`):**
+    - Downloads video from YouTube URL (MP4 format), sends, and cleans up.
+- [X] **Implement `Lyrics` command (`.lyrics query`):**
+    - Fetches lyrics from `lyrics.ovh` API and sends them. Handles long lyrics.
+- [ ] **Implement `Shazam` command (`.shazam`):**
+    - [X] Placeholder implemented.
+    - *Note: Requires audio input and integration with an audio recognition API (e.g., ACRCloud, requires API key and setup).*
+- [ ] **Implement `Pinterest` command (`.pinterest` query):**
+    - [X] Placeholder implemented.
+    - *Note: Requires Pinterest API access or robust scraping techniques.*
+- [ ] **Implement `Tiktok` command (`.tiktok URL`):**
+    - [X] Placeholder implemented.
+    - *Note: Direct downloads are very challenging due to anti-scraping. Requires specialized APIs or libraries if available.*
+- [ ] **Implement `Instagram` command (`.instagram URL`):**
+    - [X] Placeholder implemented.
+    - *Note: Direct downloads are very challenging. Requires specialized APIs or libraries.*
+- [ ] **Implement `Facebook` command (`.facebook URL`):**
+    - [X] Placeholder implemented.
+    - *Note: Direct downloads are challenging. Requires specialized APIs or libraries.*
+- [ ] **Implement `Spotify` command (`.spotify query`):**
+    - [X] Placeholder implemented (provides a search link).
+    - *Note: Direct audio downloads from Spotify are not possible with public APIs. Requires premium and specific SDKs, usually for playback, not download.*
+- [ ] **Implement `Soundcloud` command (`.soundcloud query`):**
+    - [X] Placeholder implemented (provides a search link).
+    - *Note: Direct audio downloads can be complex. May require specific libraries or APIs.*
+- [ ] **Implement `Joox` command (`.joox query`):**
+    - [X] Placeholder implemented.
+    - *Note: Likely requires specific API or library for Joox.*
+
 ## Future Phases (To be detailed)
-- Media Tools
 - Text Image Styles
 - Image Tools
 - Utilities & Lookup

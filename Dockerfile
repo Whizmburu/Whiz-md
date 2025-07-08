@@ -8,6 +8,10 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install app dependencies
+# First, update package lists and install ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN npm install
 
 # Bundle app source
