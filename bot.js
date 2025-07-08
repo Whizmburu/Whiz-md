@@ -55,6 +55,7 @@ client.on('ready', async () => {
     console.log(`Logged in as ${client.info.pushname} (${client.info.wid.user})`);
 
     // Send welcome message to "message yourself" chat
+    // This now uses the getFullMenuText from the menu command to ensure consistency
     try {
         const welcomeMessage1 = `❀━━━━━━━━━━━━❀
 ❀ *WHIZ-MD* is now Live🌀
@@ -64,19 +65,7 @@ client.on('ready', async () => {
 ❀ *_Kindly Fork me, it means a lot_*
 ❀━━━━━━━━━━━━❀`;
 
-        // The full help menu text (condensed for brevity here, will be expanded)
-        // Send welcome message to "message yourself" chat
-        // This now uses the getFullMenuText from the menu command to ensure consistency
-        try {
-            const welcomeMessage1 = `❀━━━━━━━━━━━━❀
-❀ *WHIZ-MD* is now Live🌀
-❀ Welcome and Enjoy
-❀ Repo : github.com/whizmburu/whiz-md
-❀ Owner : https://wa.me/${config.ownerNumber}
-❀ *_Kindly Fork me, it means a lot_*
-❀━━━━━━━━━━━━❀`;
-
-            // Dynamically get the menu text
+        // Dynamically get the menu text
             // We need to require the menu command or its utility function here
             // For simplicity, let's define a local version or ensure it's easily accessible
             // This creates a slight dependency; ideally, menu text generation is a shared utility
