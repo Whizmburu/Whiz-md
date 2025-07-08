@@ -39,6 +39,20 @@ const { handleTriviaCommand, handleTriviaAnswer } = require('./commands/games/tr
 const { handleConnect4Command } = require('./commands/games/connect4.js');
 const { handleSudokuCommand } = require('./commands/games/sudoku.js');
 
+// Group Command Handlers
+const { handleAddCommand } = require('./commands/group/add.js');
+const { handleKickCommand } = require('./commands/group/kick.js');
+const { handlePromoteCommand } = require('./commands/group/promote.js');
+const { handleDemoteCommand } = require('./commands/group/demote.js');
+const { handleLinkCommand } = require('./commands/group/link.js');
+const { handleTagallCommand } = require('./commands/group/tagall.js');
+const { handleHidetagCommand } = require('./commands/group/hidetag.js');
+const { handleMuteCommand } = require('./commands/group/mute.js');
+const { handleUnmuteCommand } = require('./commands/group/unmute.js');
+const { handleSetnameCommand } = require('./commands/group/setname.js');
+const { handleSetdescCommand } = require('./commands/group/setdesc.js');
+const { handleSetppCommand } = require('./commands/group/setpp.js');
+
 // Active games state management (in-memory)
 const activeGames = {};
 
@@ -235,6 +249,25 @@ function formatUptime(ms) {
 function sanitizeFilename(filename) {
     return filename.replace(/[<>:"/\\|?*]+/g, '_').substring(0, 100); // Replace invalid chars and limit length
 }
+
+// --- Group Command Helper Functions ---
+async function getChatParticipant(chat, contactId) {
+    if (!chat.isGroup) return null;
+    return chat.participants.find(p => p.id._serialized === contactId);
+}
+
+async function isUserAdmin(chat, contactId) {
+    if (!chat.isGroup) return false;
+    const participant = await getChatParticipant(chat, contactId);
+    return participant ? participant.isAdmin || participant.isSuperAdmin : false;
+}
+
+async function isBotAdmin(chat, client) {
+    if (!chat.isGroup) return false;
+    return isUserAdmin(chat, client.info.wid._serialized);
+}
+// --- End Group Command Helper Functions ---
+
 
 // Helper function for Text Effect Generation (primarily for TextPro.me style sites)
 async function generateTextEffect(effectPageUrl, textInputs = [], effectName = "effect") {
@@ -1722,6 +1755,33 @@ client.on('message', async (msg) => {
             await funCommands[commandName](msg, args, client, theme, botPrefix);
         } catch (error) {
             console.error(`Unhandled error in fun command ${commandName}:`, error);
+            await msg.reply(`❌ An unexpected error occurred while running the ${commandName} command.`);
+        }
+        return; // Command handled
+    }
+
+    // --- Group Tool Commands ---
+    const groupCommands = {
+        'add': handleAddCommand,
+        'kick': handleKickCommand,
+        'promote': handlePromoteCommand,
+        'demote': handleDemoteCommand,
+        'link': handleLinkCommand,
+        'tagall': handleTagallCommand,
+        'hidetag': handleHidetagCommand,
+        'mute': handleMuteCommand,
+        'unmute': handleUnmuteCommand,
+        'setname': handleSetnameCommand,
+        'setdesc': handleSetdescCommand,
+        'setpp': handleSetppCommand,
+    };
+
+    if (groupCommands[commandName]) {
+        try {
+            // Pass group helper functions as well
+            await groupCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isUserAdmin, isBotAdmin, getChatParticipant);
+        } catch (error) {
+            console.error(`Unhandled error in group command ${commandName}:`, error);
             await msg.reply(`❌ An unexpected error occurred while running the ${commandName} command.`);
         }
         return; // Command handled

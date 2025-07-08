@@ -228,8 +228,34 @@
 - [X] **Integrate Game Command Handlers into `index.js`:**
     - Imported and routed all new interactive game command handlers, including contextual `.answer`.
 
+... (Previous content of Phase 1-7 remains the same) ...
+
+## Phase 8: GROUP TOOLS
+- [X] **Directory Structure & Setup:**
+    - [X] Created `commands/group/` directory.
+- [X] **Add Theming for Group Tool Commands:**
+    - Added feedback messages for all group tool commands to `Themes/WHIZ.json`.
+- [X] **Implement Helper Functions for Group Commands:**
+    - Implemented `getChatParticipant`, `isUserAdmin`, `isBotAdmin` in `index.js`.
+- [X] **Implement Core Admin Actions:**
+    - [X] `.add <@user_or_number>` (in `commands/group/add.js`)
+    - [X] `.kick <@user>` (in `commands/group/kick.js`)
+    - [X] `.promote <@user>` (in `commands/group/promote.js`)
+    - [X] `.demote <@user>` (in `commands/group/demote.js`)
+- [X] **Implement Group Info & Utility Commands:**
+    - [X] `.link` (in `commands/group/link.js`)
+    - [X] `.tagall [message_optional]` (in `commands/group/tagall.js`)
+    - [X] `.hidetag [message]` (in `commands/group/hidetag.js`)
+- [X] **Implement Group Setting Modification Commands:**
+    - [X] `.mute` (in `commands/group/mute.js`)
+    - [X] `.unmute` (in `commands/group/unmute.js`)
+    - [X] `.setname <new_group_name>` (in `commands/group/setname.js`)
+    - [X] `.setdesc <new_description>` (in `commands/group/setdesc.js`)
+    - [X] `.setpp` (reply to image) (in `commands/group/setpp.js`)
+- [X] **Integrate Group Command Handlers into `index.js`:**
+    - Imported and routed all new group command handlers, passing helper functions.
+
 ## Future Phases (To be detailed)
-- Group Tools
 - Owner Controls
 - Info & Fetchers
 - AI & Prompt Tools

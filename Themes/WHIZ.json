@@ -275,6 +275,68 @@
     "placeholderGameCommand": {
         "connect4": "🔵🔴 The Connect4 game is under development.",
         "sudoku": "🔢 The Sudoku game is under development."
+    },
+    "groupCmd": {
+        "notGroup": "⚠️ This command can only be used in a group chat.",
+        "botNotAdmin": "🤖 I need to be an admin in this group to perform this action.",
+        "userNotAdmin": "🛡️ You need to be a group admin to use this command.",
+        "targetUserNotMember": "❓ The specified user is not a member of this group.",
+        "targetUserIsAdmin": "🛡️ The specified user is already an admin.",
+        "targetUserNotAdmin": "🤷 The specified user is not an admin.",
+        "noUserMentioned": "⚠️ Please mention a user or provide a valid number for this action.",
+        "invalidNumber": "⚠️ The provided number is invalid.",
+        "add": {
+            "success": "✅ Successfully added {userCount} user(s) to the group.",
+            "fail": "❌ Failed to add {userCount} user(s). They might have privacy settings enabled or the number is incorrect.",
+            "alreadyInGroup": "🤷 User {user} is already in this group."
+        },
+        "kick": {
+            "success": "✅ Successfully removed {user}.",
+            "fail": "❌ Failed to remove {user}. I might lack permissions over them or they are not in the group.",
+            "cannotKickSelf": "😂 You can't kick yourself!",
+            "cannotKickBot": "🤖 You can't make me kick myself!"
+        },
+        "promote": {
+            "success": "⬆️ Successfully promoted {user} to admin.",
+            "fail": "❌ Failed to promote {user}."
+        },
+        "demote": {
+            "success": "⬇️ Successfully demoted {user} from admin.",
+            "fail": "❌ Failed to demote {user}."
+        },
+        "link": {
+            "success": "🔗 Group Invite Link:\n{inviteLink}",
+            "fail": "❌ Failed to get group invite link. Make sure I am an admin."
+        },
+        "tagall": {
+            "header": "📢 Attention Everyone!"
+        },
+        "hidetag": {
+            "fail": "❌ Could not perform hidetag. Message content is required."
+        },
+        "mute": {
+            "success": "🔇 Group muted. Only admins can send messages now.",
+            "fail": "❌ Failed to mute group."
+        },
+        "unmute": {
+            "success": "🔊 Group unmuted. Everyone can send messages now.",
+            "fail": "❌ Failed to unmute group."
+        },
+        "setname": {
+            "noName": "⚠️ Please provide a new name for the group. Example: `{prefix}setname New Cool Group`",
+            "success": "📝 Group name changed to: {newName}",
+            "fail": "❌ Failed to change group name."
+        },
+        "setdesc": {
+            "noDesc": "⚠️ Please provide a new description for the group.",
+            "success": "📜 Group description updated!",
+            "fail": "❌ Failed to change group description."
+        },
+        "setpp": {
+            "noImage": "🖼️ Please reply to an image to set it as the group profile picture.",
+            "success": "🖼️ Group profile picture updated successfully!",
+            "fail": "❌ Failed to update group profile picture."
+        }
     }
   },
   "menu": {
