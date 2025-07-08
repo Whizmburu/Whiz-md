@@ -280,8 +280,34 @@
 - [X] **Integrate Owner Command Handlers into `index.js`:**
     - Imported and routed all new owner command handlers, ensuring `isOwner()` check is performed first for these commands.
 
+... (Previous content of Phase 1-9 remains the same) ...
+
+## Phase 10: INFO & FETCHERS
+- [X] **Directory Structure & Setup:**
+    - [X] Created `commands/info/` directory.
+    - [X] Reviewed API key needs (most chosen APIs are keyless for basic use).
+- [X] **Add Theming for Info & Fetcher Commands:**
+    - Added feedback messages for all info/fetcher commands to `Themes/WHIZ.json`.
+- [X] **Implement `.profile [@user_optional]` Command:**
+    - In `commands/info/profile.js`. Fetches and displays PFP, name, about, number.
+- [X] **Implement `.numberinfo <phone_number>` Command (Simplified):**
+    - In `commands/info/numberinfo.js`. Checks WhatsApp registration status.
+- [X] **Implement `.github <username_or_repo>` Command:**
+    - In `commands/info/github.js`. Fetches GitHub user/repo details.
+- [X] **Implement `.npm <package_name>` Command:**
+    - In `commands/info/npm.js`. Fetches npm package details.
+- [X] **Implement `.anime <search_query>` Command:**
+    - In `commands/info/anime.js`. Fetches anime details and poster from Jikan API.
+- [X] **Implement `.quoteimg` Command:**
+    - In `commands/info/quoteimg.js`. Generates an image with quote text using `jimp`.
+    - Created placeholder `assets/images/quote_bg.png`.
+- [X] **Implement `.covid [country_optional]` Command:**
+    - In `commands/info/covid.js`. Fetches global or country-specific COVID-19 stats from `disease.sh` API.
+- [ ] **(Iplookup command is covered by `.ip` from Utilities Phase)**
+- [X] **Integrate Info & Fetcher Command Handlers into `index.js`:**
+    - Imported and routed all new info/fetcher command handlers.
+
 ## Future Phases (To be detailed)
-- Info & Fetchers
 - AI & Prompt Tools
 - Status & Extras
 

@@ -63,6 +63,15 @@ const { handleRestartCommand } = require('./commands/owner/restart.js');
 const { handleGetsessionCommand } = require('./commands/owner/getsession.js');
 const { handleEvalCommand } = require('./commands/owner/eval.js');
 
+// Info & Fetcher Command Handlers
+const { handleProfileCommand } = require('./commands/info/profile.js');
+const { handleNumberInfoCommand } = require('./commands/info/numberinfo.js');
+const { handleGithubCommand } = require('./commands/info/github.js');
+const { handleNpmCommand } = require('./commands/info/npm.js');
+const { handleAnimeCommand } = require('./commands/info/anime.js');
+const { handleQuoteImgCommand } = require('./commands/info/quoteimg.js');
+const { handleCovidCommand } = require('./commands/info/covid.js');
+
 // Active games state management (in-memory)
 const activeGames = {};
 
@@ -1837,6 +1846,28 @@ client.on('message', async (msg) => {
             await msg.reply(theme.messages.ownerCmd.unauthorized);
         }
         return; // Command attempt (authorized or not) is handled.
+    }
+
+    // --- Info & Fetcher Commands ---
+    const infoCommands = {
+        'profile': handleProfileCommand,
+        'numberinfo': handleNumberInfoCommand,
+        'github': handleGithubCommand,
+        'npm': handleNpmCommand,
+        'anime': handleAnimeCommand,
+        'quoteimg': handleQuoteImgCommand,
+        'covid': handleCovidCommand,
+        // 'iplookup' is handled by 'ip' in utilities section
+    };
+
+    if (infoCommands[commandName]) {
+        try {
+            await infoCommands[commandName](msg, args, client, theme, botPrefix, activeGames); // activeGames might not be used by all
+        } catch (error) {
+            console.error(`Unhandled error in info command ${commandName}:`, error);
+            await msg.reply(`❌ An unexpected error occurred while running the ${commandName} command.`);
+        }
+        return; // Command handled
     }
 
 

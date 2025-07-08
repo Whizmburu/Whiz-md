@@ -1,0 +1,5 @@
+This is a placeholder for a quote background image (e.g., PNG or JPG).
+A visually appealing background should be placed here by the user.
+Dimensions like 800x600 or 1000x500 might be good starting points.
+The code will attempt to fit text onto this background.
+If this file is not replaced with a real image, the .quoteimg command might use a solid color background instead.

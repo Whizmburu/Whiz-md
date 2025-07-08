@@ -383,7 +383,56 @@
             "warning": "🔒 *Security Warning!* Below is your session data. Keep it extremely confidential. Anyone with this data can take over your bot's WhatsApp session.",
             "dataPrefix": "📄 Session Data (WHIZMD_SESSION_DATA content):",
             "fail": "❌ Failed to retrieve session data."
-        }
+        },
+    "profileCmd": {
+        "loading": "👤 Fetching profile information...",
+        "notFound": "❓ Could not retrieve profile information for the specified user.",
+        "info": "👤 *Profile Info*\n\n*Name:* {name}\n*About:* {about}\n*Number:* {number}\n*Is Business:* {isBusiness}\n*Is Me:* {isMe}",
+        "noAbout": "🚫 No status/about set."
+    },
+    "numberInfoCmd": {
+        "noNumber": "⚠️ Please provide a phone number to check. Example: `{prefix}numberinfo 1234567890`",
+        "checking": "🔄 Checking number {number}...",
+        "registered": "✅ Number {number} is registered on WhatsApp.",
+        "notRegistered": "❌ Number {number} is not registered on WhatsApp.",
+        "error": "❓ Could not verify number {number}. It might be invalid or an error occurred.",
+        "disclaimer": "\n\n_Note: This check only confirms WhatsApp registration, not caller ID or other details._"
+    },
+    "githubCmd": {
+        "noQuery": "⚠️ Please provide a GitHub username or username/repo. Example: `{prefix}github octocat` or `{prefix}github octocat/Spoon-Knife`",
+        "loadingUser": "🐙 Fetching GitHub user profile for {username}...",
+        "loadingRepo": "📦 Fetching GitHub repository info for {repo}...",
+        "notFound": "❓ GitHub user or repository not found: {query}",
+        "apiError": "❌ Failed to fetch data from GitHub API.",
+        "userInfo": "👤 *GitHub User: {name}* ({login})\nBio: {bio}\nFollowers: {followers} | Following: {following}\nPublic Repos: {public_repos}\nProfile: {html_url}",
+        "repoInfo": "📦 *GitHub Repo: {full_name}*\nDescription: {description}\n⭐ Stars: {stargazers_count} |  Forks: {forks_count} | 👁️ Watchers: {watchers_count}\nLanguage: {language}\nLast Push: {pushed_at}\nURL: {html_url}"
+    },
+    "npmCmd": {
+        "noPackage": "⚠️ Please provide an npm package name. Example: `{prefix}npm whatsapp-web.js`",
+        "loading": "📦 Fetching npm package info for {packageName}...",
+        "notFound": "❓ Package \"{packageName}\" not found on npm.",
+        "apiError": "❌ Failed to fetch data from npm registry.",
+        "packageInfo": "📦 *Package: {name}* v{version}\nDescription: {description}\nAuthor: {author}\nLicense: {license}\nHomepage: {homepage}\nNPM: https://www.npmjs.com/package/{name}"
+    },
+    "animeCmd": {
+        "noQuery": "⚠️ Please provide an anime name to search. Example: `{prefix}anime Attack on Titan`",
+        "searching": "🎨 Searching for anime \"{query}\"...",
+        "notFound": "❓ Sorry, couldn't find any anime matching \"{query}\".",
+        "apiError": "❌ Failed to fetch data from anime API.",
+        "result": "🎬 *{title_english}* ({title_japanese})\n\n*Type:* {type} | *Episodes:* {episodes}\n*Status:* {status} | *Score:* {score} ⭐\n*Aired:* {aired_from} to {aired_to}\n*Synopsis:* {synopsis}\n\nMore Info: {url}"
+    },
+    "quoteImgCmd": {
+        "noText": "⚠️ Please provide text for the quote image, or reply to a message.",
+        "generating": "🖼️ Generating your quote image...",
+        "error": "❌ Failed to generate quote image."
+    },
+    "covidCmd": {
+        "fetchingGlobal": "🌍 Fetching global COVID-19 stats...",
+        "fetchingCountry": "🌍 Fetching COVID-19 stats for {country}...",
+        "notFound": "❓ Country \"{country}\" not found or no data available.",
+        "apiError": "❌ Failed to fetch COVID-19 data.",
+        "globalStats": "🌎 *Global COVID-19 Stats*\n\nCases: {cases}\nDeaths: {deaths}\nRecovered: {recovered}\nActive: {active}\nToday Cases: {todayCases}\nToday Deaths: {todayDeaths}\nUpdated: {updated}",
+        "countryStats": "🌍 *COVID-19 Stats for {country}*\n\nCases: {cases}\nDeaths: {deaths}\nRecovered: {recovered}\nActive: {active}\nCritical: {critical}\nToday Cases: {todayCases}\nToday Deaths: {todayDeaths}\nCases/Million: {casesPerOneMillion}\nDeaths/Million: {deathsPerOneMillion}\nUpdated: {updated}"
     }
   },
   "menu": {
