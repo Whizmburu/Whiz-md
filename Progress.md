@@ -191,8 +191,44 @@
 - [X] **Integrate Fun Command Handlers into `index.js`:**
     - Imported and routed all new fun command handlers.
 
+... (Previous content of Phase 1-6 remains the same) ...
+
+## Phase 7: INTERACTIVE GAMES
+- [X] **Directory Structure & Setup:**
+    - [X] Created `commands/games/` directory.
+    - [X] Created `resources/gamedata/` directory.
+    - [X] Initialized `activeGames = {}` in `index.js` for in-memory game state.
+- [X] **Add Theming for Interactive Game Commands:**
+    - Added feedback messages for general game interactions and specific games to `Themes/WHIZ.json`.
+- [X] **Implement `.roll [dice_notation]` Command:**
+    - In `commands/games/roll.js`. Parses notation, simulates rolls, sends results.
+- [X] **Implement `.guess` (Number Guessing Game):**
+    - In `commands/games/guess.js`. Manages state for a number guessing game (`.guess start/stop/<number>`).
+- [X] **Implement `.riddle` Command:**
+    - In `commands/games/riddle.js`. Loads riddles from `resources/gamedata/riddles.json`.
+    - Manages active riddle state and handles answers via `.answer` command.
+- [X] **Implement `.ttt` (Tic-Tac-Toe) Command:**
+    - In `commands/games/ttt.js`. Manages Tic-Tac-Toe game state (vs. Bot or vs. Player).
+    - Handles moves, displays board, checks win/draw.
+- [X] **Implement `.hangman` Command:**
+    - In `commands/games/hangman.js`. Loads words from `resources/gamedata/hangman_words.json`.
+    - Manages Hangman game state, letter guesses, win/loss conditions.
+- [X] **Implement `.slot` (Slot Machine) Command:**
+    - In `commands/games/slot.js`. Simulates slot machine spin and checks for wins.
+- [X] **Implement `.trivia` Command (using OpenTDB API):**
+    - In `commands/games/trivia.js`. Fetches questions from OpenTDB.
+    - Manages active trivia question state and handles answers via `.answer` command.
+    - Supports difficulty/type arguments.
+- [ ] **Implement `.connect4` Command:**
+    - [X] Placeholder implemented in `commands/games/connect4.js`.
+    - *Note: Full implementation deferred (complex board logic, win conditions with gravity).*
+- [ ] **Implement `.sudoku` Command:**
+    - [X] Placeholder implemented in `commands/games/sudoku.js`.
+    - *Note: Full implementation deferred (complex puzzle generation, display, input, validation, solving logic).*
+- [X] **Integrate Game Command Handlers into `index.js`:**
+    - Imported and routed all new interactive game command handlers, including contextual `.answer`.
+
 ## Future Phases (To be detailed)
-- Interactive Games
 - Group Tools
 - Owner Controls
 - Info & Fetchers

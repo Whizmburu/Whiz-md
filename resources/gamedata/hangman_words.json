@@ -1,0 +1,14 @@
+{
+  "animals": [
+    "elephant", "tiger", "giraffe", "zebra", "monkey", "lion", "hippopotamus", "crocodile", "penguin", "kangaroo"
+  ],
+  "fruits": [
+    "apple", "banana", "orange", "grape", "strawberry", "watermelon", "pineapple", "mango", "kiwi", "blueberry"
+  ],
+  "countries": [
+    "canada", "brazil", "japan", "germany", "australia", "india", "egypt", "mexico", "france", "italy"
+  ],
+  "general": [
+    "computer", "keyboard", "bottle", "window", "backpack", "guitar", "mountain", "ocean", "sunshine", "moonlight"
+  ]
+}

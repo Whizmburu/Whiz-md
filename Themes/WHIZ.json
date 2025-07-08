@@ -205,6 +205,76 @@
         "kiss": "😘 {SENDER} blows a kiss to {MENTIONED_USER}!",
         "pat": "👋 {SENDER} gently pats {MENTIONED_USER}.",
         "ship": "💞 Shipping {USER1} and {USER2}...\nCompatibility: {PERCENTAGE}% {HEART_EMOJI}"
+    },
+    "gameCommand": {
+        "alreadyPlaying": "⚠️ You are already in a game of {gameName} in this chat! Use `{prefix}{stopCommand}` to end it first.",
+        "notPlaying": "⚠️ You are not currently playing any game in this chat.",
+        "invalidMove": "❌ Invalid move or input. Please try again.",
+        "gameOver": "🎉 Game Over!",
+        "stopped": "🛑 Game stopped."
+    },
+    "rollCommand": {
+        "result": "🎲 You rolled: {rolls} (Total: {total})"
+    },
+    "guessGame": {
+        "start": "🔢 I've picked a number between 1 and {maxNumber}. Try to guess it! Use `{prefix}guess <your_guess>`.",
+        "tooHigh": "📉 Too high! Try a lower number.",
+        "tooLow": "📈 Too low! Try a higher number.",
+        "correct": "🎉 Congratulations! You guessed the number {number} in {attempts} attempts!",
+        "noActiveGame": "⚠️ No number guessing game active. Start one with `{prefix}guess start [max_number]`.",
+        "invalidGuess": "⚠️ Please enter a valid number as your guess.",
+        "stopped": "🛑 Number guessing game stopped. The number was {number}."
+    },
+    "riddleGame": {
+        "newRiddle": "🤔 Riddle Me This:\n\n{riddle}\n\nUse `{prefix}answer <your_answer>` to guess.",
+        "noActiveRiddle": "⚠️ There's no active riddle. Get one with `{prefix}riddle`.",
+        "correctAnswer": "✅ Correct! The answer was: {answer}",
+        "wrongAnswer": "❌ Nope, that's not it. Try again or get a new riddle!",
+        "showAnswer": "💡 The answer was: {answer}",
+        "loadError": "❌ Failed to load riddles. Please contact the bot owner."
+    },
+    "tttGame": {
+        "boardTitle": "Tic-Tac-Toe Board:",
+        "turn": "➡️ It's {player}'s turn ({symbol}). Move with `{prefix}ttt move <1-9>`.",
+        "playerWins": "🏆 Player {player} ({symbol}) wins!",
+        "botWins": "🤖 I win! Better luck next time!",
+        "draw": "🤝 It's a draw!",
+        "invalidCell": "❌ Invalid cell or cell already taken. Pick an empty cell (1-9).",
+        "notYourTurn": "⏳ It's not your turn!",
+        "gameStarted": "🎮 Tic-Tac-Toe game started! {player1} (X) vs {player2} (O).\n{currentPlayer}'s turn.",
+        "vsBot": "You are X, I am O.",
+        "needOpponent": "Waiting for an opponent to join or use `.ttt start` to play against the bot."
+    },
+    "hangmanGame": {
+        "start": "🪓 Let's play Hangman! The word has {length} letters.\n`{displayWord}`\nGuesses left: {guessesLeft}\nGuess a letter with `{prefix}hangman guess <letter>`.",
+        "guessCorrect": "✅ Good guess! `{displayWord}`\nGuesses left: {guessesLeft}. Guessed: {guessedLetters}",
+        "guessIncorrect": "❌ Wrong guess! `{displayWord}`\nGuesses left: {guessesLeft}. Guessed: {guessedLetters}",
+        "alreadyGuessed": "⚠️ You already guessed '{letter}'. Try another one. Guessed: {guessedLetters}",
+        "win": "🎉 You won! The word was: {word}",
+        "lose": "💀 Game Over! The word was: {word}",
+        "invalidLetter": "⚠️ Please guess a single letter.",
+        "loadError": "❌ Failed to load words for Hangman."
+    },
+    "slotMachine": {
+        "spinning": "🎰 Spinning the reels...",
+        "result": "{reels}\n\n{message}",
+        "win": "🎉 JACKPOT! You won!",
+        "near": "😮 So close!",
+        "lose": "💔 Better luck next time!"
+    },
+    "triviaGame": {
+        "newQuestion": "🧠 Trivia Time! Difficulty: {difficulty}\nCategory: {category}\n\n{question}\n\n{options}\n\nAnswer with `{prefix}answer <option_letter_or_number>`.",
+        "correct": "✅ Correct!",
+        "incorrect": "❌ Incorrect. The correct answer was: {correctAnswer}",
+        "outOfTime": "⏰ Time's up! The correct answer was: {correctAnswer}",
+        "finalScore": "🏁 Quiz Finished! Your final score: {score}/{totalQuestions}",
+        "noActiveQuestion": "⚠️ No active trivia question. Start a new game with `{prefix}trivia`.",
+        "loading": "🔄 Fetching a new trivia question...",
+        "apiError": "❌ Failed to fetch a trivia question from the API."
+    },
+    "placeholderGameCommand": {
+        "connect4": "🔵🔴 The Connect4 game is under development.",
+        "sudoku": "🔢 The Sudoku game is under development."
     }
   },
   "menu": {

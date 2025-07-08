@@ -28,6 +28,19 @@ const { handleKissCommand } = require('./commands/fun/kiss.js');
 const { handlePatCommand } = require('./commands/fun/pat.js');
 const { handleShipCommand } = require('./commands/fun/ship.js');
 
+// Game Command Handlers
+const { handleRollCommand } = require('./commands/games/roll.js');
+const { handleGuessCommand } = require('./commands/games/guess.js');
+const { handleRiddleCommand, handleAnswerCommand: handleRiddleAnswerCommand } = require('./commands/games/riddle.js');
+const { handleTTTCommand } = require('./commands/games/ttt.js');
+const { handleHangmanCommand } = require('./commands/games/hangman.js');
+const { handleSlotCommand } = require('./commands/games/slot.js');
+const { handleTriviaCommand, handleTriviaAnswer } = require('./commands/games/trivia.js');
+const { handleConnect4Command } = require('./commands/games/connect4.js');
+const { handleSudokuCommand } = require('./commands/games/sudoku.js');
+
+// Active games state management (in-memory)
+const activeGames = {};
 
 // Load theme/config
 let theme = {};
@@ -1713,6 +1726,56 @@ client.on('message', async (msg) => {
         }
         return; // Command handled
     }
+
+    // --- Interactive Game Commands ---
+    const gameCommands = {
+        'roll': handleRollCommand,
+        'guess': handleGuessCommand,
+        'riddle': handleRiddleCommand,
+        // 'answer' is special, handled below
+        'ttt': handleTTTCommand,
+        'hangman': handleHangmanCommand,
+        'slot': handleSlotCommand,
+        'trivia': handleTriviaCommand,
+        'skipquiz': handleTriviaCommand, // Alias for stopping trivia
+        'stopquiz': handleTriviaCommand, // Alias for stopping trivia
+        'connect4': handleConnect4Command, // Placeholder
+        'sudoku': handleSudokuCommand,     // Placeholder
+    };
+
+    if (gameCommands[commandName]) {
+        try {
+            await gameCommands[commandName](msg, args, client, theme, botPrefix, activeGames);
+        } catch (error) {
+            console.error(`Unhandled error in game command ${commandName}:`, error);
+            await msg.reply(`❌ An unexpected error occurred while running the ${commandName} command.`);
+        }
+        return; // Command handled
+    }
+
+    // Special handling for .answer command (contextual to active game)
+    if (commandName === 'answer') {
+        const chatId = msg.from;
+        const activeGame = activeGames[chatId];
+        if (activeGame) {
+            try {
+                if (activeGame.gameType === 'riddle') {
+                    await handleRiddleAnswerCommand(msg, args, client, theme, botPrefix, activeGames);
+                } else if (activeGame.gameType === 'trivia') {
+                    await handleTriviaAnswer(msg, args, client, theme, botPrefix, activeGames);
+                } else {
+                    await msg.reply("There's no active game expecting an answer right now.");
+                }
+            } catch (error) {
+                 console.error(`Unhandled error in .answer command for ${activeGame.gameType}:`, error);
+                 await msg.reply(`❌ An unexpected error occurred while processing your answer.`);
+            }
+        } else {
+            await msg.reply("There's no active game expecting an answer right now. Try starting a riddle or trivia game!");
+        }
+        return; // Command handled
+    }
+
 
     // Placeholder for other commands
     // For now, send a "command not found" type message from theme
