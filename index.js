@@ -14,6 +14,21 @@ const FormData = require('form-data'); // For removebg
 const { evaluate } = require('mathjs'); // For .calc command
 const QRCode = require('qrcode'); // For .qr command
 
+// Fun Command Handlers
+const { handleJokeCommand } = require('./commands/fun/joke.js');
+const { handleQuoteCommand } = require('./commands/fun/quote.js');
+const { handleFactCommand } = require('./commands/fun/fact.js');
+const { handleMemeCommand } = require('./commands/fun/meme.js');
+const { handle8BallCommand } = require('./commands/fun/8ball.js');
+const { handleTruthCommand } = require('./commands/fun/truth.js');
+const { handleDareCommand } = require('./commands/fun/dare.js');
+const { handleHugCommand } = require('./commands/fun/hug.js');
+const { handleSlapCommand } = require('./commands/fun/slap.js');
+const { handleKissCommand } = require('./commands/fun/kiss.js');
+const { handlePatCommand } = require('./commands/fun/pat.js');
+const { handleShipCommand } = require('./commands/fun/ship.js');
+
+
 // Load theme/config
 let theme = {};
 try {
@@ -1670,6 +1685,33 @@ client.on('message', async (msg) => {
             // Optionally send an error message
         }
         return;
+    }
+
+    // --- Fun & Text Game Commands ---
+    const funCommands = {
+        'joke': handleJokeCommand,
+        'quote': handleQuoteCommand,
+        'fact': handleFactCommand,
+        'meme': handleMemeCommand,
+        '8ball': handle8BallCommand,
+        'truth': handleTruthCommand,
+        'dare': handleDareCommand,
+        'hug': handleHugCommand,
+        'slap': handleSlapCommand,
+        'kiss': handleKissCommand,
+        'pat': handlePatCommand,
+        'ship': handleShipCommand,
+    };
+
+    if (funCommands[commandName]) {
+        try {
+            // Pass botPrefix to handlers that might need it for theme messages
+            await funCommands[commandName](msg, args, client, theme, botPrefix);
+        } catch (error) {
+            console.error(`Unhandled error in fun command ${commandName}:`, error);
+            await msg.reply(`❌ An unexpected error occurred while running the ${commandName} command.`);
+        }
+        return; // Command handled
     }
 
     // Placeholder for other commands

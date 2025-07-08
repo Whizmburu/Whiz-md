@@ -171,6 +171,40 @@
     },
     "speedtestCommand": {
         "info": "💨 To test *your* internet speed, please visit a website like https://www.speedtest.net or https://fast.com.\nThis command, if fully implemented, would test the *server's* internet speed."
+    },
+    "memeCommand": {
+        "loading": "😂 Fetching a random meme...",
+        "error": "❌ Oops! Couldn't fetch a meme right now. Please try again later."
+    },
+    "jokeCommand": {
+        "loading": "😄 Getting a joke for you...",
+        "error": "❌ Failed to fetch a joke. The joke API might be down."
+    },
+    "quoteCommand": {
+        "loading": "📜 Fetching a wise quote...",
+        "error": "❌ Failed to fetch a quote."
+    },
+    "factCommand": {
+        "loading": "💡 Retrieving an interesting fact...",
+        "error": "❌ Failed to fetch a fact."
+    },
+    "eightBallCommand": {
+        "noQuestion": "🎱 You need to ask a question for the Magic 8-Ball to answer! Example: `{prefix}8ball Will it rain today?`",
+        "replyPrefix": "🎱 Magic 8-Ball says: "
+    },
+    "truthOrDareCommand": {
+        "truth": "🤔 Truth: {question}",
+        "dare": "😈 Dare: {challenge}",
+        "loadError": "❌ Failed to load truths/dares. Please contact the bot owner."
+    },
+    "interactiveCmd": {
+        "noMention": "⚠️ Please mention a user for this action! Example: `{prefix}{commandName} @user`",
+        "shipNoMention": "⚠️ Please mention one or two users to ship! Example: `{prefix}ship @user1 @user2` or `{prefix}ship @user1` (ships with you).",
+        "slap": "💥 {SENDER} slaps {MENTIONED_USER}!",
+        "hug": "🤗 {SENDER} gives {MENTIONED_USER} a big hug!",
+        "kiss": "😘 {SENDER} blows a kiss to {MENTIONED_USER}!",
+        "pat": "👋 {SENDER} gently pats {MENTIONED_USER}.",
+        "ship": "💞 Shipping {USER1} and {USER2}...\nCompatibility: {PERCENTAGE}% {HEART_EMOJI}"
     }
   },
   "menu": {

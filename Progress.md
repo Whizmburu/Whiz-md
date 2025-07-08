@@ -163,8 +163,35 @@
     - Provides informational message and links to speed test websites.
 - [ ] **(Ping command was already implemented/enhanced in Phase 1)**
 
+... (Previous content of Phase 1-5 remains the same) ...
+
+## Phase 6: FUN & TEXT GAMES
+- [X] **Directory Structure & Setup:**
+    - [X] Created `commands/fun/` directory.
+    - [X] Added API key placeholders to `.env.example` (for potential Giphy/Tenor GIF enhancements).
+- [X] **Add Theming for Fun & Text Game Commands:**
+    - Added feedback messages for all fun/text game commands to `Themes/WHIZ.json`.
+- [X] **Implement API-Based Single-Reply Commands:**
+    - [X] `.joke` (via `commands/fun/joke.js` using joke API).
+    - [X] `.quote` (via `commands/fun/quote.js` using quote API).
+    - [X] `.fact` (via `commands/fun/fact.js` using fact API).
+    - [X] `.meme` (via `commands/fun/meme.js` using meme API, sends image).
+- [X] **Implement Local Data Commands:**
+    - [X] `.8ball <question>` (via `commands/fun/8ball.js` with predefined responses).
+    - [X] `.truth` (via `commands/fun/truth.js`, loads from `resources/data/truths.json`).
+    - [X] `.dare` (via `commands/fun/dare.js`, loads from `resources/data/dares.json`).
+    - [X] Created `resources/data/truths.json` and `resources/data/dares.json`.
+- [X] **Implement Interactive/Mention-Based Commands (Text-Only First):**
+    - [X] `.ship` (via `commands/fun/ship.js`).
+    - [X] `.slap` (via `commands/fun/slap.js`).
+    - [X] `.hug` (via `commands/fun/hug.js`).
+    - [X] `.kiss` (via `commands/fun/kiss.js`).
+    - [X] `.pat` (via `commands/fun/pat.js`).
+    - *Note: GIF/image enhancements for these are deferred.*
+- [X] **Integrate Fun Command Handlers into `index.js`:**
+    - Imported and routed all new fun command handlers.
+
 ## Future Phases (To be detailed)
-- Fun & Text Games
 - Interactive Games
 - Group Tools
 - Owner Controls
