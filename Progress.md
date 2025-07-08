@@ -255,8 +255,32 @@
 - [X] **Integrate Group Command Handlers into `index.js`:**
     - Imported and routed all new group command handlers, passing helper functions.
 
+... (Previous content of Phase 1-8 remains the same) ...
+
+## Phase 9: OWNER CONTROLS
+- [X] **Directory Structure & Setup:**
+    - [X] Created `commands/owner/` directory.
+    - [X] Ensured `OWNER_NUMBER` in `.env.example` is noted for importance.
+- [X] **Add Theming for Owner Commands:**
+    - Added feedback messages for all owner commands to `Themes/WHIZ.json` (e.g., unauthorized, shutdown, eval results).
+- [X] **Implement Owner Check Helper (`isOwner`):**
+    - Implemented `isOwner(messageAuthorOrId)` in `index.js` to verify against `process.env.OWNER_NUMBER`.
+- [X] **Implement User Blocking Commands (Owner Only):**
+    - [X] `.block <@user_or_number>` (in `commands/owner/block.js`)
+    - [X] `.unblock <@user_or_number>` (in `commands/owner/unblock.js`)
+- [X] **Implement Broadcast & Send Commands (Owner Only):**
+    - [X] `.broadcast <message>` (in `commands/owner/broadcast.js`) - Sends to all chats with delay.
+    - [X] `.send <chatId> <message>` (in `commands/owner/send.js`)
+- [X] **Implement Bot Lifecycle Commands (Owner Only):**
+    - [X] `.shutdown` (in `commands/owner/shutdown.js`) - Exits process with code 0.
+    - [X] `.restart` (in `commands/owner/restart.js`) - Exits process with code 1.
+    - [X] `.getsession` (in `commands/owner/getsession.js`) - Sends `WHIZMD_SESSION_DATA` to owner.
+- [X] **Implement `.eval <code>` Command (Owner Only - HIGH RISK):**
+    - [X] In `commands/owner/eval.js`. Executes arbitrary JS code with warnings.
+- [X] **Integrate Owner Command Handlers into `index.js`:**
+    - Imported and routed all new owner command handlers, ensuring `isOwner()` check is performed first for these commands.
+
 ## Future Phases (To be detailed)
-- Owner Controls
 - Info & Fetchers
 - AI & Prompt Tools
 - Status & Extras

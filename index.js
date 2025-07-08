@@ -53,6 +53,16 @@ const { handleSetnameCommand } = require('./commands/group/setname.js');
 const { handleSetdescCommand } = require('./commands/group/setdesc.js');
 const { handleSetppCommand } = require('./commands/group/setpp.js');
 
+// Owner Command Handlers
+const { handleBlockCommand } = require('./commands/owner/block.js');
+const { handleUnblockCommand } = require('./commands/owner/unblock.js');
+const { handleBroadcastCommand } = require('./commands/owner/broadcast.js');
+const { handleSendCommand } = require('./commands/owner/send.js');
+const { handleShutdownCommand } = require('./commands/owner/shutdown.js');
+const { handleRestartCommand } = require('./commands/owner/restart.js');
+const { handleGetsessionCommand } = require('./commands/owner/getsession.js');
+const { handleEvalCommand } = require('./commands/owner/eval.js');
+
 // Active games state management (in-memory)
 const activeGames = {};
 
@@ -267,6 +277,21 @@ async function isBotAdmin(chat, client) {
     return isUserAdmin(chat, client.info.wid._serialized);
 }
 // --- End Group Command Helper Functions ---
+
+// --- Owner Command Helper Function ---
+function isOwner(messageAuthorOrId) {
+    const ownerNum = process.env.OWNER_NUMBER;
+    if (!ownerNum) {
+        console.warn("OWNER_NUMBER is not set in .env file. Owner commands will not work.");
+        return false;
+    }
+    // msg.author is for groups (e.g., 12345@c.us_67890@g.us), msg.from is for private chats (e.g., 12345@c.us)
+    // We need to compare against the user part of the ID.
+    const userId = typeof messageAuthorOrId === 'string' ? messageAuthorOrId.split('_')[0].split('@')[0] : null;
+    const ownerId = ownerNum.split('@')[0];
+    return userId === ownerId;
+}
+// --- End Owner Command Helper Function ---
 
 
 // Helper function for Text Effect Generation (primarily for TextPro.me style sites)
@@ -1786,6 +1811,34 @@ client.on('message', async (msg) => {
         }
         return; // Command handled
     }
+
+    // --- Owner Control Commands ---
+    // IMPORTANT: Owner check is the first gate for these commands.
+    const ownerCommands = {
+        'block': handleBlockCommand,
+        'unblock': handleUnblockCommand,
+        'broadcast': handleBroadcastCommand,
+        'send': handleSendCommand,
+        'shutdown': handleShutdownCommand,
+        'restart': handleRestartCommand,
+        'getsession': handleGetsessionCommand,
+        'eval': handleEvalCommand,
+    };
+
+    if (ownerCommands[commandName]) {
+        if (isOwner(msg.author || msg.from)) {
+            try {
+                await ownerCommands[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner); // Pass isOwner if needed by handlers
+            } catch (error) {
+                console.error(`Unhandled error in owner command ${commandName}:`, error);
+                await msg.reply(`❌ An unexpected error occurred while running the owner command ${commandName}.`);
+            }
+        } else {
+            await msg.reply(theme.messages.ownerCmd.unauthorized);
+        }
+        return; // Command attempt (authorized or not) is handled.
+    }
+
 
     // --- Interactive Game Commands ---
     const gameCommands = {

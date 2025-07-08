@@ -337,6 +337,53 @@
             "success": "🖼️ Group profile picture updated successfully!",
             "fail": "❌ Failed to update group profile picture."
         }
+    },
+    "ownerCmd": {
+        "unauthorized": "🚫 You are not authorized to use this command.",
+        "noTarget": "⚠️ Please mention a user or provide their number for this action.",
+        "userNotFound": "❓ User {targetUser} not found or invalid.",
+        "block": {
+            "success": "🚫 User {targetUser} has been blocked.",
+            "alreadyBlocked": "🚫 User {targetUser} is already blocked.",
+            "fail": "❌ Failed to block user {targetUser}."
+        },
+        "unblock": {
+            "success": "✅ User {targetUser} has been unblocked.",
+            "notBlocked": "🤷 User {targetUser} was not blocked.",
+            "fail": "❌ Failed to unblock user {targetUser}."
+        },
+        "broadcast": {
+            "noMessage": "⚠️ Please provide a message to broadcast.",
+            "start": "📢 Starting broadcast to {chatCount} chats... (This may take a while)",
+            "sentTo": "✔️ Sent to: {chatName}",
+            "failTo": "❌ Failed to send to: {chatName}",
+            "complete": "🏁 Broadcast complete. Sent to {successCount}/{totalCount} chats."
+        },
+        "shutdown": {
+            "confirm": "💤 Shutting down the bot...",
+            "error": "❌ Error during shutdown process."
+        },
+        "restart": {
+            "confirm": "🔄 Restarting the bot... I'll be back shortly!",
+            "error": "❌ Error initiating restart."
+        },
+        "eval": {
+            "noCode": "⚠️ Please provide code to evaluate.",
+            "resultPrefix": "💻 Eval Result:",
+            "errorPrefix": "🐞 Eval Error:"
+        },
+        "send": {
+            "noChatId": "⚠️ Please provide a Chat ID (e.g., number@c.us or groupid@g.us).",
+            "noMessage": "⚠️ Please provide a message to send.",
+            "invalidChatId": "❌ Invalid Chat ID: {chatId}",
+            "success": "✅ Message sent to {chatId}.",
+            "fail": "❌ Failed to send message to {chatId}."
+        },
+        "getSession": {
+            "warning": "🔒 *Security Warning!* Below is your session data. Keep it extremely confidential. Anyone with this data can take over your bot's WhatsApp session.",
+            "dataPrefix": "📄 Session Data (WHIZMD_SESSION_DATA content):",
+            "fail": "❌ Failed to retrieve session data."
+        }
     }
   },
   "menu": {
