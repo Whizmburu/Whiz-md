@@ -5,8 +5,8 @@ This file tracks the implementation status of commands and features for the WHIZ
 ## Command Status
 
 **Total Commands Planned:** 119+
-**Implemented Commands:** 24 (Basic) + 8 (Image Tools) + 10 (Text Image Placeholders) + 12 (Fun) + 10 (Games) + 8 (Utilities) = 72
-**Pending Commands:** 119 - 72 = 47+
+**Implemented Commands:** 24 (Basic) + 8 (Image Tools) + 10 (Text Image Placeholders) + 12 (Fun) + 10 (Games) + 8 (Utilities) + 3 (Media) = 75
+**Pending Commands:** 119 - 75 = 44+
 
 ### Key:
 - ✅: Implemented (Core functionality)
@@ -17,11 +17,11 @@ This file tracks the implementation status of commands and features for the WHIZ
 
 ---
 
-### 📁 MEDIA TOOLS (1/12)
-- 🟡 `.play` (Placeholder)
-- ❌ `.ytmp3`
-- ❌ `.ytmp4`
-- ❌ `.tiktok`
+### 📁 MEDIA TOOLS (4/12)
+- 🟡 `.play` (Placeholder, needs YouTube search/dl library)
+- ✅ `.ytmp3` (Implemented with ytdl-core, URL only)
+- ✅ `.ytmp4` (Implemented with ytdl-core, URL only)
+- ✅ `.tiktok` (Implemented with ruhend-scraper, URL only)
 - ❌ `.instagram`
 - ❌ `.facebook`
 - ❌ `.spotify`
