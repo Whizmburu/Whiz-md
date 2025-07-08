@@ -2,9 +2,14 @@
 require('dotenv').config(); // Load environment variables from .env file at the very start
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const config = require('./config');
+const path = require('path'); // Import path
 
-console.log("WHIZ-MD Bot Starting...");
+// Load config after dotenv, so config can potentially use env vars if structured that way
+const config = require('./config');
+const pjson = require('./package.json'); // Load package.json at the root
+config.setBotVersion(pjson.version || '1.0.0'); // Set the version in the config
+
+console.log(`WHIZ-MD Bot Starting... Version: ${config.getBotVersion()}`);
 
 // Session ID Check
 let sessionID = null;
@@ -78,10 +83,10 @@ client.on('ready', async () => {
             // Check if commands are loaded before calling this, or handle it inside getFullMenuText
             // For now, we assume commandHandler has loaded commands when 'ready' event fires.
             // Ensure commandHandler has loaded commands. This should be true by the 'ready' event.
-            const getMenuTextFunction = require('./commands/help.js').__getFullMenuText;
+            const helpCommandModule = require('./commands/help.js');
 
-            if (getMenuTextFunction) {
-                 menuTextForWelcome = getMenuTextFunction();
+            if (helpCommandModule && typeof helpCommandModule.__getFullMenuText === 'function') {
+                 menuTextForWelcome = helpCommandModule.__getFullMenuText(config.getBotVersion()); // Pass bot version
             } else {
                 // Fallback if the function isn't available for some reason
                 console.warn("Welcome message: __getFullMenuText not found, using fallback menu.");
@@ -143,7 +148,7 @@ client.on('message', async (msg) => { // Renamed 'message' to 'msg' for clarity 
 
     // Handle status updates (auto-view/react)
     if (msg.from === 'status@broadcast') {
-        console.log(`[BOT.JS] Detected status update from author: ${msg.author}. Body: ${msg.body}, Type: ${msg.type}`);
+        console.log(`[BOT.JS] Processing status update from author: ${msg.author}, Type: ${msg.type}`); // Reduced verbosity
 
         // Optional: If you want to completely stop further processing for status@broadcast messages here:
         // console.log("[BOT.JS] Status message detected. No further command processing will occur for this message.");

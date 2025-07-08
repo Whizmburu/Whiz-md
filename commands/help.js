@@ -4,16 +4,16 @@ const { commands } = require('../utils/commandHandler'); // Assuming commandHand
 
 // Helper function to generate the full menu text
 // Exported for use in bot.js for the welcome message
-function getFullMenuTextInternal() {
-    // Moved pjson require inside the function
-    const pathMod = require('path'); // Renamed to avoid conflict if 'path' is used elsewhere
-    const pjson = require(pathMod.join(__dirname, '..', '..', 'package.json'));
+function getFullMenuTextInternal(botVersion) { // Accepts botVersion as a parameter
+    // Removed direct require of package.json
+    // Removed direct require of commandHandler to avoid circular dependency issues here.
+    // Command count will be fetched when commandHandler is stable or passed in.
+    // For now, using a placeholder for uniqueCommandsCount.
 
-    // Temporarily remove dynamic command count to isolate package.json issue
-    // const commandList = require('../utils/commandHandler').commands;
-    // const uniqueCommands = new Set(commandList.values());
-    // const uniqueCommandsCount = uniqueCommands.size;
-    const uniqueCommandsCount = "N/A"; // Placeholder
+    const commandHandler = require('../utils/commandHandler');
+    const uniqueCommands = new Set(commandHandler.commands.values());
+    const uniqueCommandsCount = uniqueCommands.size || "N/A";
+
 
     // Define categories and their commands as per the new format
     const categories = [
@@ -35,8 +35,8 @@ function getFullMenuTextInternal() {
     menuText += `*❀* *Owner* : ${config.ownerName}\n`;
     menuText += `*❀* *Mode* : Public\n`;
     menuText += `*❀* *Prefix* : ${config.prefix}\n`;
-    menuText += `*❀* *Commands* : ${uniqueCommandsCount} (Loaded) / 119 (Planned)\n`; // Using placeholder count
-    menuText += `*❀* *Version* : ${pjson.version || "1.0.0"}\n`;
+    menuText += `*❀* *Commands* : ${uniqueCommandsCount} (Loaded) / 119 (Planned)\n`;
+    menuText += `*❀* *Version* : ${botVersion || config.getBotVersion() || "1.0.0"}\n`; // Use passed version or fallback
     menuText += `*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n`;
     menuText += `*❀━━━━━━━━━━━━━╯*\n\n`;
 
@@ -57,9 +57,6 @@ function getFullMenuTextInternal() {
 
     return menuText;
 }
-
-// const path = require('path'); // No longer needed at top level if moved inside function
-// const pjson = require(path.join(__dirname, '..', '..', 'package.json')); // Moved
 
 module.exports = {
     name: 'help',
