@@ -1,4 +1,5 @@
 // Main bot file for WHIZ-MD
+require('dotenv').config(); // Load environment variables from .env file at the very start
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const config = require('./config');

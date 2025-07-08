@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Whizmburu/Whiz-md#readme",
   "dependencies": {
+    "dotenv": "^17.1.0",
     "mathjs": "^14.5.3",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
