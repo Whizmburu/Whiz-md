@@ -5,8 +5,8 @@ This file tracks the implementation status of commands and features for the WHIZ
 ## Command Status
 
 **Total Commands Planned:** 119+
-**Implemented Commands:** 24 (Basic) + 8 (Image Tools) + 10 (Text Image Placeholders) + 12 (Fun) + 10 (Games) = 64
-**Pending Commands:** 119 - 64 = 55+
+**Implemented Commands:** 24 (Basic) + 8 (Image Tools) + 10 (Text Image Placeholders) + 12 (Fun) + 10 (Games) + 8 (Utilities) = 72
+**Pending Commands:** 119 - 72 = 47+
 
 ### Key:
 - ✅: Implemented (Core functionality)
@@ -62,18 +62,19 @@ This file tracks the implementation status of commands and features for the WHIZ
 
 ---
 
-### 🔧 UTILITIES & LOOKUP (2/11)
-- ❌ `.wiki`
-- 🟡 `.translate` (Placeholder)
-- 🟡 `.weather` (Placeholder)
-- ❌ `.time`
-- ❌ `.date`
-- ❌ `.calc`
-- ❌ `.shorturl`
-- ❌ `.ip`
-- ❌ `.qr`
-- ✅ `.ping` (Utility, part of Bot System, also listed here for completeness based on menu)
-- ❌ `.speedtest`
+### 🔧 UTILITIES & LOOKUP (8/11)
+- 🟡 `.wiki` (Placeholder, needs API/library)
+- 🟡 `.translate` (Placeholder, needs API/library)
+- 🟡 `.weather` (Placeholder, needs API/library)
+- 🟡 `.time` (Placeholder, needs API/library)
+- 🟡 `.date` (Placeholder, needs API/library)
+- ✅ `.calc` (Implemented with mathjs)
+- 🟡 `.shorturl` (Placeholder, needs API)
+- 🟡 `.ip` (Placeholder, needs API)
+- ✅ `.qr` (Implemented with qrcode)
+- ✅ `.ping` (Utility, part of Bot System)
+- 🟡 `.speedtest` (Placeholder, complex to implement reliably)
+
 
 ---
 
