@@ -36,7 +36,7 @@ const { handleTTTCommand } = require('./commands/games/ttt.js');
 const { handleHangmanCommand } = require('./commands/games/hangman.js');
 const { handleSlotCommand } = require('./commands/games/slot.js');
 const { handleTriviaCommand, handleTriviaAnswer } = require('./commands/games/trivia.js');
-const { handleConnect4Command } = require('./commands/games/connect4.js');
+const { handleConnect4Command, PLAYER_1_TOKEN: C4_P1_TOKEN, PLAYER_2_TOKEN: C4_P2_TOKEN, EMPTY_SLOT: C4_EMPTY } = require('./commands/games/connect4.js'); // Import any needed constants
 const { handleSudokuCommand } = require('./commands/games/sudoku.js');
 
 // Group Command Handlers
@@ -243,42 +243,62 @@ client.on('auth_failure', msg => {
 // Function to generate the full menu text
 function getFullMenuText() {
     const menuConfig = theme.menu;
-    if (!menuConfig) return "Menu configuration is missing in Themes/WHIZ.json";
+    if (!menuConfig || !menuConfig.sections) { // Ensure the detailed menu structure exists
+        // Fallback to simple header/footer if detailed structure is missing
+        let header = (theme.MENU_HEADER || "WHIZ-MD MENU")
+            .replace('{commandCount}', totalCommandCount)
+            .replace('{version}', theme.version || process.env.npm_package_version || '1.0.0')
+            .replace('{repoLink}', theme.repoLink || "N/A")
+            .replace('{groupLink}', theme.groupLink || "N/A")
+            .replace(/{prefix}/g, botPrefix);
+        let footer = (theme.MENU_FOOTER || "End of menu").replace(/{prefix}/g, botPrefix);
+        return `${header}\n\n[Menu body not available due to missing configuration in Themes/WHIZ.json]\n\n${footer}`;
+    }
 
-    let menuText = `${menuConfig.title.replace('{botName}', theme.botName || 'WHIZ-MD')}\n\n`;
+    let menuText = `${menuConfig.title.replace('{botName}', theme.botName || 'WHIZ-MD')}\n`;
 
+    // Construct header from menuConfig.header array
     menuConfig.header.forEach(line => {
         menuText += `${line
-            .replace('{prefix}', botPrefix)
+            .replace('{ownerName}', theme.ownerName || "WHIZ")
+            .replace(/{prefix}/g, botPrefix) // Global prefix replacement
             .replace('{commandCount}', totalCommandCount)
             .replace('{version}', theme.version || '1.0.0')
-            // botName is already in the title, but if any header line specifically needs it:
-            // .replace('{botName}', theme.botName || 'WHIZ-MD')
+            .replace('{repoLink}', theme.repoLink || "N/A")
+            .replace('{groupLink}', theme.groupLink || "N/A")
         }\n`;
     });
     menuText += `${menuConfig.headerEnd}\n\n`;
 
-    menuConfig.instructions.forEach(line => {
-        menuText += `${line.replace(/{prefix}/g, botPrefix)}\n`; // Replaced dot with {prefix}
-    });
-    // The first separator is handled by the structure, then before each section.
-    // menuText += `\n${menuConfig.sectionSeparator || theme.borders.sectionSeparator}\n`;
+    // Instructions
+    if (menuConfig.instructions) {
+        menuConfig.instructions.forEach(line => {
+            menuText += `${line.replace(/{prefix}/g, botPrefix)}\n`;
+        });
+        menuText += "\n"; // Add a newline after instructions
+    }
 
+    // Sections and Commands
     menuConfig.sections.forEach(section => {
-        menuText += `\n${menuConfig.sectionSeparator || theme.borders.sectionSeparator}\n`; // Separator before section title
+        menuText += `${menuConfig.sectionSeparator}\n`;
         menuText += `${menuConfig.sectionTitleFormat.replace('{sectionTitle}', section.title)}\n`;
         section.commands.forEach(cmd => {
             menuText += `${menuConfig.commandFormat.replace('{commandName}', cmd)}\n`;
         });
     });
-    // The last separator is handled by the structure (after last section, before footer)
-    menuText += `${menuConfig.sectionSeparator || theme.borders.sectionSeparator}\n`;
+    menuText += `${menuConfig.sectionSeparator}\n`; // Separator after the last section
 
-    menuText += `\n${menuConfig.footer}\n`;
+    // Footer (from menuConfig, not the flat theme.MENU_FOOTER)
+    if (menuConfig.footer) { // Check if footer array exists
+        menuConfig.footer.forEach(line => {
+            menuText += `${line.replace(/{prefix}/g, botPrefix)}\n`;
+        });
+    }
     menuText += `${menuConfig.footerEnd}`;
 
-    // Append global signature to the entire menu
-    return (menuText.trim() + (theme.signatures.textOnlyAppend || ""));
+    // Append global signature
+    const signature = theme.signatures && theme.signatures.textOnlyAppend ? theme.signatures.textOnlyAppend : "";
+    return `${menuText.trim()}${signature}`;
 }
 
 
@@ -1880,23 +1900,100 @@ client.on('message', async (msg) => {
         const chat = await msg.getChat();
         try {
             await chat.sendStateTyping();
-            if (args.length === 0) {
-                // .help without arguments - show full menu
-                const menuText = getFullMenuText();
-                await msg.reply(menuText.trim());
+            const query = args.join(' ').trim();
+            const menuConfig = theme.menu;
+
+            if (!menuConfig || !menuConfig.sections) {
+                await msg.reply("Menu configuration is missing or incomplete. Cannot provide help.");
+                await chat.clearState();
+                return;
+            }
+
+            if (!query) {
+                // Tier 1: .help (no arguments) - List categories
+                let helpText = (theme.HELP_CATEGORY_LIST_HEADER || "Command Categories:\n").replace(/{prefix}/g, botPrefix);
+                menuConfig.sections.forEach((section, index) => {
+                    helpText += (theme.HELP_CATEGORY_ITEM_FORMAT || "\n{categoryNumber}. {categoryTitle}")
+                        .replace('{categoryNumber}', index + 1)
+                        .replace('{categoryTitle}', section.title);
+                });
+                await msg.reply(helpText.trim() + (theme.signatures.textOnlyAppend || ""));
             } else {
-                // .help with argument (command name)
-                const specificCommand = args[0].toLowerCase();
-                // For now, just a placeholder. Later, this could look up actual help text.
-                let helpMsg = theme.messages.specificHelpPlaceholder || "📋 Detailed help for `{prefix}{command}` is not yet available. Please check back later!";
-                helpMsg = helpMsg.replace('{command}', specificCommand).replace(/{prefix}/g, botPrefix);
-                await msg.reply(helpMsg);
+                // Tier 2 or 3: .help <category_name_or_number> OR .help <command_name>
+                const categoryNumber = parseInt(query);
+                let foundCategory = null;
+
+                if (!isNaN(categoryNumber) && categoryNumber > 0 && categoryNumber <= menuConfig.sections.length) {
+                    foundCategory = menuConfig.sections[categoryNumber - 1];
+                } else {
+                    foundCategory = menuConfig.sections.find(section => section.title.toLowerCase().includes(query.toLowerCase()));
+                }
+
+                if (foundCategory) {
+                    // Tier 2: List commands in the found category
+                    let helpText = (theme.HELP_COMMANDS_IN_CATEGORY_HEADER || "Commands in {categoryTitle}:\n")
+                        .replace('{categoryTitle}', foundCategory.title)
+                        .replace(/{prefix}/g, botPrefix);
+                    foundCategory.commands.forEach(cmd => {
+                        helpText += (theme.HELP_COMMANDS_IN_CATEGORY_ITEM_FORMAT || "\n- {prefix}{commandName}")
+                            .replace('{prefix}', botPrefix)
+                            .replace('{commandName}', cmd.toLowerCase()); // Assuming commands in theme are TitleCase
+                    });
+                    await msg.reply(helpText.trim() + (theme.signatures.textOnlyAppend || ""));
+                } else {
+                    // Tier 3: Look for a specific command across all categories
+                    let foundCommandDetails = null;
+                    let commandCategoryTitle = "";
+
+                    for (const section of menuConfig.sections) {
+                        const cmdDetail = section.commands.find(c => c.toLowerCase() === query.toLowerCase());
+                        if (cmdDetail) {
+                            // For now, we don't have detailed descriptions for each command in Themes/WHIZ.json
+                            // This part needs to be significantly expanded if we want full details.
+                            // We'll use the placeholder or a generic structure.
+                            foundCommandDetails = {
+                                name: cmdDetail,
+                                description: `Help for ${cmdDetail}. (Detailed description pending)`,
+                                usage: `${cmdDetail.toLowerCase()} <args...>`, // Generic usage
+                                example: `${cmdDetail.toLowerCase()} example_arg`, // Generic example
+                                aliases: "N/A"
+                            };
+                            commandCategoryTitle = section.title; // Store category for context if needed
+                            break;
+                        }
+                    }
+
+                    if (foundCommandDetails) {
+                        let specificHelpText = (theme.HELP_SPECIFIC_COMMAND_HEADER || "Help for .{commandName}:\n")
+                            .replace(/{commandName}/g, foundCommandDetails.name.toLowerCase()) // ensure lower case for consistency
+                            .replace(/{prefix}/g, botPrefix);
+                        specificHelpText += (theme.HELP_SPECIFIC_COMMAND_DESCRIPTION || "\nDescription: {description}")
+                            .replace('{description}', foundCommandDetails.description);
+                        specificHelpText += (theme.HELP_SPECIFIC_COMMAND_USAGE || "\nUsage: {prefix}{usage}")
+                            .replace('{prefix}', botPrefix)
+                            .replace('{usage}', foundCommandDetails.usage);
+                        if (foundCommandDetails.aliases && foundCommandDetails.aliases !== "N/A") {
+                            specificHelpText += (theme.HELP_SPECIFIC_COMMAND_ALIASES || "\nAliases: {aliases}")
+                                .replace('{aliases}', foundCommandDetails.aliases);
+                        }
+                        specificHelpText += (theme.HELP_SPECIFIC_COMMAND_EXAMPLE || "\nExample: {prefix}{example}")
+                            .replace('{prefix}', botPrefix)
+                            .replace('{example}', foundCommandDetails.example);
+
+                        await msg.reply(specificHelpText.trim() + (theme.signatures.textOnlyAppend || ""));
+                    } else {
+                        // Neither category nor command found
+                        await msg.reply((theme.HELP_CATEGORY_NOT_FOUND || "❓ Category or command `{categoryQuery}` not found.")
+                            .replace('{categoryQuery}', query)
+                            .replace(/{prefix}/g, botPrefix) + (theme.signatures.textOnlyAppend || ""));
+                    }
+                }
             }
             await chat.clearState();
         } catch (error) {
             console.error(`Error processing .help command for ${msg.from}:`, error);
-            await chat.clearState();
-            // Optionally send an error message
+            await msg.reply(theme.messages.commandError || "❌ Oops! Something went wrong while fetching help.");
+            if (chat) await chat.clearState();
         }
         return;
     }
@@ -2089,13 +2186,19 @@ client.on('message', async (msg) => {
         'trivia': handleTriviaCommand,
         'skipquiz': handleTriviaCommand, // Alias for stopping trivia
         'stopquiz': handleTriviaCommand, // Alias for stopping trivia
-        'connect4': handleConnect4Command, // Placeholder
-        'sudoku': handleSudokuCommand,     // Placeholder
+        'connect4': handleConnect4Command,
+        'c4': handleConnect4Command, // Alias
+        'sudoku': handleSudokuCommand,
     };
 
     if (gameCommands[commandName]) {
         try {
-            await gameCommands[commandName](msg, args, client, theme, botPrefix, activeGames);
+            // Pass isOwner for Connect4 command to allow owner to stop games
+            if (commandName === 'connect4' || commandName === 'c4') {
+                await handleConnect4Command(msg, args, client, theme, botPrefix, activeGames, isOwner);
+            } else {
+                await gameCommands[commandName](msg, args, client, theme, botPrefix, activeGames);
+            }
         } catch (error) {
             console.error(`Unhandled error in game command ${commandName}:`, error);
             await msg.reply(`❌ An unexpected error occurred while running the ${commandName} command.`);

@@ -378,6 +378,28 @@
     - [X] Implemented the `.repo` command in `index.js` to display the repository link.
     - [X] Integrated the `.repo` command handler into `index.js`.
 
+## Phase 13: Menu, Help, Games, and README Enhancements
+- [X] **Update Menu Generation & Themes for Group Link:**
+    - [X] Modified `Themes/WHIZ.json` with a detailed `menu` object structure.
+    - [X] Added `BOT_GROUP_LINK` and updated `MENU_HEADER` in `Themes/WHIZ.json` to include a `{groupLink}` placeholder.
+    - [X] Refactored `getFullMenuText()` in `index.js` to use the new detailed menu structure and populate the group link.
+- [X] **Enhance `.help` Command Logic & Theming:**
+    - [X] Implemented Tier 1 (`.help`): Displays a numbered list of command categories.
+    - [X] Implemented Tier 2 (`.help <category_name_or_number>`): Lists commands within the specified category.
+    - [X] Implemented Tier 3 (`.help <command_name>`): Displays placeholder help for a specific command (detailed content for all commands deferred).
+    - [X] Added new help message formats (`HELP_CATEGORY_LIST_HEADER`, etc.) to `Themes/WHIZ.json`.
+- [X] **Implement `.connect4` Game Logic:**
+    - [X] Created `commands/games/connect4.js` with game logic (board, moves, win/draw check, simple bot AI).
+    - [X] Added Connect4 themes to `Themes/WHIZ.json`.
+    - [X] Integrated `handleConnect4Command` (and `.c4` alias) into `index.js`.
+- [X] **Implement `.sudoku` Game Logic (Simplified):**
+    - [X] Created `commands/games/sudoku.js` with logic for predefined puzzles, fill, check, view, stop.
+    - [X] Created `resources/gamedata/sudoku_puzzles.json` with sample puzzles.
+    - [X] Added Sudoku themes to `Themes/WHIZ.json`.
+    - [X] Integrated `handleSudokuCommand` into `index.js`.
+- [X] **Create `README.md`:**
+    - [X] Generated a comprehensive `README.md` with project overview, features, detailed deployment instructions (Docker, Node.js), usage, community links, and license placeholder.
+
 ## Future Phases (To be detailed)
 - AI & Prompt Tools (Part 2: ChatGPT/Bard, Caption, Nameart, Imgprompt)
 - Final review of all commands, AGENTS.md, README.md.
