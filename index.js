@@ -110,14 +110,14 @@ let theme = {};
 const defaultStartupErrorNoSession = "CRITICAL ERROR: WHIZMD_SESSION_DATA environment variable not found or invalid. It must start with 'WHIZMD_'. Please set it correctly. You can generate a session at https://whizmdsessions.onrender.com. The bot will now exit.";
 const defaultWelcomeMessage1 = "❀━━━━━━━━━━━━❀\n❀ *{botName}* is now Live{liveEmoji}\n❀ Welcome and Enjoy{welcomeEmoji}\n❀ Repo : {repoLink}\n❀ Owner : https://wa.me/254754783683\n❀ *_Kindly Fork me, it means a lot{forkEmoji}_*\n❀━━━━━━━━━━━━❀";
 const defaultWelcomeMessage2Prefix = "Here is the full command menu:";
-let totalCommandCount = 0; // Initialize here, will be calculated after theme is loaded
+let totalCommandCount = 0;
 
 try {
     const themeFileContent = fs.readFileSync('./Themes/WHIZ.json', 'utf8');
     theme = JSON.parse(themeFileContent);
 } catch (e) {
     console.error("Failed to load or parse Themes/WHIZ.json. Proceeding with default messages.", e);
-    theme = {}; // Initialize theme as an empty object in case of parsing error
+    theme = {};
 }
 
 // Ensure theme.messages and critical messages have fallbacks
@@ -130,9 +130,8 @@ theme.messages.welcomeMessage2Prefix = theme.messages.welcomeMessage2Prefix || d
 
 // Ensure theme.emojis exists and has defaults
 if (!theme.emojis || typeof theme.emojis !== 'object') {
-    theme.emojis = {}; // Initialize if emojis object itself is missing
+    theme.emojis = {};
 }
-// Set defaults for specific emojis if they are missing from a loaded theme.emojis object
 theme.emojis.live = theme.emojis.live || "🌀";
 theme.emojis.welcome = theme.emojis.welcome || "👋";
 theme.emojis.fork = theme.emojis.fork || "🙏";
@@ -140,23 +139,17 @@ theme.emojis.ping = theme.emojis.ping || "🏓";
 theme.emojis.uptime = theme.emojis.uptime || "⏱️";
 theme.emojis.owner = theme.emojis.owner || "👑";
 
-
-// Ensure theme.menu and its properties exist for command counting and menu generation
 if (!theme.menu || typeof theme.menu !== 'object') {
-    theme.menu = { sections: [] }; 
+    theme.menu = { sections: [] };
     console.warn("Warning: theme.menu was not defined. Menu functionality will be limited.");
 }
 if (!theme.menu.sections || !Array.isArray(theme.menu.sections)) {
     theme.menu.sections = [];
-    // console.warn("Warning: theme.menu.sections is not defined or not an array. Command count will be 0 and menu body might be incomplete.");
 }
-if (!theme.signatures || typeof theme.signatures !== 'object') { // Ensure signatures exist
+if (!theme.signatures || typeof theme.signatures !== 'object') {
     theme.signatures = {};
 }
 
-
-// Calculate total commands once after theme is processed
-// This check needs to be after theme.menu.sections is potentially initialized.
 if (theme.menu && theme.menu.sections && Array.isArray(theme.menu.sections)) {
     theme.menu.sections.forEach(section => {
         if (section.commands && Array.isArray(section.commands)) {
@@ -164,21 +157,14 @@ if (theme.menu && theme.menu.sections && Array.isArray(theme.menu.sections)) {
         }
     });
 }
-// Commenting out the warning for now as it might be too noisy if theme structure is temporarily different
-// if (totalCommandCount === 0 && theme.menu && theme.menu.sections && theme.menu.sections.length > 0) {
-//     console.warn("Warning: Command count is 0, but menu sections exist. Check 'commands' arrays in theme.menu.sections.");
-// }
 
 
 const ownerNumber = process.env.OWNER_NUMBER;
 const botPrefix = process.env.BOT_PREFIX || '.';
 
-// Session ID Check
 const sessionDataEnv = process.env.WHIZMD_SESSION_DATA;
-
-// This check MUST happen AFTER theme (and its fallbacks) are initialized.
 if (!sessionDataEnv || !sessionDataEnv.startsWith('WHIZMD_')) {
-    console.error(theme.messages.startupErrorNoSession); 
+    console.error(theme.messages.startupErrorNoSession);
     process.exit(1);
 }
 
@@ -217,7 +203,6 @@ const client = new Client({
             '--no-zygote',
             '--disable-gpu'
         ],
-        // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Example
     },
     webVersionCache: {
         type: 'remote',
@@ -246,7 +231,6 @@ client.on('auth_failure', msg => {
 
 function getFullMenuText() {
     const menuConfig = theme.menu;
-    // Fallback for critical menu parts if not defined in theme
     const defaultTitle = `❀━【 💎* _${theme.botName || 'WHIZ-MD'} MENU_━━━ *╮`;
     const defaultHeaderEnd = "*❀━━━━━━━━━━━━━╯*";
     const defaultSectionSeparator = "❀━━━━━━━━━━━━❀";
@@ -254,8 +238,8 @@ function getFullMenuText() {
     const defaultCommandFormat = "*❀* ┃ *{commandName}*";
     const defaultFooterEnd = "*❀━━━━━━━━━━━━━━╯*";
 
-    if (!menuConfig || !menuConfig.sections || !Array.isArray(menuConfig.sections)) {
-        let header = (theme.MENU_HEADER || defaultTitle) 
+    if (!menuConfig || !menuConfig.sections || !Array.isArray(menuConfig.sections) || menuConfig.sections.length === 0) {
+        let header = (theme.MENU_HEADER || defaultTitle)
             .replace('{commandCount}', totalCommandCount)
             .replace('{version}', theme.version || '1.0.0')
             .replace('{repoLink}', theme.repoLink || "N/A")
@@ -264,7 +248,7 @@ function getFullMenuText() {
             .replace('{botName}', theme.botName || 'WHIZ-MD')
             .replace('{ownerName}', theme.ownerName || "WHIZ");
         let footer = (theme.MENU_FOOTER || "_Type `{prefix}help` for details_").replace(/{prefix}/g, botPrefix);
-        return `${header}\n\n[Menu body not available due to missing detailed menu configuration in Themes/WHIZ.json]\n\n${footer}`;
+        return `${header}\n\n[Menu body not available or empty due to configuration in Themes/WHIZ.json]\n\n${footer}`;
     }
 
     let menuText = `${(menuConfig.title || defaultTitle).replace('{botName}', theme.botName || 'WHIZ-MD')}\n`;
@@ -297,7 +281,7 @@ function getFullMenuText() {
             });
         }
     });
-    menuText += `${menuConfig.sectionSeparator || defaultSectionSeparator}\n`; 
+    menuText += `${menuConfig.sectionSeparator || defaultSectionSeparator}\n`;
 
     if (menuConfig.footer && Array.isArray(menuConfig.footer)) {
         menuConfig.footer.forEach(line => {
@@ -305,7 +289,7 @@ function getFullMenuText() {
         });
     }
     menuText += `${menuConfig.footerEnd || defaultFooterEnd}`;
-    
+
     const signature = (theme.signatures && theme.signatures.textOnlyAppend) || `\n\n*~ Powered by ${theme.botName || 'WHIZ-MD'} ~*`;
     return `${menuText.trim()}${signature}`;
 }
@@ -336,7 +320,7 @@ async function isUserAdmin(chat, contactId) {
     return participant ? participant.isAdmin || participant.isSuperAdmin : false;
 }
 
-async function isBotAdmin(chat, clientInstance) { // Renamed client to clientInstance
+async function isBotAdmin(chat, clientInstance) {
     if (!chat.isGroup) return false;
     return isUserAdmin(chat, clientInstance.info.wid._serialized);
 }
@@ -418,32 +402,68 @@ client.on('ready', async () => {
     console.log('WHIZ-MD: Client is ready!');
     const currentBotName = client.info.pushname || theme.botName || 'WHIZ-MD';
     console.log(`Bot Name: ${currentBotName}`);
-    console.log(`Logged in as: ${client.info.wid._serialized || client.info.wid.user}`);
-    const selfChatId = client.info.wid._serialized;
+    const loggedInAs = client.info.wid ? (client.info.wid._serialized || client.info.wid.user) : "UNKNOWN";
+    console.log(`Logged in as: ${loggedInAs}`);
+
+    const selfChatId = client.info.wid ? client.info.wid._serialized : null;
+
+    console.log("--- DEBUG: Entering 'ready' event ---");
+    console.log("Attempting to send welcome message to selfChatId:", selfChatId);
+    console.log("Type of theme:", typeof theme);
+    try {
+        console.log("theme object content (full):", JSON.stringify(theme, null, 2));
+    } catch (e) {
+        console.log("theme object content (full): Error stringifying theme -", e.message);
+        console.log("theme object content (partial messages):", theme.messages);
+        console.log("theme object content (partial emojis):", theme.emojis);
+        console.log("theme object content (partial menu title):", theme.menu ? theme.menu.title : "theme.menu undefined");
+    }
+    console.log("Type of theme.messages:", typeof theme.messages);
+    if (theme.messages) {
+        console.log("theme.messages content:", JSON.stringify(theme.messages, null, 2));
+        console.log("Value of theme.messages.welcomeMessage1:", theme.messages.welcomeMessage1);
+    } else {
+        console.log("theme.messages is undefined or not an object.");
+    }
+    console.log("Type of theme.emojis:", typeof theme.emojis);
+     if (theme.emojis) {
+        console.log("theme.emojis content:", JSON.stringify(theme.emojis, null, 2));
+    } else {
+        console.log("theme.emojis is undefined or not an object.");
+    }
 
     if (selfChatId) {
         try {
-            let welcomeMsg1 = (theme.messages && theme.messages.welcomeMessage1) ? theme.messages.welcomeMessage1 : defaultWelcomeMessage1;
-            welcomeMsg1 = welcomeMsg1
+            let welcomeMsg1String = (theme.messages && theme.messages.welcomeMessage1) ? theme.messages.welcomeMessage1 : defaultWelcomeMessage1;
+            console.log("Initial welcomeMsg1String:", welcomeMsg1String);
+
+            welcomeMsg1String = welcomeMsg1String
                 .replace('{botName}', currentBotName)
-                .replace('{repoLink}', theme.repoLink || "N/A")
+                .replace('{repoLink}', theme.repoLink || "github.com/whizmburu/WHIZ-MD")
                 .replace('{liveEmoji}', (theme.emojis && theme.emojis.live) || '🌀')
                 .replace('{welcomeEmoji}', (theme.emojis && theme.emojis.welcome) || '👋')
                 .replace('{forkEmoji}', (theme.emojis && theme.emojis.fork) || '🙏');
-            
-            await sendSignedMessage(client, selfChatId, welcomeMsg1.trim(), theme);
-            console.log("Welcome message 1 sent to self chat.");
 
-            let menuHeaderText = (theme.messages && theme.messages.welcomeMessage2Prefix) ? theme.messages.welcomeMessage2Prefix : defaultWelcomeMessage2Prefix;
+            console.log("Processed welcomeMsg1String:", welcomeMsg1String);
+            await sendSignedMessage(client, selfChatId, welcomeMsg1String.trim(), theme);
+            console.log("Welcome message 1 sent to self chat (or attempted).");
+
+            let menuHeaderTextString = (theme.messages && theme.messages.welcomeMessage2Prefix) ? theme.messages.welcomeMessage2Prefix : defaultWelcomeMessage2Prefix;
+            console.log("Initial menuHeaderTextString:", menuHeaderTextString);
             const fullMenu = getFullMenuText();
-            
-            await sendSignedMessage(client, selfChatId, `${menuHeaderText}\n\n${fullMenu.trim()}`, theme);
-            console.log("Welcome message 2 (menu) sent to self chat.");
+            console.log("Generated fullMenu length:", fullMenu.length);
+
+            await sendSignedMessage(client, selfChatId, `${menuHeaderTextString}\n\n${fullMenu.trim()}`, theme);
+            console.log("Welcome message 2 (menu) sent to self chat (or attempted).");
+
         } catch (error) {
-            console.error("Failed to send welcome message:", error);
+            console.error("Failed to send welcome message. Error details:", error);
+            console.error("Error name:", error.name);
+            console.error("Error message:", error.message);
+            console.error("Error stack:", error.stack);
         }
     } else {
-        console.warn("Could not determine self chat ID to send welcome message.");
+        console.warn("Could not determine self chat ID (client.info.wid._serialized is null/undefined). Welcome message NOT sent.");
     }
 });
 
@@ -489,7 +509,6 @@ client.on('message', async (msg) => {
 
     console.log(`Command: ${botPrefix}${commandName}, Args: [${args.join(', ')}], From: ${contact.pushname} (${msg.author || msg.from})`);
 
-    // Command handlers (simplified structure for this example)
     if (commandName === 'ping') {
         const chat = await msg.getChat();
         try {
@@ -561,87 +580,131 @@ client.on('message', async (msg) => {
         return;
     }
 
-    // Simplified Router for other commands
-    const allCommandHandlers = {
-        // Fun
+    const commandRouter = {
+        'repo': async (m) => sendSignedTextReply(m, theme.REPO_MSG || "Repo link not configured.", theme),
+        'time': async (m) => {
+            const now = new Date();
+            const serverTime = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const utcTime = now.toLocaleTimeString('en-US', { timeZone: 'UTC', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const replyMsg = `${((theme.messages && theme.messages.dateTimeCommand && theme.messages.dateTimeCommand.serverTime) || "Server Time: {time}").replace('{time}', serverTime)}\n` +
+                           `${((theme.messages && theme.messages.dateTimeCommand && theme.messages.dateTimeCommand.utcTime) || "UTC Time: {time}").replace('{time}', utcTime + ' UTC')}`;
+            await sendSignedTextReply(m, replyMsg.trim(), theme);
+        },
+        'date': async (m) => {
+            const now = new Date();
+            const serverDate = now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const utcDate = now.toLocaleDateString('en-GB', { timeZone: 'UTC', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const replyMsg = `${((theme.messages && theme.messages.dateTimeCommand && theme.messages.dateTimeCommand.serverDate) || "Server Date: {date}").replace('{date}', serverDate)}\n` +
+                           `${((theme.messages && theme.messages.dateTimeCommand && theme.messages.dateTimeCommand.utcDate) || "UTC Date: {date}").replace('{date}', utcDate + ' (UTC)')}`;
+            await sendSignedTextReply(m, replyMsg.trim(), theme);
+        },
+        'speedtest': async (m) => sendSignedTextReply(m, ((theme.messages && theme.messages.speedtestCommand && theme.messages.speedtestCommand.info) || "Test speed at speedtest.net"), theme),
+        'ip': async (m, a) => {
+            const query = a.join(' ');
+            if (!query) { await sendSignedTextReply(m, ((theme.messages && theme.messages.ipCommand && theme.messages.ipCommand.noQuery) || "Provide IP/domain.").replace('{prefix}', botPrefix), theme); return; }
+            try {
+                const response = await axios.get(`http://ip-api.com/json/${encodeURIComponent(query)}?fields=status,message,country,countryCode,regionName,city,isp,query`);
+                if (response.data && response.data.status === 'success') await sendSignedTextReply(m, `IP Details for ${response.data.query}: ${response.data.city}, ${response.data.regionName}, ${response.data.country} (ISP: ${response.data.isp})`, theme);
+                else await sendSignedTextReply(m, "Could not fetch IP details.", theme);
+            } catch { await sendSignedTextReply(m, "Error fetching IP details.", theme); }
+        },
+        'shorturl': async (m, a) => { /* ... */ },
+        'translate': async (m, a) => { /* ... */ },
+        'weather': async (m, a) => { /* ... */ },
+        'qr': async (m, a) => { /* ... */ },
+        'wiki': async (m, a) => { /* ... */ },
+        'calc': async (m, a) => { /* ... */ },
         'joke': handleJokeCommand, 'quote': handleQuoteCommand, 'fact': handleFactCommand, 'meme': handleMemeCommand,
         '8ball': handle8BallCommand, 'truth': handleTruthCommand, 'dare': handleDareCommand, 'hug': handleHugCommand,
         'slap': handleSlapCommand, 'kiss': handleKissCommand, 'pat': handlePatCommand, 'ship': handleShipCommand,
-        // AI
         'image': handleImageCommand, 'dalle': handleImageCommand,
-        // Misc
         'vv': handleVvCommand, 'emojimix': handleEmojimixCommand, 'logomaker': handleLogomakerCommand,
         'logostyles': handleLogostylesCommand, 'qotd': handleQotdCommand, 'birthday': handleBirthdayCommand,
-        // Group
         'add': handleAddCommand, 'kick': handleKickCommand, 'promote': handlePromoteCommand, 'demote': handleDemoteCommand,
         'link': handleLinkCommand, 'tagall': handleTagallCommand, 'hidetag': handleHidetagCommand, 'mute': handleMuteCommand,
         'unmute': handleUnmuteCommand, 'setname': handleSetnameCommand, 'setdesc': handleSetdescCommand, 'setpp': handleSetppCommand,
-        // Info
         'profile': handleProfileCommand, 'numberinfo': handleNumberInfoCommand, 'github': handleGithubCommand,
         'npm': handleNpmCommand, 'anime': handleAnimeCommand, 'quoteimg': handleQuoteImgCommand, 'covid': handleCovidCommand,
-        // Games
         'roll': handleRollCommand, 'guess': handleGuessCommand, 'riddle': handleRiddleCommand, 'ttt': handleTTTCommand,
         'hangman': handleHangmanCommand, 'slot': handleSlotCommand, 'trivia': handleTriviaCommand,
         'skipquiz': handleTriviaCommand, 'stopquiz': handleTriviaCommand,
         'connect4': handleConnect4Command, 'c4': handleConnect4Command, 'sudoku': handleSudokuCommand,
-        // Owner (will be checked inside their handlers or a wrapper)
         'block': handleBlockCommand, 'unblock': handleUnblockCommand, 'broadcast': handleBroadcastCommand,
         'send': handleSendCommand, 'shutdown': handleShutdownCommand, 'restart': handleRestartCommand,
         'getsession': handleGetsessionCommand, 'eval': handleEvalCommand, 'autoview': handleAutoviewCommand,
         'autoreact': handleAutoreactCommand, 'setreactions': handleSetreactionsCommand,
-        // Bot System (already handled: ping, menu, help, repo, time, date)
-        'status': async (m, a, cl, t, p) => { /* status logic */ await sendSignedTextReply(m, (t.messages.status || "Status...").replace('{uptime}',formatUptime(Date.now() - startTime)), t);},
-        'runtime': async (m, a, cl, t, p) => { await sendSignedTextReply(m, (t.messages.runtime || "Runtime...").replace('{runtimeValue}',formatUptime(Date.now() - startTime)), t);},
-        // Media, Text Styles, Image Tools, Utilities (many are placeholders or need full implementation)
-        // ... (add simplified or full handlers as available)
+        'status': async (m) => { await sendSignedTextReply(m, ((theme.messages && theme.messages.status) || "Status...").replace('{uptime}',formatUptime(Date.now() - startTime)).replace('{botName}', theme.botName || "WHIZ-MD").replace('{commandsCount}', totalCommandCount).replace('{prefix}', botPrefix).replace('{version}', theme.version || "1.0.0"), theme);},
+        'runtime': async (m) => { await sendSignedTextReply(m, ((theme.messages && theme.messages.runtime) || "Runtime...").replace('{uptimeEmoji}', (theme.emojis && theme.emojis.uptime) || '⏱️').replace('{runtimeValue}',formatUptime(Date.now() - startTime)), theme);},
+        'play': async (m,a) => { if (!a.join(' ')) {await sendSignedTextReply(m, "Provide song name",theme); return;} await sendSignedTextReply(m, `Playing ${a.join(' ')}... (Full logic needed)`, theme); /* Full ytdl logic */},
+        'ytmp3': async (m,a) => { if (!a[0]) {await sendSignedTextReply(m, "Provide YT URL",theme); return;} await sendSignedTextReply(m, `Downloading MP3 from ${a[0]}... (Full logic needed)`, theme); /* Full ytdl logic */},
+        'ytmp4': async (m,a) => { if (!a[0]) {await sendSignedTextReply(m, "Provide YT URL",theme); return;} await sendSignedTextReply(m, `Downloading MP4 from ${a[0]}... (Full logic needed)`, theme); /* Full ytdl logic */},
+        'lyrics': async (m,a) => { if (!a.join(' ')) {await sendSignedTextReply(m, "Provide song name for lyrics",theme); return;} await sendSignedTextReply(m, `Fetching lyrics for ${a.join(' ')}... (Full logic needed)`, theme); /* Full API logic */},
+        'fire': async(m,a) => { if (!a.join(' ')) {await sendSignedTextReply(m, "Provide text for fire effect",theme); return;} await sendSignedTextReply(m, (theme.TEXT_EFFECT_GENERATING || "Generating fire text...").replace('{styleName}','Fire').replace('{text}',a.join(' ')), theme); /* Full generateTextEffect */},
+        'textstyles': async(m) => await sendSignedTextReply(m, (theme.TEXT_STYLES_AVAILABLE || "Available styles..."), theme),
+        'sticker': async(m) => await sendSignedTextReply(m, ((theme.messages && theme.messages.stickerCommand && theme.messages.stickerCommand.creating) || "Creating sticker..."), theme),
     };
 
-    if (allCommandHandlers[commandName]) {
+    if (commandRouter[commandName]) {
         try {
-            // Prepare context/args for different handler signatures if necessary
-            const isOwnerCmd = ['block', 'unblock', 'broadcast', 'send', 'shutdown', 'restart', 'getsession', 'eval', 'autoview', 'autoreact', 'setreactions'].includes(commandName);
-            const isGameCmd = ['connect4', 'c4', 'sudoku', 'ttt', 'hangman', 'riddle', 'guess', 'slot', 'trivia', 'roll'].includes(commandName);
-            const needsGameAndOwner = ['connect4', 'c4']; // Example
-
-            if (isOwnerCmd) {
+            // For commands needing specific contexts like `isOwner` or game states
+            if (['block', 'unblock', 'broadcast', 'send', 'shutdown', 'restart', 'getsession', 'eval', 'autoview', 'autoreact', 'setreactions'].includes(commandName)) {
                 if (isOwner(msg.author || msg.from)) {
-                    const statusAutomationState = { autoViewEnabled, autoReactEnabled, autoReactionEmojis }; // simplified
-                    const globalState = { birthdays };
-                     await allCommandHandlers[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, statusAutomationState, globalState);
+                    const statusAutomationState = { autoViewEnabled, autoReactEnabled, autoReactionEmojis, birthdays };
+                     await commandRouter[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, statusAutomationState, {birthdays});
                 } else {
                     await sendSignedTextReply(msg, (theme.messages.ownerCmd && theme.messages.ownerCmd.unauthorized) || "Owner only.", theme);
                 }
-            } else if (needsGameAndOwner.includes(commandName)) {
-                 await allCommandHandlers[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner);
-            }
-            else if (['logomaker', 'logostyles'].includes(commandName)) {
-                 await allCommandHandlers[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, null, generateTextEffect, availableLogoStyles);
-            }
-             else {
-                await allCommandHandlers[commandName](msg, args, client, theme, botPrefix, activeGames);
+            } else if (['connect4', 'c4', 'sudoku', 'ttt', 'hangman', 'riddle', 'guess', 'slot', 'trivia', 'roll', 'birthday', 'logomaker', 'logostyles'].includes(commandName)) {
+                 await commandRouter[commandName](msg, args, client, theme, botPrefix, activeGames, isOwner, null, generateTextEffect, availableLogoStyles); // Pass more args
+            } else {
+                await commandRouter[commandName](msg, args, client, theme, botPrefix, activeGames);
             }
         } catch (error) {
-            console.error(`Error in command ${botPrefix}${commandName}:`, error);
-            await sendSignedTextReply(msg, (theme.messages.commandError || `❌ Error executing ${commandName}.`), theme);
+            console.error(`Error executing command ${botPrefix}${commandName}:`, error);
+            await sendSignedTextReply(msg, (theme.messages.commandError || "❌ Error executing command."), theme);
         }
         return;
     }
-    
-    // Fallback for unknown commands (if not caught by the simplified router above)
-    let cmdNotFoundMsg = (theme.messages && theme.messages.commandNotFound) || "❌ Command `{cmd}` not found. Type `{prefix}help`.".replace('{cmd}', commandName);
-    cmdNotFoundMsg = cmdNotFoundMsg.replace(/{prefix}/g, botPrefix);
+
+    // Special handling for .answer (contextual to game)
+    if (commandName === 'answer') {
+        const chatId = msg.from;
+        const activeGame = activeGames[chatId];
+        if (activeGame) {
+            try {
+                if (activeGame.gameType === 'riddle') {
+                    await handleRiddleAnswerCommand(msg, args, client, theme, botPrefix, activeGames);
+                } else if (activeGame.gameType === 'trivia') {
+                    await handleTriviaAnswer(msg, args, client, theme, botPrefix, activeGames);
+                } else {
+                    await sendSignedTextReply(msg, "There's no active game expecting an answer right now.", theme);
+                }
+            } catch (error) {
+                 console.error(`Unhandled error in .answer command for ${activeGame.gameType}:`, error);
+                 await sendSignedTextReply(msg, `❌ An unexpected error occurred while processing your answer.`, theme);
+            }
+        } else {
+            await sendSignedTextReply(msg, "There's no active game expecting an answer right now. Try starting a riddle or trivia game!", theme);
+        }
+        return;
+    }
+
+    // Fallback for truly unknown commands
+    let cmdNotFoundMsg = ((theme.messages && theme.messages.commandNotFound) || "❌ Command `{commandName}` not found. Type `{prefix}help` to see the menu.")
+        .replace('{commandName}', commandName)
+        .replace(/{prefix}/g, botPrefix);
     await sendSignedTextReply(msg, cmdNotFoundMsg, theme);
 
 
     // Autoview & Autoreact to Statuses
-    if (msg.from === 'status@broadcast' && msg.author && msg.author !== client.info.wid._serialized) {
+    if (msg.from === 'status@broadcast' && msg.author && msg.author !== (client.info.wid ? client.info.wid._serialized : null) ) {
         const statusAuthorId = msg.author;
         if (autoViewEnabled) {
-            try { await client.sendSeen(statusAuthorId); } 
+            try { await client.sendSeen(statusAuthorId); }
             catch (viewError) { console.error(`Failed to autoview status from ${statusAuthorId}:`, viewError.message); }
         }
         if (autoReactEnabled && autoReactionEmojis.length > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500)); 
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500));
             try {
                 const randomReaction = autoReactionEmojis[Math.floor(Math.random() * autoReactionEmojis.length)];
                 await msg.react(randomReaction);
