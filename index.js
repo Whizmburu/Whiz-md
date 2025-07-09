@@ -268,7 +268,8 @@ function getFullMenuText() {
     menuText += `\n${menuConfig.footer}\n`;
     menuText += `${menuConfig.footerEnd}`;
 
-    return menuText.trim(); // Trim overall to remove any leading/trailing newlines from assembly
+    // Append global signature to the entire menu
+    return (menuText.trim() + (theme.signatures.textOnlyAppend || ""));
 }
 
 
@@ -331,6 +332,28 @@ function isOwner(messageAuthorOrId) {
     return userId === ownerId;
 }
 // --- End Owner Command Helper Function ---
+
+// --- Signed Reply Helper Functions ---
+async function sendSignedTextReply(msg, textContent, theme) {
+    try {
+        const fullMessage = `${textContent}${theme.signatures.textOnlyAppend || ''}`;
+        await msg.reply(fullMessage.trim());
+    } catch (error) {
+        console.error("Error in sendSignedTextReply:", error);
+        // Fallback if sending signed reply fails, try sending original (should be rare)
+        // Or just let the error propagate if msg.reply itself is the issue.
+    }
+}
+
+async function sendSignedMessage(client, chatId, textContent, theme) {
+    try {
+        const fullMessage = `${textContent}${theme.signatures.textOnlyAppend || ''}`;
+        await client.sendMessage(chatId, fullMessage.trim());
+    } catch (error) {
+        console.error("Error in sendSignedMessage:", error);
+    }
+}
+// --- End Signed Reply Helper Functions ---
 
 
 // Helper function for Text Effect Generation (primarily for TextPro.me style sites)
@@ -446,14 +469,14 @@ client.on('ready', async () => {
                 .replace('{welcomeEmoji}', theme.emojis.welcome || '👋')
                 .replace('{forkEmoji}', theme.emojis.fork || '🙏');
 
-            await client.sendMessage(selfChatId, welcomeMsg1.trim());
+            await sendSignedMessage(client, selfChatId, welcomeMsg1.trim(), theme);
             console.log("Welcome message 1 sent to self chat.");
 
             // Message 2: Full help menu (as a new message, not reply, per user prompt structure)
             let menuHeaderText = theme.messages.welcomeMessage2Prefix || "Here is the full command menu:";
-            const fullMenu = getFullMenuText();
+            const fullMenu = getFullMenuText(); // This function will also need to be updated to append signature
 
-            await client.sendMessage(selfChatId, `${menuHeaderText}\n\n${fullMenu.trim()}`);
+            await sendSignedMessage(client, selfChatId, `${menuHeaderText}\n\n${fullMenu.trim()}`, theme);
             console.log("Welcome message 2 (menu) sent to self chat.");
 
         } catch (error) {
@@ -476,7 +499,7 @@ client.on('message', async (msg) => {
                 await chat.sendStateTyping();
                 const statusAuthorId = quotedMsg.author;
                 if (!statusAuthorId) {
-                    await msg.reply(theme.messages.statusSaveCmd.failNotStatusOrMedia || "Could not identify status author.");
+                    await sendSignedTextReply(msg, theme.messages.statusSaveCmd.failNotStatusOrMedia || "Could not identify status author.", theme);
                     await chat.clearState();
                     return;
                 }
@@ -484,27 +507,33 @@ client.on('message', async (msg) => {
                 const statusAuthorContact = await client.getContactById(statusAuthorId);
                 const authorName = statusAuthorContact.pushname || statusAuthorContact.name || statusAuthorId.split('@')[0];
 
-                await msg.reply(theme.messages.statusSaveCmd.saving.replace('{userName}', authorName));
+                await sendSignedTextReply(msg, theme.messages.statusSaveCmd.saving.replace('{userName}', authorName), theme);
 
                 const media = await quotedMsg.downloadMedia();
                 if (!media) {
-                    await msg.reply(theme.messages.statusSaveCmd.failDownload);
+                    await sendSignedTextReply(msg, theme.messages.statusSaveCmd.failDownload, theme);
                     await chat.clearState();
                     return;
                 }
 
                 const originalStatusCaption = quotedMsg.body || ""; // Statuses can have text captions
-                const finalCaption = theme.messages.statusSaveCmd.caption
-                    .replace('{userName}', authorName)
-                    .replace('{statusCaption}', originalStatusCaption);
+                // const originalStatusCaption = quotedMsg.body || ""; // Statuses can have text captions // Old caption logic
+                // const finalCaption = theme.messages.statusSaveCmd.caption
+                //     .replace('{userName}', authorName)
+                //     .replace('{statusCaption}', originalStatusCaption); // Old caption logic
 
-                await client.sendMessage(msg.from, media, { caption: finalCaption.trim() });
-                // await msg.reply(theme.messages.statusSaveCmd.success); // Optional success message after sending media
+                await client.sendMessage(msg.from, media, { caption: theme.signatures.downloadedBy });
+
+                // Optional success message would also need signature if sent separately
+                // if (theme.messages.statusSaveCmd.success) {
+                //    await msg.reply(theme.messages.statusSaveCmd.success + (theme.signatures.textOnlyAppend || ""));
+                // }
 
                 await chat.clearState();
             } catch (error) {
                 console.error("Error in status save feature:", error);
-                await msg.reply(theme.messages.statusSaveCmd.failDownload + ` (Error: ${error.message})`);
+                const errorText = (theme.messages.statusSaveCmd.failDownload + ` (Error: ${error.message})`) + (theme.signatures.textOnlyAppend || "");
+                await msg.reply(errorText);
                 if (chat) await chat.clearState();
             }
             return; // Important: stop further processing if it was a save attempt
@@ -866,12 +895,12 @@ client.on('message', async (msg) => {
             });
 
             const qrMedia = new MessageMedia('image/png', qrCodeBuffer.toString('base64'), 'qrcode.png');
-            await client.sendMessage(msg.from, qrMedia, { caption: `QR Code for: ${textToEncode.substring(0, 50)}` });
+            await client.sendMessage(msg.from, qrMedia, { caption: theme.signatures.generatedByBot });
 
             await chat.clearState();
         } catch (error) {
             console.error(`Error generating QR code for "${textToEncode}":`, error);
-            await msg.reply(theme.messages.qrCommand.error);
+            await msg.reply(theme.messages.qrCommand.error + (theme.signatures.textOnlyAppend || ""));
             await chat.clearState();
         }
         return;
@@ -1551,7 +1580,7 @@ client.on('message', async (msg) => {
             }
 
             const media = MessageMedia.fromFilePath(tempFilePath);
-            await client.sendMessage(msg.from, media, { caption: `${videoInfo.videoDetails.title}` });
+            await client.sendMessage(msg.from, media, { caption: theme.signatures.downloadedBy });
 
             fs.unlink(tempFilePath, (err) => {
                 if (err) console.error("Error deleting temp video file for .ytmp4:", err);
@@ -1623,7 +1652,7 @@ client.on('message', async (msg) => {
             });
 
             const media = MessageMedia.fromFilePath(tempFilePath);
-            await client.sendMessage(msg.from, media, { sendAudioAsVoice: false, caption: `Playing: ${video.title}` });
+            await client.sendMessage(msg.from, media, { sendAudioAsVoice: false, caption: theme.signatures.downloadedBy });
 
             fs.unlink(tempFilePath, (err) => { // Clean up temp file
                 if (err) console.error("Error deleting temp audio file for .play:", err);
@@ -1734,7 +1763,7 @@ client.on('message', async (msg) => {
             });
 
             const media = MessageMedia.fromFilePath(tempFilePath);
-            await client.sendMessage(msg.from, media, { sendAudioAsVoice: false, caption: `${videoInfo.videoDetails.title}` });
+            await client.sendMessage(msg.from, media, { sendAudioAsVoice: false, caption: theme.signatures.downloadedBy });
 
             fs.unlink(tempFilePath, (err) => {
                 if (err) console.error("Error deleting temp audio file for .ytmp3:", err);

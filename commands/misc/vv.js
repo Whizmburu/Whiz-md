@@ -41,21 +41,25 @@ async function handleVvCommand(msg, args, client, theme, botPrefix) {
 
         const finalCaption = theme.messages.vvCmd.caption
             .replace('{userName}', senderName)
-            .replace('{originalCaption}', originalCaption ? `\nOriginal caption: ${originalCaption}` : " (View-once media)");
+            .replace('{originalCaption}', originalCaption ? `\nOriginal caption: ${originalCaption}` : " (View-once media)"); // This part of caption is removed by new rule
 
-        await client.sendMessage(msg.from, media, { caption: finalCaption.trim() });
-        // await msg.reply(theme.messages.vvCmd.success); // Optional, sending media is success indication
-
+        await client.sendMessage(msg.from, media, { caption: theme.signatures.downloadedBy });
+        // Optional success message would also need signature
+        // if (theme.messages.vvCmd.success) {
+        //     await msg.reply(theme.messages.vvCmd.success + (theme.signatures.textOnlyAppend || ""));
+        // }
         await chat.clearState();
 
     } catch (error) {
         console.error("Error in .vv command:", error);
+        let errorText = theme.messages.vvCmd.fail;
         // Check if error is due to already viewed/expired view-once
         if (error.message && (error.message.includes("already been opened") || error.message.includes("already viewed"))) {
-            await msg.reply(theme.messages.vvCmd.fail + " (This view-once message might have already been opened or expired).");
+            errorText += " (This view-once message might have already been opened or expired).";
         } else {
-            await msg.reply(theme.messages.vvCmd.fail + ` (Error: ${error.message})`);
+            errorText += ` (Error: ${error.message})`;
         }
+        await msg.reply(errorText + (theme.signatures.textOnlyAppend || ""));
         if (chat) await chat.clearState();
     }
 }

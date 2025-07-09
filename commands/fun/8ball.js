@@ -28,14 +28,16 @@ async function handle8BallCommand(msg, args, client, theme) {
     const question = args.join(' ');
 
     if (!question) {
-        await msg.reply(theme.messages.eightBallCommand.noQuestion.replace('{prefix}', client.botPrefix || '.')); // Assuming botPrefix is on client or passed differently
+        const replyText = theme.messages.eightBallCommand.noQuestion.replace('{prefix}', botPrefix || '.');
+        await msg.reply(replyText + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     const randomIndex = Math.floor(Math.random() * eightBallResponses.length);
     const response = eightBallResponses[randomIndex];
+    const fullReply = `${theme.messages.eightBallCommand.replyPrefix}${response}`;
 
-    await msg.reply(`${theme.messages.eightBallCommand.replyPrefix}${response}`);
+    await msg.reply(fullReply + (theme.signatures.textOnlyAppend || ""));
 }
 
 module.exports = {

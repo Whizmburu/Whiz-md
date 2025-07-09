@@ -15,7 +15,7 @@ async function handleRiddleCommand(msg, args, client, theme, botPrefix, activeGa
     const game = activeGames[chatId];
 
     if (riddles.length === 0) {
-        await msg.reply(theme.messages.riddleGame.loadError);
+        await msg.reply(theme.messages.riddleGame.loadError + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
@@ -35,7 +35,7 @@ async function handleRiddleCommand(msg, args, client, theme, botPrefix, activeGa
 
     await msg.reply(theme.messages.riddleGame.newRiddle
         .replace('{riddle}', newRiddle.question)
-        .replace('{prefix}', botPrefix)
+        .replace('{prefix}', botPrefix) + (theme.signatures.textOnlyAppend || "")
     );
 }
 
@@ -44,7 +44,7 @@ async function handleAnswerCommand(msg, args, client, theme, botPrefix, activeGa
     const game = activeGames[chatId];
 
     if (!game || game.gameType !== 'riddle' || game.answered) {
-        await msg.reply(theme.messages.riddleGame.noActiveRiddle.replace('{prefix}', botPrefix));
+        await msg.reply(theme.messages.riddleGame.noActiveRiddle.replace('{prefix}', botPrefix) + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
@@ -52,17 +52,17 @@ async function handleAnswerCommand(msg, args, client, theme, botPrefix, activeGa
     const correctAnswer = game.currentRiddleAnswer.toLowerCase();
 
     if (!userAnswer) {
-        await msg.reply("⚠️ Please provide an answer after the command. Example: `.answer Your Guess`");
+        await msg.reply(("⚠️ Please provide an answer after the command. Example: `.answer Your Guess`") + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     if (userAnswer === correctAnswer) {
-        await msg.reply(theme.messages.riddleGame.correctAnswer.replace('{answer}', game.currentRiddleAnswer));
+        await msg.reply(theme.messages.riddleGame.correctAnswer.replace('{answer}', game.currentRiddleAnswer) + (theme.signatures.textOnlyAppend || ""));
         game.answered = true; // Mark as answered
         // Optionally, clear the game: delete activeGames[chatId];
         // For now, let's keep it so they can't answer again until new riddle.
     } else {
-        await msg.reply(theme.messages.riddleGame.wrongAnswer);
+        await msg.reply(theme.messages.riddleGame.wrongAnswer + (theme.signatures.textOnlyAppend || ""));
     }
 }
 

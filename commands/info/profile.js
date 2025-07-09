@@ -56,16 +56,20 @@ async function handleProfileCommand(msg, args, client, theme, botPrefix) {
             .replace('{isMe}', isMe);
 
         if (profilePicMedia) {
-            await client.sendMessage(msg.from, profilePicMedia, { caption: profileInfoMsg });
+            // The profile info is substantial, so it acts as the main content.
+            // The signature is appended to this text, which becomes the caption.
+            const signedProfileInfoMsg = profileInfoMsg + (theme.signatures.textOnlyAppend || "");
+            await client.sendMessage(msg.from, profilePicMedia, { caption: signedProfileInfoMsg });
         } else {
-            await msg.reply(profileInfoMsg);
+            await msg.reply(profileInfoMsg + (theme.signatures.textOnlyAppend || ""));
         }
 
         await chat.clearState();
 
     } catch (error) {
         console.error(`Error in .profile command for ${targetId}:`, error);
-        await msg.reply(theme.messages.profileCmd.notFound || "❓ Error fetching profile.");
+        const errorText = (theme.messages.profileCmd.notFound || "❓ Error fetching profile.") + (theme.signatures.textOnlyAppend || "");
+        await msg.reply(errorText);
         await chat.clearState();
     }
 }

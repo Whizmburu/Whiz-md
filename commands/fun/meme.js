@@ -29,19 +29,20 @@ async function handleMemeCommand(msg, args, client, theme) {
 
 
             const media = new MessageMedia(mimeType, imageBuffer.toString('base64'), `meme.${extension}`);
-            await client.sendMessage(msg.from, media, { caption: `${memeTitle}\n_Source: r/${response.data.subreddit || 'meme'}_` });
+            await client.sendMessage(msg.from, media, { caption: theme.signatures.downloadedBy });
 
         } else {
-            await msg.reply(theme.messages.memeCommand.error + " (Invalid API response structure or no meme URL)");
+            const replyText = (theme.messages.memeCommand.error + " (Invalid API response structure or no meme URL)") + (theme.signatures.textOnlyAppend || "");
+            await msg.reply(replyText);
         }
         await chat.clearState();
     } catch (error) {
         console.error("Error fetching meme:", error.message);
+        let errorReplyText = theme.messages.memeCommand.error;
         if (error.code === 'ECONNABORTED') {
-             await msg.reply(theme.messages.memeCommand.error + " (API request timed out)");
-        } else {
-            await msg.reply(theme.messages.memeCommand.error);
+             errorReplyText += " (API request timed out)";
         }
+        await msg.reply(errorReplyText + (theme.signatures.textOnlyAppend || ""));
         await chat.clearState();
     }
 }

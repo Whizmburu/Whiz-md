@@ -3,9 +3,9 @@ async function handleHugCommand(msg, args, client, theme, botPrefix) {
     await chat.sendStateTyping();
 
     if (msg.mentionedIds.length === 0) {
-        let replyMsg = theme.messages.interactiveCmd.noMention;
-        replyMsg = replyMsg.replace('{prefix}', botPrefix).replace('{commandName}', 'hug');
-        await msg.reply(replyMsg);
+        let replyMsgContent = theme.messages.interactiveCmd.noMention;
+        replyMsgContent = replyMsgContent.replace('{prefix}', botPrefix).replace('{commandName}', 'hug');
+        await msg.reply(replyMsgContent + (theme.signatures.textOnlyAppend || ""));
         await chat.clearState();
         return;
     }
@@ -21,15 +21,24 @@ async function handleHugCommand(msg, args, client, theme, botPrefix) {
     const mentionedContact = await client.getContactById(mentionedId);
     const mentionedUserName = mentionedContact.pushname || mentionedContact.name || mentionedId.split('@')[0];
 
-    let replyMsg = theme.messages.interactiveCmd.hug;
-    replyMsg = replyMsg
+    let replyMsgContent = theme.messages.interactiveCmd.hug;
+    replyMsgContent = replyMsgContent
         .replace('{SENDER}', senderName)
         .replace('{MENTIONED_USER}', `@${mentionedId.split('@')[0]}`); // Tag the user
 
-    await client.sendMessage(msg.from, replyMsg, { mentions: [mentionedContact] }); // Send with mention object
+    // This is a text message, so append signature
+    await client.sendMessage(msg.from, replyMsgContent + (theme.signatures.textOnlyAppend || ""), { mentions: [mentionedContact] });
     await chat.clearState();
 }
 
 module.exports = {
     handleHugCommand
 };
+// Note: The noMention reply also needs to be signed.
+// if (msg.mentionedIds.length === 0) {
+//     let replyMsg = theme.messages.interactiveCmd.noMention;
+//     replyMsg = replyMsg.replace('{prefix}', botPrefix).replace('{commandName}', 'hug');
+//     await msg.reply(replyMsg + (theme.signatures.textOnlyAppend || "")); // SIGNED
+//     await chat.clearState();
+//     return;
+// }

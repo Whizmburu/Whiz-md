@@ -62,12 +62,12 @@ async function handleHangmanCommand(msg, args, client, theme, botPrefix, activeG
             await msg.reply(theme.messages.gameCommand.alreadyPlaying
                 .replace('{gameName}', 'Hangman')
                 .replace('{prefix}', botPrefix)
-                .replace('{stopCommand}', 'hangman stop')
+                .replace('{stopCommand}', 'hangman stop') + (theme.signatures.textOnlyAppend || "")
             );
             return;
         }
         if (Object.keys(wordCategories).length === 0 || !wordCategories['general'] || wordCategories['general'].length === 0) {
-            await msg.reply(theme.messages.hangmanGame.loadError);
+            await msg.reply(theme.messages.hangmanGame.loadError + (theme.signatures.textOnlyAppend || ""));
             return;
         }
 
@@ -91,49 +91,49 @@ async function handleHangmanCommand(msg, args, client, theme, botPrefix, activeG
             .replace('{length}', game.wordToGuess.length)
             .replace('{displayWord}', display)
             .replace('{guessesLeft}', MAX_INCORRECT_GUESSES - game.incorrectGuesses)
-            .replace('{prefix}', botPrefix)
+            .replace('{prefix}', botPrefix) + (theme.signatures.textOnlyAppend || "")
         );
-        // await msg.reply(getHangmanVisual(game.incorrectGuesses)); // Show initial visual
+        // await msg.reply(getHangmanVisual(game.incorrectGuesses) + (theme.signatures.textOnlyAppend || "")); // Show initial visual
         await chat.clearState();
         return;
     }
 
     if (!game || game.gameType !== 'hangman') {
-        await msg.reply(theme.messages.gameCommand.notPlaying + ` Start a new game with \`${botPrefix}hangman start\`.`);
+        await msg.reply((theme.messages.gameCommand.notPlaying + ` Start a new game with \`${botPrefix}hangman start\`.`) + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     if (subCommand === 'stop') {
         const wordWas = game.wordToGuess;
         delete activeGames[chatId];
-        await msg.reply(theme.messages.gameCommand.stopped + ` The word was: ${wordWas}`);
+        await msg.reply((theme.messages.gameCommand.stopped + ` The word was: ${wordWas}`) + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     if (subCommand === 'word') { // Display current status
         const display = getDisplayWord(game.wordToGuess, game.guessedLetters);
         const visual = getHangmanVisual(game.incorrectGuesses);
-        await msg.reply(`${visual}\nWord: \`${display}\`\nGuessed: ${Array.from(game.guessedLetters).join(', ') || 'None'}`);
+        await msg.reply((`${visual}\nWord: \`${display}\`\nGuessed: ${Array.from(game.guessedLetters).join(', ') || 'None'}`) + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
 
     if (subCommand === 'guess') {
         if (game.gameOver) {
-            await msg.reply(theme.messages.gameCommand.gameOver + ` The word was: ${game.wordToGuess}. Start a new game.`);
+            await msg.reply((theme.messages.gameCommand.gameOver + ` The word was: ${game.wordToGuess}. Start a new game.`) + (theme.signatures.textOnlyAppend || ""));
             return;
         }
 
         const letter = args[1] ? args[1].toLowerCase() : null;
         if (!letter || letter.length !== 1 || !letter.match(/[a-z]/i)) {
-            await msg.reply(theme.messages.hangmanGame.invalidLetter);
+            await msg.reply(theme.messages.hangmanGame.invalidLetter + (theme.signatures.textOnlyAppend || ""));
             return;
         }
 
         if (game.guessedLetters.has(letter)) {
             await msg.reply(theme.messages.hangmanGame.alreadyGuessed
                 .replace('{letter}', letter)
-                .replace('{guessedLetters}', Array.from(game.guessedLetters).join(', '))
+                .replace('{guessedLetters}', Array.from(game.guessedLetters).join(', ')) + (theme.signatures.textOnlyAppend || "")
             );
             return;
         }
@@ -145,39 +145,39 @@ async function handleHangmanCommand(msg, args, client, theme, botPrefix, activeG
             const newDisplayWord = getDisplayWord(game.wordToGuess, game.guessedLetters);
             if (!newDisplayWord.includes('_')) { // Win condition
                 game.gameOver = true;
-                await msg.reply(theme.messages.hangmanGame.win.replace('{word}', game.wordToGuess));
+                await msg.reply(theme.messages.hangmanGame.win.replace('{word}', game.wordToGuess) + (theme.signatures.textOnlyAppend || ""));
                 delete activeGames[chatId];
             } else {
                 await msg.reply(theme.messages.hangmanGame.guessCorrect
                     .replace('{displayWord}', newDisplayWord)
                     .replace('{guessesLeft}', MAX_INCORRECT_GUESSES - game.incorrectGuesses)
-                    .replace('{guessedLetters}', Array.from(game.guessedLetters).join(', '))
+                    .replace('{guessedLetters}', Array.from(game.guessedLetters).join(', ')) + (theme.signatures.textOnlyAppend || "")
                 );
             }
         } else {
             game.incorrectGuesses++;
             if (game.incorrectGuesses >= MAX_INCORRECT_GUESSES) { // Lose condition
                 game.gameOver = true;
-                await msg.reply(theme.messages.hangmanGame.lose.replace('{word}', game.wordToGuess));
-                await msg.reply(getHangmanVisual(game.incorrectGuesses)); // Show final hangman
+                await msg.reply(theme.messages.hangmanGame.lose.replace('{word}', game.wordToGuess) + (theme.signatures.textOnlyAppend || ""));
+                await msg.reply(getHangmanVisual(game.incorrectGuesses) + (theme.signatures.textOnlyAppend || "")); // Show final hangman
                 delete activeGames[chatId];
             } else {
                 await msg.reply(theme.messages.hangmanGame.guessIncorrect
                     .replace('{displayWord}', getDisplayWord(game.wordToGuess, game.guessedLetters))
                     .replace('{guessesLeft}', MAX_INCORRECT_GUESSES - game.incorrectGuesses)
-                    .replace('{guessedLetters}', Array.from(game.guessedLetters).join(', '))
+                    .replace('{guessedLetters}', Array.from(game.guessedLetters).join(', ')) + (theme.signatures.textOnlyAppend || "")
                 );
             }
         }
         if (!game.gameOver) { // Show visual only if game continues
-             await msg.reply(getHangmanVisual(game.incorrectGuesses));
+             await msg.reply(getHangmanVisual(game.incorrectGuesses) + (theme.signatures.textOnlyAppend || ""));
         }
         await chat.clearState();
         return;
     }
 
     // If no valid Hangman subcommand
-    await msg.reply(`Invalid .hangman command. Use \`${botPrefix}hangman start\`, \`${botPrefix}hangman guess <letter>\`, \`${botPrefix}hangman word\`, or \`${botPrefix}hangman stop\`.`);
+    await msg.reply((`Invalid .hangman command. Use \`${botPrefix}hangman start\`, \`${botPrefix}hangman guess <letter>\`, \`${botPrefix}hangman word\`, or \`${botPrefix}hangman stop\`.`) + (theme.signatures.textOnlyAppend || ""));
 }
 
 module.exports = {

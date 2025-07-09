@@ -13,14 +13,15 @@ try {
 
 async function handleTruthCommand(msg, args, client, theme) {
     if (truths.length === 0) {
-        await msg.reply(theme.messages.truthOrDareCommand.loadError);
+        await msg.reply(theme.messages.truthOrDareCommand.loadError + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     const randomIndex = Math.floor(Math.random() * truths.length);
     const question = truths[randomIndex];
+    const replyText = theme.messages.truthOrDareCommand.truth.replace('{question}', question);
 
-    await msg.reply(theme.messages.truthOrDareCommand.truth.replace('{question}', question));
+    await msg.reply(replyText + (theme.signatures.textOnlyAppend || ""));
 }
 
 module.exports = {

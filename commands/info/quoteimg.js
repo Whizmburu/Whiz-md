@@ -97,12 +97,13 @@ async function handleQuoteImgCommand(msg, args, client, theme, botPrefix) {
         const outputBuffer = await image.getBufferAsync(Jimp.MIME_PNG);
         const quoteImageMedia = new MessageMedia('image/png', outputBuffer.toString('base64'), 'quote.png');
 
-        await client.sendMessage(msg.from, quoteImageMedia, { caption: `💬 Quote by ${authorText}` });
+        await client.sendMessage(msg.from, quoteImageMedia, { caption: theme.signatures.generatedByBot });
         await chat.clearState();
 
     } catch (error) {
         console.error("Error in .quoteimg command:", error);
-        await msg.reply(theme.messages.quoteImgCmd.error + ` (Details: ${error.message})`);
+        const errorText = (theme.messages.quoteImgCmd.error + ` (Details: ${error.message})`) + (theme.signatures.textOnlyAppend || "");
+        await msg.reply(errorText);
         await chat.clearState();
     }
 }

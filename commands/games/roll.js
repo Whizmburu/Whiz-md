@@ -35,7 +35,7 @@ async function handleRollCommand(msg, args, client, theme, botPrefix) {
     const parsed = parseDiceNotation(notation);
 
     if (parsed.error) {
-        await msg.reply(`⚠️ ${parsed.error}`);
+        await msg.reply(`⚠️ ${parsed.error}` + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
@@ -62,7 +62,7 @@ async function handleRollCommand(msg, args, client, theme, botPrefix) {
     }
 
 
-    await msg.reply(resultMessage);
+    await msg.reply(resultMessage + (theme.signatures.textOnlyAppend || ""));
 }
 
 module.exports = {

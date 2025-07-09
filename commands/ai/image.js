@@ -14,18 +14,18 @@ async function handleImageCommand(msg, args, client, theme, botPrefix) {
     const chat = await msg.getChat();
 
     if (!process.env.OPENAI_API_KEY || !openaiClient) {
-        await msg.reply(theme.messages.aiImageCmd.noApiKey);
+        await msg.reply(theme.messages.aiImageCmd.noApiKey + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     if (!prompt) {
-        await msg.reply(theme.messages.aiImageCmd.noPrompt.replace('{prefix}', botPrefix));
+        await msg.reply(theme.messages.aiImageCmd.noPrompt.replace('{prefix}', botPrefix) + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     try {
         await chat.sendStateTyping();
-        await msg.reply(theme.messages.aiImageCmd.generating.replace('{prompt}', truncateText(prompt, 50)));
+        await msg.reply(theme.messages.aiImageCmd.generating.replace('{prompt}', truncateText(prompt, 50)) + (theme.signatures.textOnlyAppend || ""));
 
         // Using DALL-E 2 as a common default, DALL-E 3 might be 'dall-e-3'
         // Check OpenAI documentation for the latest model identifiers if issues arise.
@@ -52,37 +52,33 @@ async function handleImageCommand(msg, args, client, theme, botPrefix) {
 
             const media = new MessageMedia(mimeType, imageBuffer.toString('base64'), `dalle_image.${mimeType.split('/')[1]}`);
 
-            const caption = theme.messages.aiImageCmd.successCaption.replace('{prompt}', truncateText(prompt, 100));
-            await client.sendMessage(msg.from, media, { caption: caption });
+            // const caption = theme.messages.aiImageCmd.successCaption.replace('{prompt}', truncateText(prompt, 100)); // Old caption
+            await client.sendMessage(msg.from, media, { caption: theme.signatures.generatedByBot });
 
         } else {
-            // This case might occur if the API call succeeded but returned no image data,
-            // or if a content policy violation occurred that wasn't caught as an API error directly.
-            // The OpenAI API usually throws specific errors for content policy.
             console.warn("OpenAI DALL-E response did not contain expected image data:", imageResponse);
-            await msg.reply(theme.messages.aiImageCmd.noResults);
+            await msg.reply(theme.messages.aiImageCmd.noResults + (theme.signatures.textOnlyAppend || ""));
         }
 
         await chat.clearState();
 
     } catch (error) {
         console.error("Error in .image (DALL-E) command:", error);
-        let errorReply = theme.messages.aiImageCmd.apiError.replace('{errorDetails}', error.message);
-        if (error.response && error.response.data) {
+        let errorReplyText = "";
+        if (error.response && error.response.data && error.response.data.error) {
             const apiError = error.response.data.error;
-            if (apiError) {
-                let details = apiError.message || 'Unknown API error.';
-                if (apiError.code === 'content_policy_violation') {
-                    errorReply = theme.messages.aiImageCmd.contentPolicyViolation;
-                } else {
-                     errorReply = theme.messages.aiImageCmd.apiError.replace('{errorDetails}', details.substring(0,150));
-                }
+            if (apiError.code === 'content_policy_violation') {
+                errorReplyText = theme.messages.aiImageCmd.contentPolicyViolation;
+            } else {
+                errorReplyText = theme.messages.aiImageCmd.apiError.replace('{errorDetails}', (apiError.message || 'Unknown API error.').substring(0,150));
             }
         } else if (error.code === 'insufficient_quota') {
-            errorReply = "❌ API request failed: Insufficient quota. Please check your OpenAI plan and billing details.";
+            errorReplyText = "❌ API request failed: Insufficient quota. Please check your OpenAI plan and billing details.";
+        } else {
+            errorReplyText = theme.messages.aiImageCmd.apiError.replace('{errorDetails}', error.message.substring(0,150));
         }
 
-        await msg.reply(errorReply);
+        await msg.reply(errorReplyText + (theme.signatures.textOnlyAppend || ""));
         await chat.clearState();
     }
 }

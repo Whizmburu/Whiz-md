@@ -3,9 +3,9 @@ async function handleSlapCommand(msg, args, client, theme, botPrefix) {
     await chat.sendStateTyping();
 
     if (msg.mentionedIds.length === 0) {
-        let replyMsg = theme.messages.interactiveCmd.noMention;
-        replyMsg = replyMsg.replace('{prefix}', botPrefix).replace('{commandName}', 'slap');
-        await msg.reply(replyMsg);
+        let replyMsgContent = theme.messages.interactiveCmd.noMention;
+        replyMsgContent = replyMsgContent.replace('{prefix}', botPrefix).replace('{commandName}', 'slap');
+        await msg.reply(replyMsgContent + (theme.signatures.textOnlyAppend || ""));
         await chat.clearState();
         return;
     }
@@ -17,12 +17,12 @@ async function handleSlapCommand(msg, args, client, theme, botPrefix) {
     const mentionedContact = await client.getContactById(mentionedId);
     // const mentionedUserName = mentionedContact.pushname || mentionedContact.name || mentionedId.split('@')[0];
 
-    let replyMsg = theme.messages.interactiveCmd.slap;
-    replyMsg = replyMsg
+    let replyMsgContent = theme.messages.interactiveCmd.slap;
+    replyMsgContent = replyMsgContent
         .replace('{SENDER}', senderName)
         .replace('{MENTIONED_USER}', `@${mentionedId.split('@')[0]}`);
 
-    await client.sendMessage(msg.from, replyMsg, { mentions: [mentionedContact] });
+    await client.sendMessage(msg.from, replyMsgContent + (theme.signatures.textOnlyAppend || ""), { mentions: [mentionedContact] });
     await chat.clearState();
 }
 

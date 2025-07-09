@@ -13,14 +13,15 @@ try {
 
 async function handleDareCommand(msg, args, client, theme) {
     if (dares.length === 0) {
-        await msg.reply(theme.messages.truthOrDareCommand.loadError);
+        await msg.reply(theme.messages.truthOrDareCommand.loadError + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     const randomIndex = Math.floor(Math.random() * dares.length);
     const challenge = dares[randomIndex];
+    const replyText = theme.messages.truthOrDareCommand.dare.replace('{challenge}', challenge);
 
-    await msg.reply(theme.messages.truthOrDareCommand.dare.replace('{challenge}', challenge));
+    await msg.reply(replyText + (theme.signatures.textOnlyAppend || ""));
 }
 
 module.exports = {

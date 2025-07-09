@@ -11,14 +11,14 @@ async function handleGuessCommand(msg, args, client, theme, botPrefix, activeGam
             await msg.reply(theme.messages.gameCommand.alreadyPlaying
                 .replace('{gameName}', 'Number Guessing')
                 .replace('{prefix}', botPrefix)
-                .replace('{stopCommand}', 'guess stop')
+                .replace('{stopCommand}', 'guess stop') + (theme.signatures.textOnlyAppend || "")
             );
             return;
         }
 
         const maxNumber = parseInt(args[1]) || 100;
         if (isNaN(maxNumber) || maxNumber <= 1 || maxNumber > 10000) {
-            await msg.reply("⚠️ Please provide a valid maximum number between 2 and 10000 for the game.");
+            await msg.reply("⚠️ Please provide a valid maximum number between 2 and 10000 for the game." + (theme.signatures.textOnlyAppend || ""));
             return;
         }
 
@@ -30,7 +30,7 @@ async function handleGuessCommand(msg, args, client, theme, botPrefix, activeGam
         };
         await msg.reply(theme.messages.guessGame.start
             .replace('{maxNumber}', maxNumber)
-            .replace('{prefix}', botPrefix)
+            .replace('{prefix}', botPrefix) + (theme.signatures.textOnlyAppend || "")
         );
         return;
     }
@@ -39,22 +39,22 @@ async function handleGuessCommand(msg, args, client, theme, botPrefix, activeGam
         if (game && game.gameType === 'guess') {
             const stoppedMessage = theme.messages.guessGame.stopped.replace('{number}', game.targetNumber);
             delete activeGames[chatId];
-            await msg.reply(stoppedMessage);
+            await msg.reply(stoppedMessage + (theme.signatures.textOnlyAppend || ""));
         } else {
-            await msg.reply(theme.messages.guessGame.noActiveGame.replace('{prefix}', botPrefix));
+            await msg.reply(theme.messages.guessGame.noActiveGame.replace('{prefix}', botPrefix) + (theme.signatures.textOnlyAppend || ""));
         }
         return;
     }
 
     // If it's not 'start' or 'stop', it must be a guess
     if (!game || game.gameType !== 'guess') {
-        await msg.reply(theme.messages.guessGame.noActiveGame.replace('{prefix}', botPrefix));
+        await msg.reply(theme.messages.guessGame.noActiveGame.replace('{prefix}', botPrefix) + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
     const userGuess = parseInt(commandArg);
     if (isNaN(userGuess)) {
-        await msg.reply(theme.messages.guessGame.invalidGuess);
+        await msg.reply(theme.messages.guessGame.invalidGuess + (theme.signatures.textOnlyAppend || ""));
         return;
     }
 
@@ -63,13 +63,13 @@ async function handleGuessCommand(msg, args, client, theme, botPrefix, activeGam
     if (userGuess === game.targetNumber) {
         await msg.reply(theme.messages.guessGame.correct
             .replace('{number}', game.targetNumber)
-            .replace('{attempts}', game.attempts)
+            .replace('{attempts}', game.attempts) + (theme.signatures.textOnlyAppend || "")
         );
         delete activeGames[chatId]; // Game ends
     } else if (userGuess < game.targetNumber) {
-        await msg.reply(theme.messages.guessGame.tooLow);
+        await msg.reply(theme.messages.guessGame.tooLow + (theme.signatures.textOnlyAppend || ""));
     } else { // userGuess > game.targetNumber
-        await msg.reply(theme.messages.guessGame.tooHigh);
+        await msg.reply(theme.messages.guessGame.tooHigh + (theme.signatures.textOnlyAppend || ""));
     }
 }
 

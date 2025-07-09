@@ -354,9 +354,10 @@
 
 ... (Previous content of Phase 1-11 Part 2 remains the same) ...
 
-## Phase 12: Finalize PriorityView & Implement First AI Command (DALL-E Image Generation)
-- [X] **Integrate `priorityViewList` into Autoview Logic:**
-    - [X] Modified `client.on('message', ...)` in `index.js` to use `priorityViewList` for Autoview decisions if the list is populated and `autoViewEnabled` is true. Autoreact logic also updated to respect this.
+## Phase 12: Correct Autoview Logic & Implement DALL-E Image Generation
+- [X] **Correct Autoview Logic & Remove PriorityView Feature:**
+    - [X] Modified `client.on('message', ...)` in `index.js` to ensure Autoview (if enabled) views ALL statuses from contacts, removing the `priorityViewList` filter for this action. Autoreact logic simplified accordingly.
+    - [X] Removed the `.priorityview` command, its handler, the `priorityViewList` global variable, and related themes.
 - [X] **Setup for AI Command (DALL-E Image Generation):**
     - [X] Created `commands/ai/` directory.
     - [X] Added `openai` to `package.json`.

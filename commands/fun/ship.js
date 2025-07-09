@@ -15,8 +15,8 @@ async function handleShipCommand(msg, args, client, theme, botPrefix) {
 
     if (mentionedCount === 0) {
         // Ship sender with a random concept or self? For now, require mention.
-        let replyMsg = theme.messages.interactiveCmd.shipNoMention;
-        await msg.reply(replyMsg.replace('{prefix}', botPrefix));
+        let replyMsgContent = theme.messages.interactiveCmd.shipNoMention;
+        await msg.reply(replyMsgContent.replace(/{prefix}/g, botPrefix) + (theme.signatures.textOnlyAppend || ""));
         await chat.clearState();
         return;
     } else if (mentionedCount === 1) {
@@ -59,7 +59,7 @@ async function handleShipCommand(msg, args, client, theme, botPrefix) {
         .replace('{PERCENTAGE}', percentage)
         .replace('{HEART_EMOJI}', heartEmoji);
 
-    await client.sendMessage(msg.from, replyMsg, { mentions: mentionsToSend });
+    await client.sendMessage(msg.from, replyMsg + (theme.signatures.textOnlyAppend || ""), { mentions: mentionsToSend });
     await chat.clearState();
 }
 

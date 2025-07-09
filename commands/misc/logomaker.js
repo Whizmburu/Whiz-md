@@ -56,12 +56,14 @@ async function handleLogomakerCommand(msg, args, client, theme, botPrefix, activ
         }
 
         const media = await generateTextEffectHelper(effectDetails.url, textInputs, styleNameArg);
-        await client.sendMessage(msg.from, media, { caption: `${effectStyleName} logo for: ${text1.substring(0,30)}` });
+        // Corrected variable name from effectStyleName to styleNameArg for caption consistency
+        // const safeCaptionText = (text1 + (text2 ? ` | ${text2}` : '')).replace(/[*_~`]/g, ''); // Old caption logic
+        await client.sendMessage(msg.from, media, { caption: theme.signatures.generatedByBot });
         await chat.clearState();
 
     } catch (error) {
         console.error(`Error processing .logomaker command for style "${styleNameArg}":`, error);
-        await msg.reply(theme.messages.logomakerCmd.apiError);
+        await msg.reply(theme.messages.logomakerCmd.apiError + (theme.signatures.textOnlyAppend || ""));
         await chat.clearState();
     }
 }

@@ -108,12 +108,21 @@ async function handleEmojimixCommand(msg, args, client, theme, botPrefix) {
                 const imageBuffer = Buffer.from(imageResponse.data, 'binary');
                 const mimeType = imageResponse.headers['content-type'] || 'image/png';
                 const mixedEmojiMedia = new MessageMedia(mimeType, imageBuffer.toString('base64'), 'emojimix.png');
-                await client.sendMessage(msg.from, mixedEmojiMedia, { sendMediaAsSticker: true, stickerName: `${emoji1}+${emoji2}`, stickerAuthor:theme.botName });
+                // Stickers don't have captions in the same way. The 'stickerName' and 'stickerAuthor' are metadata.
+                // As per rules, generated media should have "By WHIZ MD BOT" caption.
+                // Since stickers don't have visible captions, we can't apply it directly.
+                // We could send a follow-up text message, or put it in stickerName/Author if desired.
+                // For now, let's assume the act of sending the sticker implies it's by the bot.
+                // If a text signature is required *with* the sticker, it needs to be a separate message.
+                await client.sendMessage(msg.from, mixedEmojiMedia, {
+                    sendMediaAsSticker: true,
+                    stickerName: `${emoji1}+${emoji2}`, // Can customize this further
+                    stickerAuthor: theme.signatures.generatedByBot // Using signature here for author
+                });
                 foundImage = true;
                 break; // Found one, exit loop
             }
         } catch (error) {
-            // If one URL fails (e.g., 404), try the next one. Only log if it's not a 404.
             if (!error.response || error.response.status !== 404) {
                  console.warn(`Emojimix attempt failed for URL ${url}: ${error.message}`);
             }
@@ -122,10 +131,9 @@ async function handleEmojimixCommand(msg, args, client, theme, botPrefix) {
 
     if (!foundImage) {
         const fallbackUrl = `https://emojikitchen.dev/?${encodeURIComponent(emoji1)}+${encodeURIComponent(emoji2)}`;
-        await msg.reply(
-            theme.messages.emojimixCmd.notFound.replace('{emoji1}', emoji1).replace('{emoji2}', emoji2) +
-            `\nYou can try creating it here: ${fallbackUrl}`
-        );
+        const notFoundText = theme.messages.emojimixCmd.notFound.replace('{emoji1}', emoji1).replace('{emoji2}', emoji2) +
+            `\nYou can try creating it here: ${fallbackUrl}`;
+        await msg.reply(notFoundText + (theme.signatures.textOnlyAppend || ""));
     }
 
     await chat.clearState();
