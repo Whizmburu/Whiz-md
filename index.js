@@ -198,9 +198,18 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            // '--single-process', // Desabilitado para evitar problemas no Linux
+            // '--single-process', // Disabled to avoid issues on some Linux systems
             '--disable-gpu'
         ],
+        // IMPORTANT: If you are on Windows and encounter an error like "Failed to launch the browser process!"
+        // (ENOENT error for chrome.exe), it might mean Puppeteer couldn't find its bundled Chromium.
+        // You can try uncommenting the 'executablePath' line below and providing the path to your
+        // installed Google Chrome or Chromium executable.
+        // Common paths:
+        // Windows: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' or 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+        // Linux: '/usr/bin/google-chrome-stable' or '/usr/bin/chromium-browser'
+        // macOS: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Example for Windows
     },
     webVersionCache: {
         type: 'remote',
@@ -499,7 +508,7 @@ client.on('message', async (msg) => {
                 await chat.sendStateTyping();
                 const statusAuthorId = quotedMsg.author;
                 if (!statusAuthorId) {
-                    await sendSignedTextReply(msg, theme.messages.statusSaveCmd.failNotStatusOrMedia || "Could not identify status author.", theme);
+                    await sendSignedTextReply(msg, theme.STATUS_SAVE_FAIL_NO_AUTHOR || "Could not identify status author.", theme);
                     await chat.clearState();
                     return;
                 }
@@ -507,33 +516,32 @@ client.on('message', async (msg) => {
                 const statusAuthorContact = await client.getContactById(statusAuthorId);
                 const authorName = statusAuthorContact.pushname || statusAuthorContact.name || statusAuthorId.split('@')[0];
 
-                await sendSignedTextReply(msg, theme.messages.statusSaveCmd.saving.replace('{userName}', authorName), theme);
+                // Using a generic saving message, can be themed if a specific key like STATUS_SAVE_SAVING is added
+                await sendSignedTextReply(msg, (theme.STATUS_SAVE_SAVING || "💾 Saving status from {userName}...").replace('{userName}', authorName), theme);
 
                 const media = await quotedMsg.downloadMedia();
                 if (!media) {
-                    await sendSignedTextReply(msg, theme.messages.statusSaveCmd.failDownload, theme);
+                    await sendSignedTextReply(msg, (theme.STATUS_SAVE_FAIL_DOWNLOAD || "❌ Failed to download status media.").replace('{userName}', authorName), theme);
                     await chat.clearState();
                     return;
                 }
 
-                const originalStatusCaption = quotedMsg.body || ""; // Statuses can have text captions
-                // const originalStatusCaption = quotedMsg.body || ""; // Statuses can have text captions // Old caption logic
-                // const finalCaption = theme.messages.statusSaveCmd.caption
-                //     .replace('{userName}', authorName)
-                //     .replace('{statusCaption}', originalStatusCaption); // Old caption logic
+                const originalStatusCaption = quotedMsg.body || "";
+                // The caption for the saved media is now just the generic signature.
+                // If specific caption formatting is needed, theme keys can be added.
+                await client.sendMessage(msg.from, media, { caption: theme.signatures.downloadedBy || `Downloaded by ${theme.botName || "WHIZ-MD"}` });
 
-                await client.sendMessage(msg.from, media, { caption: theme.signatures.downloadedBy });
-
-                // Optional success message would also need signature if sent separately
-                // if (theme.messages.statusSaveCmd.success) {
-                //    await msg.reply(theme.messages.statusSaveCmd.success + (theme.signatures.textOnlyAppend || ""));
-                // }
+                // Optional success message, using STATUS_SAVE_SUCCESS
+                if (theme.STATUS_SAVE_SUCCESS) {
+                   await sendSignedTextReply(msg, theme.STATUS_SAVE_SUCCESS, theme);
+                }
 
                 await chat.clearState();
             } catch (error) {
                 console.error("Error in status save feature:", error);
-                const errorText = (theme.messages.statusSaveCmd.failDownload + ` (Error: ${error.message})`) + (theme.signatures.textOnlyAppend || "");
-                await msg.reply(errorText);
+                // Using the generic STATUS_SAVE_FAIL for errors during the process
+                const errorText = (theme.STATUS_SAVE_FAIL || "❌ Failed to save status.") + ` (Error: ${error.message})`;
+                await sendSignedTextReply(msg, errorText, theme); // Ensure signed reply for error
                 if (chat) await chat.clearState();
             }
             return; // Important: stop further processing if it was a save attempt
@@ -559,9 +567,13 @@ client.on('message', async (msg) => {
             // Latency: time from message arrival (or processing start) to sending reply
             const latency = processingStartTime - messageTimestamp;
 
-            let pongMsg = theme.messages.pongWithLatency || "{pingEmoji} Pong! Latency: {latency}ms";
+            let pongMsg = theme.PING_REPLY || "{pingEmoji} Pong! Latency: {latency}ms"; // Corrected key
+            // Ensure theme.emojis.ping is used if PING_REPLY doesn't contain it
+            if (theme.PING_REPLY && !theme.PING_REPLY.includes("{pingEmoji}")) { // Basic check
+                 pongMsg = (theme.emojis.ping || '🏓') + " " + pongMsg;
+            }
             pongMsg = pongMsg
-                .replace('{pingEmoji}', theme.emojis.ping || '🏓')
+                .replace('{pingEmoji}', theme.emojis.ping || '🏓') // Still replace if present in default
                 .replace('{latency}', latency);
 
             await msg.reply(pongMsg);
@@ -569,6 +581,19 @@ client.on('message', async (msg) => {
         } catch (error) {
             console.error(`Error processing ping command for ${msg.from}:`, error);
             await chat.clearState(); // Ensure state is cleared even on error
+        }
+        return;
+    }
+
+    if (commandName === 'repo') {
+        const chat = await msg.getChat();
+        try {
+            // await chat.sendStateTyping(); // Optional for quick static message
+            await msg.reply(theme.REPO_MSG); // Corrected to use the actual key from Themes/WHIZ.json
+            // await chat.clearState(); // Optional
+        } catch (error) {
+            console.error(`Error processing .repo command:`, error);
+            await msg.reply("Error fetching repo link. Please check logs.");
         }
         return;
     }
@@ -1475,15 +1500,16 @@ client.on('message', async (msg) => {
         const effectStyleName = commandName.charAt(0).toUpperCase() + commandName.slice(1); // e.g., "Fire"
 
         if (!text) {
-            let रिप्लाईMsg = theme.messages.textEffectCommand.noText || "⚠️ Please provide text.";
-            await msg.reply(रिप्लाईMsg.replace('{prefix}', botPrefix).replace('{commandName}', commandName));
+            // Using a generic 'please provide text' or we can add a specific theme key if needed
+            let replyMsg = theme.TEXT_EFFECT_NO_TEXT || "⚠️ Please provide text for the .{commandName} command.";
+            await msg.reply(replyMsg.replace('{prefix}', botPrefix).replace('{commandName}', commandName));
             return;
         }
 
         try {
             await chat.sendStateTyping();
-            let जेनरेटिंगMsg = theme.messages.textEffectCommand.generating || "🎨 Generating...";
-            await msg.reply(जेनरेटिंगMsg.replace('{styleName}', effectStyleName).replace('{text}', text.substring(0, 30))); // Show first 30 chars
+            let generatingMsg = theme.TEXT_EFFECT_GENERATING || "🎨 Generating {styleName} for: {text}...";
+            await msg.reply(generatingMsg.replace('{styleName}', effectStyleName).replace('{text}', text.substring(0, 30))); // Show first 30 chars
 
             let effectPageUrl = textEffectCommands[commandName];
             let textInputs = [text];
@@ -1511,7 +1537,8 @@ client.on('message', async (msg) => {
 
         } catch (error) {
             console.error(`Error processing .${commandName} command for "${text}":`, error);
-            await msg.reply(theme.messages.textEffectCommand.apiError || "❌ Error generating image.");
+            let errorReply = theme.TEXT_EFFECT_ERROR || "❌ Error generating {styleName} image.";
+            await msg.reply(errorReply.replace('{styleName}', effectStyleName).replace('{error}', error.message));
             await chat.clearState();
         }
         return;

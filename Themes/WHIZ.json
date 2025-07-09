@@ -1,614 +1,211 @@
 {
-  "botName": "WHIZ-MD",
-  "version": "1.0.0",
-  "borders": {
-    "headerTop": "❀━━━━━━━━━━━━━━━━━━━━━❀",
-    "headerBottom": "*❀━━━━━━━━━━━━━╯*",
-    "section": "*❀━━━━━━━━━━━━❀*",
-    "footer": "*❀━━━━━━━━━━━━━━╯*",
-    "sectionSeparator": "*❀━━━━━━━━━━━━❀*"
-  },
-  "emojis": {
-    "owner": "👑",
-    "mode": "⚙️",
-    "prefix": "❗",
-    "commands": "🔢",
-    "version": " V",
-    "repo": "🔗",
-    "success": "✅",
-    "error": "❌",
-    "info": "💡",
-    "ping": "🏓",
-    "uptime": "⏱️",
-    "live": "🌀",
-    "welcome": "👋",
-    "fork": "🙏"
-  },
-  "signatures": {
-    "downloadedBy": "𝓭𝓸𝔀𝓷𝓵𝓸𝓪𝓭𝓮𝓭 𝓫𝔂 𝔀𝓱𝓲𝔃 𝓶𝓭",
-    "generatedByBot": "𝓑𝔂 𝔀𝓱𝓲𝔃 𝓶𝓭 𝓑𝓸𝓽",
-    "textOnlyAppend": " 𝔀𝓱𝓲𝔃 𝓶𝓭"
-  },
-  "messages": {
-    "startupErrorNoSession": "WHIZMD_SESSION_DATA environment variable not found or invalid. Please set it correctly. You can generate a session at https://whizmdsessions.onrender.com",
-    "welcomeMessage1": "❀━━━━━━━━━━━━❀\n❀ *{botName}* is now Live{liveEmoji}\n❀ Welcome and Enjoy{welcomeEmoji}\n❀ Repo : github.com/whizmburu/whiz-md\n❀ Owner : https://wa.me/254754783683\n❀ *_Kindly Fork me, it means a lot_{forkEmoji}\n❀━━━━━━━━━━━━❀",
-    "welcomeMessage2Prefix": "Here is the full command menu:",
-    "commandNotFound": "{errorEmoji} Command not found. Type `{prefix}help` to see the menu.",
-    "pingResponse": "{pingEmoji} Pong!",
-    "pongWithLatency": "{pingEmoji} Pong! Latency: {latency}ms",
-    "specificHelpPlaceholder": "📋 Detailed help for `{prefix}{command}` is not yet available. Please check back later!",
-    "status": "❀ *{botName} Status* ❀\nMode: {mode}\nUptime: {uptime}\nCommands Loaded: {commandsCount}\nPrefix: {prefix}",
-    "runtime": "{uptimeEmoji} Bot has been running for: {runtimeValue}",
-    "botInfo": "❀━【 {ownerEmoji} *{botName} MENU*{repoEmoji}*━━━ *╮*\n*❀* *Owner* : WHIZ\n*❀* *Mode* : Public\n*❀* *Prefix* : {prefix}\n*❀* *Commands* : {commandsCount}\n*❀* *Version* : {version}\n*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n*❀━━━━━━━━━━━━━╯*",
-    "versionInfo": "{botName} Version: {version}",
-    "playCommand": {
-      "noQuery": "⚠️ Please provide a song name or search query after the command. Example: `{prefix}play Never Gonna Give You Up`",
-      "searching": "🔎 Searching for \"{query}\"...",
-      "downloading": "📥 Downloading audio for \"{title}\"... Please wait.",
-      "notFound": "❓ Sorry, I couldn't find any results for \"{query}\".",
-      "downloadError": "❌ Oops! Something went wrong while downloading the audio for \"{title}\".",
-      "sendError": "❌ Failed to send the audio for \"{title}\"."
-    },
-    "ytmp3Command": {
-      "noUrl": "⚠️ Please provide a valid YouTube video URL after the command. Example: `{prefix}ytmp3 https://www.youtube.com/watch?v=dQw4w9WgXcQ`",
-      "invalidUrl": "🚫 The URL provided does not seem to be a valid YouTube video URL.",
-      "fetchingInfo": "ℹ️ Fetching video information...",
-      "downloading": "📥 Downloading MP3 for \"{title}\"... Please wait.",
-      "conversionError": "❌ Error converting audio to MP3 for \"{title}\".",
-      "downloadError": "❌ Oops! Something went wrong while downloading the MP3 for \"{title}\".",
-      "sendError": "❌ Failed to send the MP3 for \"{title}\"."
-    },
-    "ytmp4Command": {
-      "noUrl": "⚠️ Please provide a valid YouTube video URL after the command. Example: `{prefix}ytmp4 https://www.youtube.com/watch?v=dQw4w9WgXcQ`",
-      "invalidUrl": "🚫 The URL provided does not seem to be a valid YouTube video URL.",
-      "fetchingInfo": "ℹ️ Fetching video information...",
-      "downloading": "📥 Downloading MP4 for \"{title}\"... This may take a moment.",
-      "downloadError": "❌ Oops! Something went wrong while downloading the video \"{title}\".",
-      "sendError": "❌ Failed to send the video for \"{title}\"."
-    },
-    "lyricsCommand": {
-      "noQuery": "⚠️ Please provide a song name (and optionally artist) to search for lyrics. Example: `{prefix}lyrics Bohemian Rhapsody Queen`",
-      "searching": "🔎 Searching for lyrics for \"{query}\"...",
-      "notFound": "❓ Sorry, I couldn't find lyrics for \"{query}\". Please try being more specific or check the spelling.",
-      "fetchError": "❌ Oops! Something went wrong while trying to fetch the lyrics."
-    },
-    "placeholderCommand": {
-      "shazam": "🎵 The `.shazam` command is under development. It will allow identifying songs from audio replies. Requires API setup (e.g., ACRCloud).",
-      "pinterest": "🖼️ The `.pinterest` command to search for images is under development.",
-      "tiktok": "📹 The `.tiktok` command to download TikTok videos is under development. Direct downloads are challenging.",
-      "instagram": "📸 The `.instagram` command to download Instagram media is under development. Direct downloads are challenging.",
-      "facebook": "📘 The `.facebook` command to download Facebook videos is under development. Direct downloads are challenging.",
-      "spotify": "🎧 The `.spotify` command is under development. For now, you can search on Spotify directly: https://open.spotify.com/search/{query}",
-      "soundcloud": "☁️ The `.soundcloud` command is under development. For now, you can search on Soundcloud directly: https://soundcloud.com/search?q={query}",
-      "joox": "🎤 The `.joox` command is under development. For now, you can search on Joox directly."
-    },
-    "textEffectCommand": {
-      "noText": "⚠️ Please provide the text you want to stylize. Example: `{prefix}{commandName} Your Text Here`",
-      "generating": "🎨 Generating your \"{styleName}\" text image for \"{text}\"... Please wait.",
-      "apiError": "❌ Oops! Something went wrong while generating the text image. The API might be temporarily down or the effect unavailable.",
-      "downloadImageError": "❌ Failed to download the generated text image.",
-      "sendError": "❌ Failed to send the text image."
-    },
-    "textStylesList": "✨ Available Text Styles ✨\n\n{stylesList}\n\nUse `{prefix}[style_name] [your text]` to generate an image.",
-    "stickerCommand": {
-        "noMedia": "⚠️ Please reply to an image/GIF or send one with the command to create a sticker.",
-        "creating": "✨ Creating your sticker... Please wait.",
-        "error": "❌ Oops! Something went wrong while creating the sticker.",
-        "success": "✅ Sticker created!"
-    },
-    "toImgCommand": {
-        "noSticker": "⚠️ Please reply to a sticker message to convert it to an image.",
-        "converting": "🖼️ Converting sticker to image...",
-        "error": "❌ Failed to convert sticker to image."
-    },
-    "removeBgCommand": {
-        "noImage": "⚠️ Please reply to an image or send one with the command to remove its background.",
-        "noApiKey": "🔑 API key for background removal service is not set. Please contact the bot owner.",
-        "processing": "⏳ Removing background... This might take a moment.",
-        "apiError": "❌ Failed to remove background due to an API error. Please try again later.",
-        "downloadError": "❌ Failed to download the processed image.",
-        "error": "❌ Oops! Something went wrong during background removal."
-    },
-    "imageFilterCommand": {
-        "noImage": "⚠️ Please reply to an image or send one with the command to apply a filter.",
-        "applying": "🎨 Applying {filterName} filter...",
-        "error": "❌ Oops! Something went wrong while applying the {filterName} filter."
-    },
-    "wantedCommand": {
-        "noImage": "⚠️ Please reply to an image or send one with the command to create a wanted poster.",
-        "creating": "📜 Creating your wanted poster...",
-        "error": "❌ Oops! Something went wrong while creating the wanted poster."
-    },
-    "placeholderImageCommand": {
-        "triggered": "💥 The `.triggered` GIF generator is under development.",
-        "glitchimg": "👾 The `.glitchimg` effect generator is under development."
-    },
-    "calcCommand": {
-        "noExpression": "⚠️ Please provide a mathematical expression to calculate. Example: `{prefix}calc 2+2*10`",
-        "invalidExpression": "❌ Invalid mathematical expression. Please check your input.",
-        "result": "🧮 Result: `{result}`"
-    },
-    "qrCommand": {
-        "noText": "⚠️ Please provide text to generate a QR code. Example: `{prefix}qr Hello World`",
-        "generating": "🔄 Generating QR code for \"{text}\"...",
-        "error": "❌ Failed to generate QR code."
-    },
-    "wikiCommand": {
-        "noQuery": "⚠️ Please provide a search query for Wikipedia. Example: `{prefix}wiki Artificial Intelligence`",
-        "searching": "🔎 Searching Wikipedia for \"{query}\"...",
-        "notFound": "❓ Sorry, I couldn't find any Wikipedia results for \"{query}\".",
-        "apiError": "❌ Oops! Something went wrong while fetching data from Wikipedia.",
-        "summaryTitle": "📖 *{title}*\n\n{summary}\n\nRead more: {url}"
-    },
-    "translateCommand": {
-        "usage": "⚠️ Usage: `{prefix}translate <target_lang_code> <text>` or `{prefix}translate <text> to <target_lang_name/code>`.\nExample: `{prefix}translate es Hello World` or `{prefix}translate Hello World to Spanish`",
-        "translating": "🌐 Translating \"{text}\" to {language}...",
-        "error": "❌ Failed to translate text. Please check the language code/name or try again.",
-        "result": "📜 Translation ({language}):\n\n`{translatedText}`"
-    },
-    "weatherCommand": {
-        "noCity": "⚠️ Please provide a city name to get weather information. Example: `{prefix}weather London`",
-        "noApiKey": "🔑 API key for weather service is not set. Please contact the bot owner.",
-        "fetching": "🌦️ Fetching weather for \"{city}\"...",
-        "notFound": "❓ City \"{city}\" not found or no weather data available.",
-        "apiError": "❌ Oops! Something went wrong while fetching weather data.",
-        "result": "🌤️ *Weather in {city} ({country})*:\n\n🌡️ Temp: {temp}°C (Feels like: {feelsLike}°C)\n💧 Humidity: {humidity}%\n🌬️ Wind: {windSpeed} m/s {windDir}\n☁️ Condition: {description}\n🌅 Sunrise: {sunrise}\n🌇 Sunset: {sunset}"
-    },
-    "shortUrlCommand": {
-        "noUrl": "⚠️ Please provide a URL to shorten. Example: `{prefix}shorturl https://example.com/very/long/url`",
-        "invalidUrl": "🚫 The provided input is not a valid URL.",
-        "shortening": "🔗 Shortening URL...",
-        "error": "❌ Failed to shorten URL.",
-        "result": "✅ Shortened URL: {shortenedUrl}"
-    },
-    "ipCommand": {
-        "noQuery": "⚠️ Please provide an IP address or domain name. Example: `{prefix}ip google.com` or `{prefix}ip 8.8.8.8`",
-        "fetching": "🛰️ Fetching IP/domain information for \"{query}\"...",
-        "notFound": "❓ Information not found for \"{query}\". Please provide a valid IP or domain.",
-        "apiError": "❌ Oops! Something went wrong while fetching IP/domain data.",
-        "result": "💻 *IP/Domain Info for: {query}*\n\nIP: {ip}\nCountry: {country} ({countryCode})\nRegion: {regionName} ({region})\nCity: {city}\nZip: {zip}\nLat/Lon: {lat}, {lon}\nTimezone: {timezone}\nISP: {isp}\nOrg: {org}\nAS: {as}"
-    },
-    "dateTimeCommand": {
-        "serverTime": "🕰️ Current Server Time: `{time}`",
-        "serverDate": "📅 Current Server Date: `{date}`",
-        "utcTime": "🌍 Current UTC Time: `{time}`",
-        "utcDate": "🌍 Current UTC Date: `{date}`"
-    },
-    "speedtestCommand": {
-        "info": "💨 To test *your* internet speed, please visit a website like https://www.speedtest.net or https://fast.com.\nThis command, if fully implemented, would test the *server's* internet speed."
-    },
-    "memeCommand": {
-        "loading": "😂 Fetching a random meme...",
-        "error": "❌ Oops! Couldn't fetch a meme right now. Please try again later."
-    },
-    "jokeCommand": {
-        "loading": "😄 Getting a joke for you...",
-        "error": "❌ Failed to fetch a joke. The joke API might be down."
-    },
-    "quoteCommand": {
-        "loading": "📜 Fetching a wise quote...",
-        "error": "❌ Failed to fetch a quote."
-    },
-    "factCommand": {
-        "loading": "💡 Retrieving an interesting fact...",
-        "error": "❌ Failed to fetch a fact."
-    },
-    "eightBallCommand": {
-        "noQuestion": "🎱 You need to ask a question for the Magic 8-Ball to answer! Example: `{prefix}8ball Will it rain today?`",
-        "replyPrefix": "🎱 Magic 8-Ball says: "
-    },
-    "truthOrDareCommand": {
-        "truth": "🤔 Truth: {question}",
-        "dare": "😈 Dare: {challenge}",
-        "loadError": "❌ Failed to load truths/dares. Please contact the bot owner."
-    },
-    "interactiveCmd": {
-        "noMention": "⚠️ Please mention a user for this action! Example: `{prefix}{commandName} @user`",
-        "shipNoMention": "⚠️ Please mention one or two users to ship! Example: `{prefix}ship @user1 @user2` or `{prefix}ship @user1` (ships with you).",
-        "slap": "💥 {SENDER} slaps {MENTIONED_USER}!",
-        "hug": "🤗 {SENDER} gives {MENTIONED_USER} a big hug!",
-        "kiss": "😘 {SENDER} blows a kiss to {MENTIONED_USER}!",
-        "pat": "👋 {SENDER} gently pats {MENTIONED_USER}.",
-        "ship": "💞 Shipping {USER1} and {USER2}...\nCompatibility: {PERCENTAGE}% {HEART_EMOJI}"
-    },
-    "gameCommand": {
-        "alreadyPlaying": "⚠️ You are already in a game of {gameName} in this chat! Use `{prefix}{stopCommand}` to end it first.",
-        "notPlaying": "⚠️ You are not currently playing any game in this chat.",
-        "invalidMove": "❌ Invalid move or input. Please try again.",
-        "gameOver": "🎉 Game Over!",
-        "stopped": "🛑 Game stopped."
-    },
-    "rollCommand": {
-        "result": "🎲 You rolled: {rolls} (Total: {total})"
-    },
-    "guessGame": {
-        "start": "🔢 I've picked a number between 1 and {maxNumber}. Try to guess it! Use `{prefix}guess <your_guess>`.",
-        "tooHigh": "📉 Too high! Try a lower number.",
-        "tooLow": "📈 Too low! Try a higher number.",
-        "correct": "🎉 Congratulations! You guessed the number {number} in {attempts} attempts!",
-        "noActiveGame": "⚠️ No number guessing game active. Start one with `{prefix}guess start [max_number]`.",
-        "invalidGuess": "⚠️ Please enter a valid number as your guess.",
-        "stopped": "🛑 Number guessing game stopped. The number was {number}."
-    },
-    "riddleGame": {
-        "newRiddle": "🤔 Riddle Me This:\n\n{riddle}\n\nUse `{prefix}answer <your_answer>` to guess.",
-        "noActiveRiddle": "⚠️ There's no active riddle. Get one with `{prefix}riddle`.",
-        "correctAnswer": "✅ Correct! The answer was: {answer}",
-        "wrongAnswer": "❌ Nope, that's not it. Try again or get a new riddle!",
-        "showAnswer": "💡 The answer was: {answer}",
-        "loadError": "❌ Failed to load riddles. Please contact the bot owner."
-    },
-    "tttGame": {
-        "boardTitle": "Tic-Tac-Toe Board:",
-        "turn": "➡️ It's {player}'s turn ({symbol}). Move with `{prefix}ttt move <1-9>`.",
-        "playerWins": "🏆 Player {player} ({symbol}) wins!",
-        "botWins": "🤖 I win! Better luck next time!",
-        "draw": "🤝 It's a draw!",
-        "invalidCell": "❌ Invalid cell or cell already taken. Pick an empty cell (1-9).",
-        "notYourTurn": "⏳ It's not your turn!",
-        "gameStarted": "🎮 Tic-Tac-Toe game started! {player1} (X) vs {player2} (O).\n{currentPlayer}'s turn.",
-        "vsBot": "You are X, I am O.",
-        "needOpponent": "Waiting for an opponent to join or use `.ttt start` to play against the bot."
-    },
-    "hangmanGame": {
-        "start": "🪓 Let's play Hangman! The word has {length} letters.\n`{displayWord}`\nGuesses left: {guessesLeft}\nGuess a letter with `{prefix}hangman guess <letter>`.",
-        "guessCorrect": "✅ Good guess! `{displayWord}`\nGuesses left: {guessesLeft}. Guessed: {guessedLetters}",
-        "guessIncorrect": "❌ Wrong guess! `{displayWord}`\nGuesses left: {guessesLeft}. Guessed: {guessedLetters}",
-        "alreadyGuessed": "⚠️ You already guessed '{letter}'. Try another one. Guessed: {guessedLetters}",
-        "win": "🎉 You won! The word was: {word}",
-        "lose": "💀 Game Over! The word was: {word}",
-        "invalidLetter": "⚠️ Please guess a single letter.",
-        "loadError": "❌ Failed to load words for Hangman."
-    },
-    "slotMachine": {
-        "spinning": "🎰 Spinning the reels...",
-        "result": "{reels}\n\n{message}",
-        "win": "🎉 JACKPOT! You won!",
-        "near": "😮 So close!",
-        "lose": "💔 Better luck next time!"
-    },
-    "triviaGame": {
-        "newQuestion": "🧠 Trivia Time! Difficulty: {difficulty}\nCategory: {category}\n\n{question}\n\n{options}\n\nAnswer with `{prefix}answer <option_letter_or_number>`.",
-        "correct": "✅ Correct!",
-        "incorrect": "❌ Incorrect. The correct answer was: {correctAnswer}",
-        "outOfTime": "⏰ Time's up! The correct answer was: {correctAnswer}",
-        "finalScore": "🏁 Quiz Finished! Your final score: {score}/{totalQuestions}",
-        "noActiveQuestion": "⚠️ No active trivia question. Start a new game with `{prefix}trivia`.",
-        "loading": "🔄 Fetching a new trivia question...",
-        "apiError": "❌ Failed to fetch a trivia question from the API."
-    },
-    "placeholderGameCommand": {
-        "connect4": "🔵🔴 The Connect4 game is under development.",
-        "sudoku": "🔢 The Sudoku game is under development."
-    },
-    "groupCmd": {
-        "notGroup": "⚠️ This command can only be used in a group chat.",
-        "botNotAdmin": "🤖 I need to be an admin in this group to perform this action.",
-        "userNotAdmin": "🛡️ You need to be a group admin to use this command.",
-        "targetUserNotMember": "❓ The specified user is not a member of this group.",
-        "targetUserIsAdmin": "🛡️ The specified user is already an admin.",
-        "targetUserNotAdmin": "🤷 The specified user is not an admin.",
-        "noUserMentioned": "⚠️ Please mention a user or provide a valid number for this action.",
-        "invalidNumber": "⚠️ The provided number is invalid.",
-        "add": {
-            "success": "✅ Successfully added {userCount} user(s) to the group.",
-            "fail": "❌ Failed to add {userCount} user(s). They might have privacy settings enabled or the number is incorrect.",
-            "alreadyInGroup": "🤷 User {user} is already in this group."
-        },
-        "kick": {
-            "success": "✅ Successfully removed {user}.",
-            "fail": "❌ Failed to remove {user}. I might lack permissions over them or they are not in the group.",
-            "cannotKickSelf": "😂 You can't kick yourself!",
-            "cannotKickBot": "🤖 You can't make me kick myself!"
-        },
-        "promote": {
-            "success": "⬆️ Successfully promoted {user} to admin.",
-            "fail": "❌ Failed to promote {user}."
-        },
-        "demote": {
-            "success": "⬇️ Successfully demoted {user} from admin.",
-            "fail": "❌ Failed to demote {user}."
-        },
-        "link": {
-            "success": "🔗 Group Invite Link:\n{inviteLink}",
-            "fail": "❌ Failed to get group invite link. Make sure I am an admin."
-        },
-        "tagall": {
-            "header": "📢 Attention Everyone!"
-        },
-        "hidetag": {
-            "fail": "❌ Could not perform hidetag. Message content is required."
-        },
-        "mute": {
-            "success": "🔇 Group muted. Only admins can send messages now.",
-            "fail": "❌ Failed to mute group."
-        },
-        "unmute": {
-            "success": "🔊 Group unmuted. Everyone can send messages now.",
-            "fail": "❌ Failed to unmute group."
-        },
-        "setname": {
-            "noName": "⚠️ Please provide a new name for the group. Example: `{prefix}setname New Cool Group`",
-            "success": "📝 Group name changed to: {newName}",
-            "fail": "❌ Failed to change group name."
-        },
-        "setdesc": {
-            "noDesc": "⚠️ Please provide a new description for the group.",
-            "success": "📜 Group description updated!",
-            "fail": "❌ Failed to change group description."
-        },
-        "setpp": {
-            "noImage": "🖼️ Please reply to an image to set it as the group profile picture.",
-            "success": "🖼️ Group profile picture updated successfully!",
-            "fail": "❌ Failed to update group profile picture."
-        }
-    },
-    "ownerCmd": {
-        "unauthorized": "🚫 You are not authorized to use this command.",
-        "noTarget": "⚠️ Please mention a user or provide their number for this action.",
-        "userNotFound": "❓ User {targetUser} not found or invalid.",
-        "block": {
-            "success": "🚫 User {targetUser} has been blocked.",
-            "alreadyBlocked": "🚫 User {targetUser} is already blocked.",
-            "fail": "❌ Failed to block user {targetUser}."
-        },
-        "unblock": {
-            "success": "✅ User {targetUser} has been unblocked.",
-            "notBlocked": "🤷 User {targetUser} was not blocked.",
-            "fail": "❌ Failed to unblock user {targetUser}."
-        },
-        "broadcast": {
-            "noMessage": "⚠️ Please provide a message to broadcast.",
-            "start": "📢 Starting broadcast to {chatCount} chats... (This may take a while)",
-            "sentTo": "✔️ Sent to: {chatName}",
-            "failTo": "❌ Failed to send to: {chatName}",
-            "complete": "🏁 Broadcast complete. Sent to {successCount}/{totalCount} chats."
-        },
-        "shutdown": {
-            "confirm": "💤 Shutting down the bot...",
-            "error": "❌ Error during shutdown process."
-        },
-        "restart": {
-            "confirm": "🔄 Restarting the bot... I'll be back shortly!",
-            "error": "❌ Error initiating restart."
-        },
-        "eval": {
-            "noCode": "⚠️ Please provide code to evaluate.",
-            "resultPrefix": "💻 Eval Result:",
-            "errorPrefix": "🐞 Eval Error:"
-        },
-        "send": {
-            "noChatId": "⚠️ Please provide a Chat ID (e.g., number@c.us or groupid@g.us).",
-            "noMessage": "⚠️ Please provide a message to send.",
-            "invalidChatId": "❌ Invalid Chat ID: {chatId}",
-            "success": "✅ Message sent to {chatId}.",
-            "fail": "❌ Failed to send message to {chatId}."
-        },
-        "getSession": {
-            "warning": "🔒 *Security Warning!* Below is your session data. Keep it extremely confidential. Anyone with this data can take over your bot's WhatsApp session.",
-            "dataPrefix": "📄 Session Data (WHIZMD_SESSION_DATA content):",
-            "fail": "❌ Failed to retrieve session data."
-        }
-    },
-    "profileCmd": {
-        "loading": "👤 Fetching profile information...",
-        "notFound": "❓ Could not retrieve profile information for the specified user.",
-        "info": "👤 *Profile Info*\n\n*Name:* {name}\n*About:* {about}\n*Number:* {number}\n*Is Business:* {isBusiness}\n*Is Me:* {isMe}",
-        "noAbout": "🚫 No status/about set."
-    },
-    "numberInfoCmd": {
-        "noNumber": "⚠️ Please provide a phone number to check. Example: `{prefix}numberinfo 1234567890`",
-        "checking": "🔄 Checking number {number}...",
-        "registered": "✅ Number {number} is registered on WhatsApp.",
-        "notRegistered": "❌ Number {number} is not registered on WhatsApp.",
-        "error": "❓ Could not verify number {number}. It might be invalid or an error occurred.",
-        "disclaimer": "\n\n_Note: This check only confirms WhatsApp registration, not caller ID or other details._"
-    },
-    "githubCmd": {
-        "noQuery": "⚠️ Please provide a GitHub username or username/repo. Example: `{prefix}github octocat` or `{prefix}github octocat/Spoon-Knife`",
-        "loadingUser": "🐙 Fetching GitHub user profile for {username}...",
-        "loadingRepo": "📦 Fetching GitHub repository info for {repo}...",
-        "notFound": "❓ GitHub user or repository not found: {query}",
-        "apiError": "❌ Failed to fetch data from GitHub API.",
-        "userInfo": "👤 *GitHub User: {name}* ({login})\nBio: {bio}\nFollowers: {followers} | Following: {following}\nPublic Repos: {public_repos}\nProfile: {html_url}",
-        "repoInfo": "📦 *GitHub Repo: {full_name}*\nDescription: {description}\n⭐ Stars: {stargazers_count} |  Forks: {forks_count} | 👁️ Watchers: {watchers_count}\nLanguage: {language}\nLast Push: {pushed_at}\nURL: {html_url}"
-    },
-    "npmCmd": {
-        "noPackage": "⚠️ Please provide an npm package name. Example: `{prefix}npm whatsapp-web.js`",
-        "loading": "📦 Fetching npm package info for {packageName}...",
-        "notFound": "❓ Package \"{packageName}\" not found on npm.",
-        "apiError": "❌ Failed to fetch data from npm registry.",
-        "packageInfo": "📦 *Package: {name}* v{version}\nDescription: {description}\nAuthor: {author}\nLicense: {license}\nHomepage: {homepage}\nNPM: https://www.npmjs.com/package/{name}"
-    },
-    "animeCmd": {
-        "noQuery": "⚠️ Please provide an anime name to search. Example: `{prefix}anime Attack on Titan`",
-        "searching": "🎨 Searching for anime \"{query}\"...",
-        "notFound": "❓ Sorry, couldn't find any anime matching \"{query}\".",
-        "apiError": "❌ Failed to fetch data from anime API.",
-        "result": "🎬 *{title_english}* ({title_japanese})\n\n*Type:* {type} | *Episodes:* {episodes}\n*Status:* {status} | *Score:* {score} ⭐\n*Aired:* {aired_from} to {aired_to}\n*Synopsis:* {synopsis}\n\nMore Info: {url}"
-    },
-    "quoteImgCmd": {
-        "noText": "⚠️ Please provide text for the quote image, or reply to a message.",
-        "generating": "🖼️ Generating your quote image...",
-        "error": "❌ Failed to generate quote image."
-    },
-    "covidCmd": {
-        "fetchingGlobal": "🌍 Fetching global COVID-19 stats...",
-        "fetchingCountry": "🌍 Fetching COVID-19 stats for {country}...",
-        "notFound": "❓ Country \"{country}\" not found or no data available.",
-        "apiError": "❌ Failed to fetch COVID-19 data.",
-        "globalStats": "🌎 *Global COVID-19 Stats*\n\nCases: {cases}\nDeaths: {deaths}\nRecovered: {recovered}\nActive: {active}\nToday Cases: {todayCases}\nToday Deaths: {todayDeaths}\nUpdated: {updated}",
-        "countryStats": "🌍 *COVID-19 Stats for {country}*\n\nCases: {cases}\nDeaths: {deaths}\nRecovered: {recovered}\nActive: {active}\nCritical: {critical}\nToday Cases: {todayCases}\nToday Deaths: {todayDeaths}\nCases/Million: {casesPerOneMillion}\nDeaths/Million: {deathsPerOneMillion}\nUpdated: {updated}"
-    },
-    "statusSaveCmd": {
-        "notStatusReply": "⚠️ Please reply to a status with 'save' to download it.",
-        "notMediaStatus": "⚠️ The replied status does not seem to contain downloadable media.",
-        "saving": "📥 Saving status from {userName}...",
-        "success": "✅ Status saved and sent to your chat!",
-        "failDownload": "❌ Failed to download the status media.",
-        "failSend": "❌ Failed to send the saved status media to you.",
-        "caption": "Status from: {userName}\n\n{statusCaption}"
-    },
-    "autoViewCmd": {
-        "enabled": "👁️ Auto-viewing of statuses is now ON.",
-        "disabled": "🙈 Auto-viewing of statuses is now OFF.",
-        "status": "Auto-view is currently: {statusState}"
-    },
-    "autoReactCmd": {
-        "enabled": "💖 Auto-reacting to statuses is now ON.",
-        "disabled": "💔 Auto-reacting to statuses is now OFF.",
-        "status": "Auto-react is currently: {statusState}"
-    },
-    "setReactionsCmd": {
-        "success": "👍 Reaction emojis updated to: {emojis}",
-        "noEmojisProvided": "⚠️ No emojis provided. To clear, use `{prefix}setreactions clear`.",
-        "cleared": "🗑️ Reaction emoji list has been cleared. Auto-react will be ineffective until new emojis are set.",
-        "current": "Current reaction emojis: {emojis}\nUse `{prefix}setreactions <e1> <e2> ...` to change them, or `{prefix}setreactions clear` to remove all."
-    },
-    "aiImageCmd": {
-        "noApiKey": "🔑 OpenAI API key is not set. This command is unavailable. Please contact the bot owner.",
-        "noPrompt": "🖼️ Please provide a prompt to generate an image. Example: `{prefix}image A futuristic city skyline at sunset`",
-        "generating": "🎨 Generating image for prompt: \"{prompt}\"... This may take a moment.",
-        "apiError": "❌ Failed to generate image. The OpenAI API returned an error. (Details: {errorDetails})",
-        "contentPolicyViolation": "🚫 Your prompt may have violated the content policy. Please try a different prompt.",
-        "noResults": "🤷 No image was generated for your prompt. Please try a different or more specific prompt.",
-        "downloadError": "❌ Failed to download the generated image.",
-        "successCaption": "🖼️ AI Generated Image for: \"{prompt}\""
-    },
-    "vvCmd": {
-        "noReply": "⚠️ Please reply to a view-once message with `.vv` to save it.",
-        "notViewOnce": "⚠️ The replied message is not a view-once message.",
-        "saving": "📥 Saving view-once media from {userName}...",
-        "success": "✅ View-once media saved and sent to your chat!",
-        "fail": "❌ Failed to save the view-once media.",
-        "caption": "View-once media from: {userName}\n\n{originalCaption}"
-    },
-    "emojimixCmd": {
-        "usage": "⚠️ Please provide two emojis to mix. Example: `{prefix}emojimix 😂😭`",
-        "mixing": "🔄 Mixing {emoji1} + {emoji2}...",
-        "notFound": "❓ Sorry, I couldn't create a mix for {emoji1} and {emoji2}. Not all combinations are possible!",
-        "apiError": "❌ Failed to generate emoji mix. The API might be down or the combination is unsupported."
-    },
-    "logomakerCmd": {
-        "usage": "⚠️ Usage: `{prefix}logomaker <style_name> <text1> [| text2]` (Use '|' to separate text for multi-text logos). Example: `{prefix}logomaker neon MyLogo`",
-        "styleNotFound": "🎨 Style '{styleName}' not found. Use `{prefix}logostyles` to see available styles.",
-        "generating": "✨ Generating your '{styleName}' logo with text \"{text}\"...",
-        "apiError": "❌ Failed to generate logo. API error or invalid parameters for the style.",
-        "noText": "⚠️ Please provide text for the logo."
-    },
-    "qotdCmd": {
-        "loading": "📜 Fetching the Quote of the Day...",
-        "quoteFormat": "🌟 *Quote of the Day* 🌟\n\n\"_{quote}_\"\n\n— *{author}*",
-        "apiError": "❌ Failed to fetch the Quote of the Day."
-    },
-    "priorityViewCmd": {
-        "usage": "⚠️ Usage: `{prefix}priorityview <add|remove|list> [@user]`",
-        "added": "⭐ User {userName} added to priority view list.",
-        "removed": "🗑️ User {userName} removed from priority view list.",
-        "notFound": "❓ User {userName} not found in priority view list to remove.",
-        "listEmpty": "🗒️ Priority view list is currently empty.",
-        "listHeader": "⭐ Priority View List ({count} users):",
-        "listEntry": "➢ {userName} ({userId})",
-        "alreadyExists": "⚠️ User {userName} is already in the priority view list.",
-        "notInList": "⚠️ User {userName} was not found in the priority view list.",
-        "noUserMentioned": "⚠️ Please mention a user for 'add' or 'remove' actions."
-    },
-    "birthdayCmd": {
-        "usageSet": "🎂 Usage: `{prefix}birthday set DD/MM [@user_if_owner]` (e.g., `{prefix}birthday set 28/10`)",
-        "usageCheck": "🎂 Usage: `{prefix}birthday check [@user_optional]`",
-        "usageRemove": "🎂 Usage: `{prefix}birthday remove [@user_optional_if_owner]`",
-        "usageList": "🎂 Usage: `{prefix}birthday list`",
-        "setSuccess": "✅ Your birthday has been set to {date}!",
-        "setForUserSuccess": "✅ Birthday for {userName} has been set to {date}.",
-        "checkResult": "🎂 {userName}'s birthday is on {date}.",
-        "checkNotSet": "❓ {userName} has not set a birthday with me yet.",
-        "checkSelfNotSet": "❓ You haven't set your birthday with me yet. Use `{prefix}birthday set DD/MM`.",
-        "removedSuccess": "🗑️ Birthday for {userName} has been removed.",
-        "removeUserNotSet": "🤷 {userName} does not have a birthday set to remove.",
-        "removeSelfNotSet": "🤷 You don't have a birthday set to remove.",
-        "listHeaderGroup": "🎂 Birthdays Set in this Group:",
-        "listHeaderPm": "🎂 Your Registered Birthday:",
-        "listEntry": "➢ {userName}: {date}",
-        "listEmptyChat": "🤷 No birthdays have been set in this group yet.",
-        "listEmptyUser": "🤷 You haven't set your birthday yet.",
-        "invalidDate": "⚠️ Invalid date format. Please use DD/MM (e.g., 28/10).",
-        "notFound": "❓ User {userName} not found.",
-        "noUserMentioned": "⚠️ Please mention a user if you are the owner and setting/removing for someone else."
-    }
-  },
-  "menu": {
-    "title": "*❀━【 💎* _*{botName} MENU*━━━ *╮*",
-    "header": [
-      "*❀* *Owner* : WHIZ",
-      "*❀* *Mode* : Public",
-      "*❀* *Prefix* : {prefix}",
-      "*❀* *Commands* : {commandCount}",
-      "*❀* *Version* : {version}",
-      "*❀* *Repo* : github.com/whizmburu/WHIZ‑MD"
-    ],
-    "headerEnd": "*❀━━━━━━━━━━━━━╯*",
-    "instructions": [
-      "*❀* _Type_ `{prefix}help [command]` _for command details_",
-      "*❀* _Type_ `{prefix}menu` _for the full command list (this message)_"
-    ],
-    "sectionSeparator": "*❀━━━━━━━━━━━━❀*",
-    "commandFormat": "*❀* ┃ *{commandName}*",
-    "sectionTitleFormat": "*❀* ✦✦✦ *{sectionTitle}* ✦✦✦",
-    "sections": [
-      {
-        "title": "📁 MEDIA TOOLS",
-        "commands": ["Play", "Ytmp3", "Ytmp4", "Tiktok", "Instagram", "Facebook", "Spotify", "Soundcloud", "Joox", "Pinterest", "Shazam", "Lyrics"]
-      },
-      {
-        "title": "🎨 TEXT IMAGE STYLES",
-        "commands": ["Steel", "Wood", "Fire", "Ice", "Neon", "Splash", "Glitchtxt", "Gradient", "Comic", "Textstyles"]
-      },
-      {
-        "title": "📷 IMAGE TOOLS",
-        "commands": ["Sticker", "Toimg", "Removebg", "Blur", "Invert", "Circle", "Sepia", "Triggered", "Glitchimg", "Wanted", "Ocr"]
-      },
-      {
-        "title": "🔧 UTILITIES & LOOKUP",
-        "commands": ["Wiki", "Translate", "Weather", "Time", "Date", "Calc", "Shorturl", "Ip", "Qr", "Ping", "Speedtest"]
-      },
-      {
-        "title": "🎭 FUN & TEXT GAMES",
-        "commands": ["Meme", "Joke", "Quote", "Fact", "8ball", "Truth", "Dare", "Ship", "Slap", "Hug", "Kiss", "Pat"]
-      },
-      {
-        "title": "🎮 INTERACTIVE GAMES",
-        "commands": ["Ttt", "Connect4", "Guess", "Sudoku", "Trivia", "Hangman", "Riddle", "Slot", "Roll", "Quiz"]
-      },
-      {
-        "title": "👥 GROUP TOOLS",
-        "commands": ["Add", "Kick", "Promote", "Demote", "Link", "Tagall", "Hidetag", "Mute", "Unmute", "Setname", "Setdesc", "Setpp"]
-      },
-      {
-        "title": "🧑‍💻 OWNER CONTROLS",
-        "commands": ["Block", "Unblock", "Broadcast", "Shutdown", "Restart", "Eval", "Send", "Getsession"]
-      },
-      {
-        "title": "📊 INFO & FETCHERS",
-        "commands": ["Profile", "Numberinfo", "Github", "Npm", "Anime", "Quoteimg", "Iplookup", "Covid"]
-      },
-      {
-        "title": "💡 AI & PROMPT TOOLS",
-        "commands": ["Chatgpt", "Bard", "Openai", "Dalle", "Image", "Caption", "Nameart", "Imgprompt"]
-      },
-      {
-        "title": "🧪 STATUS & EXTRAS",
-        "commands": ["Vv", "Emojimix", "Logomaker", "Qotd", "Birthday", "Autoreact", "Autoview", "Setreactions", "Priorityview", "Save"]
-      },
-      {
-        "title": "📋 BOT SYSTEM",
-        "commands": ["Menu", "Help", "Status", "Ping", "Runtime", "Info", "Version"]
-      }
-    ],
-    "footer": "https://chat.whatsapp.com/JLmSbTfqf4I2Kh4SNJcWgM",
-    "footerEnd": "*❀━━━━━━━━━━━━━━╯*"
-  }
+  "BOT_HEADER": "❀━━━━━━━━━━━━━━━━━━━━━❀\n✨ *WHIZ‑MD* ✨\n❀━━━━━━━━━━━━━━━━━━━━━❀",
+  "MENU_HEADER": "❀━【 💎* _WHIZ‑MD MENU_━━━ *╮\n*❀* *Owner* : WHIZ\n*❀* *Mode* : Public\n*❀* *Prefix* : .\n*❀* *Commands* : 119\n*❀* *Version* : 1.0.0\n*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n*❀━━━━━━━━━━━━━╯",
+  "MENU_FOOTER": "*❀* _Type_ `.help [command]` _for command details_\n*❀* _Type_ `.menu` _for the full command list (this message)_",
+  "SECTION_DIVIDER": "❀━━━━━━━━━━━━❀",
+  "WELCOME_MSG_1": "❀━━━━━━━━━━━━❀\n❀ *WHIZ-MD* is now Live🌀\n❀ Welcome and Enjoy\n❀ Repo : github.com/whizmburu/whiz-md\n❀ Owner : https://wa.me/254754783683\n❀ *_Kindly Fork me, it means a lot_*\n❀━━━━━━━━━━━━❀",
+  "CMD_NOT_FOUND": "❓ Command not found. Type `.menu` to see all available commands.",
+  "PING_REPLY": "Pong!  latency: {latency}ms",
+  "STATUS_MSG": "❀ *WHIZ‑MD Status* ❀\n*Mode*: {mode}\n*Uptime*: {uptime}\n*Commands*: {commandCount}\n*Prefix*: {prefix}\n*Version*: {version}",
+  "RUNTIME_MSG": "🕒 Bot has been running for: {runtime}",
+  "INFO_MSG": "❀━【 💎* _WHIZ‑MD INFO_━━━ *╮\n*❀* *Owner* : WHIZ\n*❀* *Mode* : Public\n*❀* *Prefix* : .\n*❀* *Commands* : 119\n*❀* *Version* : 1.0.0\n*❀* *Repo* : github.com/whizmburu/WHIZ‑MD\n*❀━━━━━━━━━━━━━╯",
+  "VERSION_MSG": "⚙️ WHIZ-MD Version: {version}",
+  "HELP_MSG_GENERAL": "{menuHeader}\n\n{menuBody}\n\n{menuFooter}",
+  "HELP_MSG_SPECIFIC": "❀ *Help for `.{commandName}`* ❀\n{description}\n*Usage*: `.{usage}`\n*Example*: `.{example}`",
+  "PLAY_SEARCHING": "Searching for \"{query}\" on YouTube...",
+  "PLAY_DOWNLOADING": "Downloading and converting \"{title}\"...",
+  "PLAY_SENDING": "Sending \"{title}\"...",
+  "PLAY_NOT_FOUND": "Could not find any video for \"{query}\".",
+  "PLAY_ERROR": "Error playing song: {error}",
+  "YTMP3_DOWNLOADING": "Downloading MP3 for \"{title}\"...",
+  "YTMP3_SENDING": "Sending MP3 \"{title}\"...",
+  "YTMP3_ERROR": "Error downloading MP3: {error}",
+  "YTMP4_DOWNLOADING": "Downloading MP4 for \"{title}\"...",
+  "YTMP4_SENDING": "Sending MP4 \"{title}\"...",
+  "YTMP4_ERROR": "Error downloading MP4: {error}",
+  "LYRICS_SEARCHING": "Searching for lyrics for \"{query}\"...",
+  "LYRICS_FOUND": "🎶 Lyrics for *{title}* by *{artist}*\n\n{lyrics}",
+  "LYRICS_NOT_FOUND": "Could not find lyrics for \"{query}\".",
+  "LYRICS_ERROR": "Error fetching lyrics: {error}",
+  "TEXT_EFFECT_GENERATING": "Generating your text effect...",
+  "TEXT_EFFECT_ERROR": "Could not generate the text effect: {error}",
+  "TEXT_STYLES_AVAILABLE": "Available text styles: {styles}",
+  "STICKER_CREATING": "Creating your sticker...",
+  "STICKER_ERROR": "Error creating sticker: {error}",
+  "TOIMG_CONVERTING": "Converting sticker to image...",
+  "TOIMG_ERROR": "Error converting sticker to image: {error}",
+  "REMOVEBG_PROCESSING": "Removing background...",
+  "REMOVEBG_ERROR": "Error removing background: {error}. Ensure API key is valid and you have credits.",
+  "REMOVEBG_NO_KEY": "RemoveBG API key not set. Please set REMOVEBG_API_KEY in .env",
+  "IMAGE_FILTER_APPLYING": "Applying {filter} filter...",
+  "IMAGE_FILTER_ERROR": "Error applying {filter} filter: {error}",
+  "WANTED_PROCESSING": "Creating wanted poster...",
+  "WANTED_ERROR": "Error creating wanted poster: {error}",
+  "WANTED_TEMPLATE_MISSING": "Wanted template missing. Cannot create poster.",
+  "CALC_RESULT": "🧮 Result: {result}",
+  "CALC_ERROR": "Error in calculation: {error}",
+  "QR_GENERATING": "Generating QR code...",
+  "QR_ERROR": "Error generating QR code: {error}",
+  "WIKI_SEARCHING": "Searching Wikipedia for \"{query}\"...",
+  "WIKI_FOUND": "📚 *{title}*\n\n{extract}\n\n*URL*: {url}",
+  "WIKI_NOT_FOUND": "Could not find anything on Wikipedia for \"{query}\".",
+  "WIKI_ERROR": "Error fetching from Wikipedia: {error}",
+  "TRANSLATE_TRANSLATING": "Translating to {lang}...",
+  "TRANSLATE_RESULT": "🌐 *Translation*: {translation}",
+  "TRANSLATE_ERROR": "Error translating: {error}",
+  "WEATHER_FETCHING": "Fetching weather for {city}...",
+  "WEATHER_RESULT": "🌤️ *Weather in {name}, {country}*:\nTemperature: {temp}°C (feels like {feels_like}°C)\nCondition: {description}\nHumidity: {humidity}%\nWind: {wind_speed} m/s",
+  "WEATHER_ERROR": "Error fetching weather: {error}. Ensure API key is valid.",
+  "WEATHER_NO_KEY": "OpenWeatherMap API key not set. Please set OPENWEATHERMAP_API_KEY in .env",
+  "SHORTURL_CREATING": "Shortening URL...",
+  "SHORTURL_RESULT": "🔗 Short URL: {shortUrl}",
+  "SHORTURL_ERROR": "Error shortening URL: {error}",
+  "IP_LOOKUP_FETCHING": "Looking up IP/domain {query}...",
+  "IP_LOOKUP_RESULT": "🔍 *IP Lookup for {query}*:\nIP: {ip}\nCountry: {country}\nCity: {city}\nISP: {isp}",
+  "IP_LOOKUP_ERROR": "Error looking up IP: {error}",
+  "TIME_UTC": "🕒 Current UTC time: {time}",
+  "DATE_TODAY": "📅 Today's date (Server): {date}",
+  "SPEEDTEST_MSG": "To test your internet speed, please visit:\n- fast.com\n- speedtest.net",
+  "JOKE_FETCHING": "Fetching a joke...",
+  "JOKE_DELIVERY": "{joke}",
+  "JOKE_ERROR": "Couldn't fetch a joke right now.",
+  "QUOTE_FETCHING": "Fetching a quote...",
+  "QUOTE_DELIVERY": "✒️ \"{content}\" - *{author}*",
+  "QUOTE_ERROR": "Couldn't fetch a quote right now.",
+  "FACT_FETCHING": "Fetching a fun fact...",
+  "FACT_DELIVERY": "💡 Did you know? {fact}",
+  "FACT_ERROR": "Couldn't fetch a fact right now.",
+  "MEME_FETCHING": "Fetching a meme...",
+  "MEME_ERROR": "Couldn't fetch a meme right now.",
+  "EIGHTBALL_THINKING": "🎱 Thinking...",
+  "EIGHTBALL_RESPONSE": "🎱 {response}",
+  "TRUTH_QUESTION": "❓ Truth: {truth}",
+  "DARE_CHALLENGE": "🔥 Dare: {dare}",
+  "NO_TRUTHS_DARES": "No truths/dares found in the data files.",
+  "SHIP_RESULT": "💖 Compatibility of {user1} and {user2}: {percentage}% {emoji}\n{message}",
+  "SLAP_ACTION": "{user1} slaps {user2} {adv} with a {item}! {emoji}",
+  "HUG_ACTION": "{user1} gives {user2} a warm hug! 🤗",
+  "KISS_ACTION": "{user1} gives {user2} a sweet kiss! 😘",
+  "PAT_ACTION": "{user1} gently pats {user2}! 😊",
+  "ROLL_RESULT": "🎲 You rolled: {results} (Total: {total})",
+  "ROLL_INVALID": "Invalid dice notation. Example: `.roll 2d6` or `.roll d20`",
+  "GUESS_START": "🤔 I've picked a number between 1 and 100. Try to guess it! Use `.guess <number>`.",
+  "GUESS_TOO_HIGH": "Too high! Try again.",
+  "GUESS_TOO_LOW": "Too low! Try again.",
+  "GUESS_CORRECT": "🎉 Correct! The number was {number}. You guessed it in {attempts} attempts.",
+  "GUESS_NO_GAME": "No guessing game in progress. Start one with `.guess`.",
+  "GUESS_ALREADY_STARTED": "A game is already in progress! Guess the number.",
+  "RIDDLE_NEW": "❓ Here's a riddle for you:\n\n{riddle}\n\nReply with `.answer <your_answer>`",
+  "RIDDLE_CORRECT": "✅ That's correct!",
+  "RIDDLE_INCORRECT": "❌ Wrong answer. Try again!",
+  "RIDDLE_NO_GAME": "No riddle active. Start one with `.riddle`.",
+  "RIDDLE_NO_ANSWER_PROVIDED": "Please provide an answer with `.answer <your_answer>`.",
+  "RIDDLE_DATA_ERROR": "Could not load riddles.",
+  "TTT_START_PVB": "❌⭕ Tic-Tac-Toe vs Bot! You are X. Board:\n{board}\nUse `.ttt <row> <col>` (e.g., `.ttt 1 1`)",
+  "TTT_START_PVP": "❌⭕ Tic-Tac-Toe! {player1} (X) vs {player2} (O). {player1}, it's your turn. Board:\n{board}\nUse `.ttt <row> <col>`",
+  "TTT_INVALID_MOVE": "Invalid move. Cell occupied or out of bounds.",
+  "TTT_NOT_YOUR_TURN": "It's not your turn!",
+  "TTT_MOVE_SUCCESS": "Move accepted. Board:\n{board}",
+  "TTT_WIN": "🎉 {player} wins! Board:\n{board}",
+  "TTT_DRAW": "🤝 It's a draw! Board:\n{board}",
+  "TTT_GAME_NOT_FOUND": "No Tic-Tac-Toe game in progress with you or in this chat.",
+  "TTT_ALREADY_IN_GAME": "You or this chat is already in a Tic-Tac-Toe game.",
+  "TTT_USAGE": "Usage: `.ttt` (start vs Bot), `.ttt @user` (start vs Player), or `.ttt <row> <col>` (make a move).",
+  "HANGMAN_START": "🪢 Hangman started! Word: `{displayWord}`. You have {guessesLeft} guesses left. Use `.hangman <letter>`.",
+  "HANGMAN_GUESS_CORRECT": "✅ Correct! Word: `{displayWord}`. Guesses left: {guessesLeft}.",
+  "HANGMAN_GUESS_INCORRECT": "❌ Incorrect! Word: `{displayWord}`. Guesses left: {guessesLeft}. Wrong guesses: {wrongLetters}",
+  "HANGMAN_WIN": "🎉 You won! The word was `{word}`.",
+  "HANGMAN_LOSE": "💀 You lost! The word was `{word}`.",
+  "HANGMAN_ALREADY_GUESSED": "You already guessed that letter.",
+  "HANGMAN_INVALID_GUESS": "Invalid guess. Please enter a single letter.",
+  "HANGMAN_NO_GAME": "No Hangman game in progress. Start one with `.hangman`.",
+  "HANGMAN_ALREADY_STARTED": "A Hangman game is already in progress.",
+  "HANGMAN_DATA_ERROR": "Could not load words for Hangman.",
+  "SLOT_STARTING": "🎰 Spinning the slots...",
+  "SLOT_RESULT": "{reels}\n{message}",
+  "SLOT_JACKPOT": "💰💰💰 JACKPOT! You won big!",
+  "SLOT_WIN_BIG": "🎉🎉 Big Win!",
+  "SLOT_WIN_SMALL": "🎊 Small Win!",
+  "SLOT_LOSE": "💔 No win this time. Better luck next spin!",
+  "TRIVIA_QUESTION": "🧠 Trivia Time! Category: {category} ({difficulty})\n\n{question}\n\nOptions:\n{options}\n\nUse `.answer <option_number>`",
+  "TRIVIA_CORRECT": "✅ Correct! The answer was: {correctAnswer}",
+  "TRIVIA_INCORRECT": "❌ Incorrect! The correct answer was: {correctAnswer}",
+  "TRIVIA_NO_GAME": "No trivia question active. Start one with `.trivia`.",
+  "TRIVIA_ERROR": "Could not fetch a trivia question.",
+  "TRIVIA_ANSWER_INVALID": "Invalid answer format. Use `.answer <option_number>`.",
+  "GROUP_ADD_SUCCESS": "✅ Added @{user} to the group.",
+  "GROUP_ADD_FAIL": "❌ Failed to add @{user}. They might have blocked the bot or have privacy settings.",
+  "GROUP_ADD_ALREADY_MEMBER": "@User is already a member.",
+  "GROUP_KICK_SUCCESS": "✅ Kicked @{user} from the group.",
+  "GROUP_KICK_FAIL": "❌ Failed to kick @{user}.",
+  "GROUP_PROMOTE_SUCCESS": "⬆️ Promoted @{user} to admin.",
+  "GROUP_PROMOTE_FAIL": "❌ Failed to promote @{user}.",
+  "GROUP_DEMOTE_SUCCESS": "⬇️ Demoted @{user} from admin.",
+  "GROUP_DEMOTE_FAIL": "❌ Failed to demote @{user}.",
+  "GROUP_LINK_SUCCESS": "🔗 Group Invite Link: {link}",
+  "GROUP_TAGALL_PING": "📢 Paging all members: {mentions}",
+  "GROUP_HIDETAG_PING": "{message}",
+  "GROUP_MUTE_SUCCESS": "🔇 Group chat muted.",
+  "GROUP_UNMUTE_SUCCESS": "🔊 Group chat unmuted.",
+  "GROUP_SETNAME_SUCCESS": "📝 Group name changed to: {name}",
+  "GROUP_SETDESC_SUCCESS": "📄 Group description updated.",
+  "GROUP_SETPP_SUCCESS": "🖼️ Group profile picture updated.",
+  "GROUP_ACTION_NOT_ADMIN": "Bot is not an admin in this group.",
+  "GROUP_ACTION_USER_NOT_FOUND": "User not found in this group.",
+  "GROUP_ACTION_PERMISSION_DENIED": "You do not have permission to do that.",
+  "GROUP_ACTION_ERROR": "An error occurred: {error}",
+  "OWNER_BLOCK_SUCCESS": "🚫 Blocked @{user}.",
+  "OWNER_BLOCK_FAIL": "❌ Failed to block @{user}.",
+  "OWNER_UNBLOCK_SUCCESS": "✅ Unblocked @{user}.",
+  "OWNER_UNBLOCK_FAIL": "❌ Failed to unblock @{user}.",
+  "OWNER_BROADCAST_SENDING": "📣 Broadcasting message to {count} chats...",
+  "OWNER_BROADCAST_COMPLETE": "Broadcast complete.",
+  "OWNER_BROADCAST_NO_MESSAGE": "Please provide a message to broadcast.",
+  "OWNER_SHUTDOWN": "💤 Shutting down bot...",
+  "OWNER_RESTART": "🔄 Restarting bot...",
+  "OWNER_EVAL_RESULT": "💻 Eval Result:\n```\n{result}\n```",
+  "OWNER_EVAL_ERROR": "⌨️ Eval Error:\n```\n{error}\n```",
+  "OWNER_SEND_SUCCESS": "✉️ Message sent to {chatId}.",
+  "OWNER_SEND_FAIL": "❌ Failed to send message to {chatId}.",
+  "OWNER_GETSESSION_MSG": "🔑 Your WHIZMD_SESSION_DATA:\n\n`{sessionData}`\n\nSave this securely!",
+  "OWNER_CMD_NOT_OWNER": "⛔ This command can only be used by the bot owner.",
+  "PROFILE_INFO": "👤 *Profile for {name}* (@{pushname})\nNumber: {number}\nAbout: {about}\nAdmin: {isAdmin}",
+  "PROFILE_INFO_NO_MENTION": "👤 *Your Profile*\nName: {name} (@{pushname})\nNumber: {number}\nAbout: {about}",
+  "PROFILE_PIC_CAPTION": "🖼️ Profile picture of {name}",
+  "PROFILE_ERROR": "Could not fetch profile information.",
+  "NUMBERINFO_RESULT": "📞 Info for *{number}*:\nStatus: {status}\nIs Business: {isBusiness}\nCan Receive Messages: {canReceiveMessage}",
+  "NUMBERINFO_INVALID": "Invalid number format. Please provide a full number with country code.",
+  "NUMBERINFO_ERROR": "Error fetching number info.",
+  "GITHUB_USER_INFO": "🐙 *GitHub User: {login}*\nName: {name}\nBio: {bio}\nFollowers: {followers} | Following: {following}\nPublic Repos: {public_repos}\nURL: {html_url}",
+  "GITHUB_REPO_INFO": "📦 *GitHub Repo: {full_name}*\nDescription: {description}\nStars: {stargazers_count} | Forks: {forks_count}\nLanguage: {language}\nURL: {html_url}",
+  "GITHUB_NOT_FOUND": "Could not find GitHub user or repository: {query}",
+  "GITHUB_ERROR": "Error fetching from GitHub API.",
+  "NPM_PACKAGE_INFO": "📦 *NPM Package: {name}*\nVersion: {version}\nDescription: {description}\nLicense: {license}\nKeywords: {keywords}\nURL: {npmLink}",
+  "NPM_NOT_FOUND": "Could not find NPM package: {query}",
+  "NPM_ERROR": "Error fetching from NPM API.",
+  "ANIME_SEARCHING": "Searching for anime \"{query}\"...",
+  "ANIME_RESULT": "📺 *{title_english}* ({title_japanese})\nType: {type} | Episodes: {episodes} | Score: {score}\nSynopsis: {synopsis}\nURL: {url}",
+  "ANIME_NOT_FOUND": "Could not find anime: {query}",
+  "ANIME_ERROR": "Error fetching from Jikan API.",
+  "QUOTEIMG_GENERATING": "Generating quote image...",
+  "QUOTEIMG_ERROR": "Error generating quote image.",
+  "COVID_GLOBAL_STATS": "🌍 *Global COVID-19 Stats*:\nCases: {cases}\nDeaths: {deaths}\nRecovered: {recovered}",
+  "COVID_COUNTRY_STATS": "🌎 *COVID-19 Stats for {country}*:\nCases: {cases}\nToday: {todayCases}\nDeaths: {deaths}\nToday: {todayDeaths}\nRecovered: {recovered}\nActive: {active}",
+  "COVID_NOT_FOUND": "Could not find COVID-19 data for {country}.",
+  "COVID_ERROR": "Error fetching COVID-19 data.",
+  "AUTOREACT_ENABLED": "❤️ Auto-react enabled with: {emojis}",
+  "AUTOREACT_DISABLED": "💔 Auto-react disabled.",
+  "AUTOREACT_STATUS_ENABLED": "❤️ Auto-react is ON. Emojis: {emojis}",
+  "AUTOREACT_STATUS_DISABLED": "💔 Auto-react is OFF.",
+  "AUTOREACT_SET_SUCCESS": "👍 Auto-reaction emojis set to: {emojis}",
+  "AUTOREACT_CLEARED": "🗑️ Auto-reaction emojis cleared. Auto-react disabled.",
+  "AUTOREACT_USAGE": "Usage: `.autoreact on/off/status` or `.setreactions 😂 ❤️ 👍` or `.setreactions clear`",
+  "AUTOVIEW_ENABLED": "👁️ Auto-view enabled.",
+  "AUTOVIEW_DISABLED": "🙈 Auto-view disabled.",
+  "AUTOVIEW_STATUS_ENABLED": "👁️ Auto-view is ON.",
+  "AUTOVIEW_STATUS_DISABLED": "🙈 Auto-view is OFF.",
+  "STATUS_SAVE_SUCCESS": "💾 Status saved successfully!",
+  "STATUS_SAVE_TEXT": "📝 Status text saved:\n\n{text}",
+  "STATUS_SAVE_FAIL": "❌ Failed to save status.",
+  "REPO_MSG": "📚 Find the bot's source code and contribute at: github.com/whizmburu/WHIZ-MD"
 }
-
-[end of Themes/WHIZ.json]
-
-[end of Themes/WHIZ.json]

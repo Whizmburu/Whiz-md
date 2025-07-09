@@ -369,6 +369,15 @@
 - [X] **Integrate `.image` Command Handler into `index.js`:**
     - [X] Imported and routed `.image` (and alias `.dalle`) command.
 
+## Mini-Phase 12.5: Puppeteer Fix & `.repo` Command
+- [X] **Address Puppeteer Startup Issue:**
+    - [X] Modified Puppeteer config in `index.js` with commented-out `executablePath` and guidance for Windows.
+    - [X] Created `TROUBLESHOOTING.md` with detailed Puppeteer solutions.
+- [X] **Implement `.repo` Command:**
+    - [X] Added theming for `.repo` to `Themes/WHIZ.json`.
+    - [X] Implemented the `.repo` command in `index.js` to display the repository link.
+    - [X] Integrated the `.repo` command handler into `index.js`.
+
 ## Future Phases (To be detailed)
 - AI & Prompt Tools (Part 2: ChatGPT/Bard, Caption, Nameart, Imgprompt)
 - Final review of all commands, AGENTS.md, README.md.
