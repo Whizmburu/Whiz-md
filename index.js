@@ -143,7 +143,7 @@ theme.emojis.owner = theme.emojis.owner || "👑";
 
 // Ensure theme.menu and its properties exist for command counting and menu generation
 if (!theme.menu || typeof theme.menu !== 'object') {
-    theme.menu = { sections: [] };
+    theme.menu = { sections: [] }; 
     console.warn("Warning: theme.menu was not defined. Menu functionality will be limited.");
 }
 if (!theme.menu.sections || !Array.isArray(theme.menu.sections)) {
@@ -178,7 +178,7 @@ const sessionDataEnv = process.env.WHIZMD_SESSION_DATA;
 
 // This check MUST happen AFTER theme (and its fallbacks) are initialized.
 if (!sessionDataEnv || !sessionDataEnv.startsWith('WHIZMD_')) {
-    console.error(theme.messages.startupErrorNoSession);
+    console.error(theme.messages.startupErrorNoSession); 
     process.exit(1);
 }
 
@@ -255,7 +255,7 @@ function getFullMenuText() {
     const defaultFooterEnd = "*❀━━━━━━━━━━━━━━╯*";
 
     if (!menuConfig || !menuConfig.sections || !Array.isArray(menuConfig.sections)) {
-        let header = (theme.MENU_HEADER || defaultTitle)
+        let header = (theme.MENU_HEADER || defaultTitle) 
             .replace('{commandCount}', totalCommandCount)
             .replace('{version}', theme.version || '1.0.0')
             .replace('{repoLink}', theme.repoLink || "N/A")
@@ -297,7 +297,7 @@ function getFullMenuText() {
             });
         }
     });
-    menuText += `${menuConfig.sectionSeparator || defaultSectionSeparator}\n`;
+    menuText += `${menuConfig.sectionSeparator || defaultSectionSeparator}\n`; 
 
     if (menuConfig.footer && Array.isArray(menuConfig.footer)) {
         menuConfig.footer.forEach(line => {
@@ -305,7 +305,7 @@ function getFullMenuText() {
         });
     }
     menuText += `${menuConfig.footerEnd || defaultFooterEnd}`;
-
+    
     const signature = (theme.signatures && theme.signatures.textOnlyAppend) || `\n\n*~ Powered by ${theme.botName || 'WHIZ-MD'} ~*`;
     return `${menuText.trim()}${signature}`;
 }
@@ -430,13 +430,13 @@ client.on('ready', async () => {
                 .replace('{liveEmoji}', (theme.emojis && theme.emojis.live) || '🌀')
                 .replace('{welcomeEmoji}', (theme.emojis && theme.emojis.welcome) || '👋')
                 .replace('{forkEmoji}', (theme.emojis && theme.emojis.fork) || '🙏');
-
+            
             await sendSignedMessage(client, selfChatId, welcomeMsg1.trim(), theme);
             console.log("Welcome message 1 sent to self chat.");
 
             let menuHeaderText = (theme.messages && theme.messages.welcomeMessage2Prefix) ? theme.messages.welcomeMessage2Prefix : defaultWelcomeMessage2Prefix;
             const fullMenu = getFullMenuText();
-
+            
             await sendSignedMessage(client, selfChatId, `${menuHeaderText}\n\n${fullMenu.trim()}`, theme);
             console.log("Welcome message 2 (menu) sent to self chat.");
         } catch (error) {
@@ -626,7 +626,7 @@ client.on('message', async (msg) => {
         }
         return;
     }
-
+    
     // Fallback for unknown commands (if not caught by the simplified router above)
     let cmdNotFoundMsg = (theme.messages && theme.messages.commandNotFound) || "❌ Command `{cmd}` not found. Type `{prefix}help`.".replace('{cmd}', commandName);
     cmdNotFoundMsg = cmdNotFoundMsg.replace(/{prefix}/g, botPrefix);
@@ -637,11 +637,11 @@ client.on('message', async (msg) => {
     if (msg.from === 'status@broadcast' && msg.author && msg.author !== client.info.wid._serialized) {
         const statusAuthorId = msg.author;
         if (autoViewEnabled) {
-            try { await client.sendSeen(statusAuthorId); }
+            try { await client.sendSeen(statusAuthorId); } 
             catch (viewError) { console.error(`Failed to autoview status from ${statusAuthorId}:`, viewError.message); }
         }
         if (autoReactEnabled && autoReactionEmojis.length > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500));
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500)); 
             try {
                 const randomReaction = autoReactionEmojis[Math.floor(Math.random() * autoReactionEmojis.length)];
                 await msg.react(randomReaction);
